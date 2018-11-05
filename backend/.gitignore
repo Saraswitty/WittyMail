@@ -1,2 +1,5 @@
 # Python Virtual Environment directory
 ve/
+
+# WittyMail log file
+**/wittymail_log.txt
