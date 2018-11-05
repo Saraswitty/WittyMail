@@ -3,10 +3,11 @@
 
 import os, sys
 sys.path.insert(0, os.path.abspath('..'))
-import time, webbrowser, threading, traceback
 
+# This should be the first import to bootstrap the runtime env
 import util.bootstrap
 
+import time, webbrowser, threading, traceback
 import util.logger as logger
 
 _logger = logger.get_logger(__name__)
@@ -20,10 +21,12 @@ def parse_cmd_args():
     parser.add_argument("--version", "-v", action = 'version', version = pretty_version)
     parser.add_argument("--skip-opening-browser", "-s", action='store_true', default=False, help = 'Do not automatically open a browser window (only serve REST API)')
     args = parser.parse_args()
+
     _logger.debug("CLI args: %s", args)
     return args
 
 def start_flask_server():
+    # See wittymail_server/__init__.py for the Flask app bootstrap
     import wittymail_server
     flask_app = wittymail_server.flask_app
     flask_app.run()
@@ -52,7 +55,7 @@ def main():
         start_flask_server()
         
     except Exception:
-        _logger.exception("Failed to start web server")
+        _logger.exception("Failed to start the WittyMail GUI")
         sys.exit(1)
       
 if __name__ == "__main__":

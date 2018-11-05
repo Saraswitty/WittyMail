@@ -12,9 +12,12 @@ _logger = None
 LOG_LEVEL_IN_FILE = logging.DEBUG
 LOG_LEVEL_ON_CONSOLE = logging.INFO
 
+import os
+LOG_FILE_PATH = os.path.join(os.path.abspath(os.getcwd()), 'wittymail_log.txt')
+
 def init_logger():
     try:
-        logging.basicConfig(filename='wittymail_log.txt', 
+        logging.basicConfig(filename=LOG_FILE_PATH, 
                             format='%(asctime)s %(threadName)s %(name)-12s %(levelname)-8s | %(message)s',
                             level=LOG_LEVEL_IN_FILE)
 
@@ -43,3 +46,6 @@ def get_logger(module_name):
         return logging.getLogger(module_name)
     except Exception as e:
         raise Exception("Failed to get the logger module name")
+
+def get_log_file_path():
+    return LOG_FILE_PATH
