@@ -9,19 +9,22 @@ import logging, sys, traceback
 
 _logger = None
 
+LOG_LEVEL_IN_FILE = logging.DEBUG
+LOG_LEVEL_ON_CONSOLE = logging.INFO
+
 def init_logger():
     try:
         logging.basicConfig(filename='wittymail_log.txt', 
                             format='%(asctime)s %(threadName)s %(name)-12s %(levelname)-8s | %(message)s',
-                            level=logging.DEBUG)
+                            level=LOG_LEVEL_IN_FILE)
 
         # Add a logging handler to print all messages to the console (stdout)
-        root = logging.getLogger()
-
         console_logger = logging.StreamHandler(sys.stdout)
-        console_logger.setLevel(logging.DEBUG)
+        console_logger.setLevel(LOG_LEVEL_ON_CONSOLE)
         formatter = logging.Formatter('%(levelname)-8s | %(message)s')
         console_logger.setFormatter(formatter)
+
+        root = logging.getLogger()
         root.addHandler(console_logger)
     except:
         import os
