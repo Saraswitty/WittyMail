@@ -10,9 +10,10 @@ import util.logger as logger
 _logger = logger.get_logger(__name__)
 
 from flask import jsonify, request
+import util.version as version
 
 @flask_app.route("/api/version", methods=['GET'])
 def get_version():
-    return (jsonify({'version': '0.1.0'}),
+    return (jsonify({'version': version.__pretty_version__}),
             200,
             {'ContentType':'application/json'})
