@@ -20,38 +20,38 @@ headers =                   \
 'Sponsor',                  \
 'Reference',                \
 'Sponsor Mail Id',          \
-'Reference Mail Id'         \
-'email subject',            \
-'email body',               \
-'attachment',               \
-'has_sent_mail',            \
+'Reference Mail Id',        \
+'Email subject',            \
+'Email body',               \
+'Attachment',               \
+'Has_sent_mail',            \
 ]                           
 
 data =                      \
 [                           \
 [                           \
 '1',                        \
-'Avani Kulkarni'            \
+'Avani Kulkarni',           \
 'Nur',                      \
 'Amit Shah',                \
 'Sumit Kumar',              \
-'amit.shah@gmail.com'       \
-'sumit.kumar@gmail.com'     \
-'Report card'               \
-'Hello Amit,\nPlease see attached the report card\nThanks,\nSneh Foundation\n' \
+'amit.shah@gmail.com',      \
+'sumit.kumar@gmail.com',    \
+'Report card',              \
+'Hello Amit,\nPlease see attached the report card\nThanks,\nSneh Foundation\n', \
 'avani.kulkarni.pdf',       \
 False,                      \
 ],                          \
 [                           \
 '2',                        \
-'Bhavani Shah'              \
+'Bhavani Shah',              \
 'Senior',                   \
 'Amar Shinde',              \
 'Sunil krishna',            \
-'amar.shinde@gmail.com'     \
-'sunilkrishna@gmail.com'    \
-'Report card'               \
-'Hello Amar,\nPlease see attached the report card\nThanks,\nSneh Foundation\n' \
+'amar.shinde@gmail.com',    \
+'sunilkrishna@gmail.com',   \
+'Report card',              \
+'Hello Amar,\nPlease see attached the report card\nThanks,\nSneh Foundation\n', \
 'bhavani.shah.pdf',         \
 False,                      \
 ]                           \

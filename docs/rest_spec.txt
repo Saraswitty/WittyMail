@@ -18,8 +18,7 @@ Access-Control-Allow-Origin: *
 Server: Werkzeug/0.14.1 Python/2.7.5
 Date: Thu, 08 Nov 2018 12:49:30 GMT
 
-["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Idemail subject","email body","attachment","has_sent_mail"]
-
+["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Id","Email subject","Email body","Attachment","Has_sent_mail"]
 
 POST on attachment: Set attachment template and directory 
   Input: {attachment_template: string, dir_path: string} 
@@ -49,7 +48,7 @@ Access-Control-Allow-Origin: *
 Server: Werkzeug/0.14.1 Python/2.7.5
 Date: Thu, 08 Nov 2018 12:46:36 GMT
 
-{"data":[["1","Avani KulkarniNur","Amit Shah","Sumit Kumar","amit.shah@gmail.comsumit.kumar@gmail.comReport cardHello Amit,\nPlease see attached the report card\nThanks,\nSneh Foundation\navani.kulkarni.pdf",false],["2","Bhavani ShahSenior","Amar Shinde","Sunil krishna","amar.shinde@gmail.comsunilkrishna@gmail.comReport cardHello Amar,\nPlease see attached the report card\nThanks,\nSneh Foundation\nbhavani.shah.pdf",false]],"headers":["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Idemail subject","email body","attachment","has_sent_mail"]}
+{"data":[["1","Avani Kulkarni","Nur","Amit Shah","Sumit Kumar","amit.shah@gmail.com","sumit.kumar@gmail.com","Report card","Hello Amit,\nPlease see attached the report card\nThanks,\nSneh Foundation\navani.kulkarni.pdf",false],["2","Bhavani ShahSenior","Amar Shinde","Sunil krishna","amar.shinde@gmail.com","sunilkrishna@gmail.com","Report card","Hello Amar,\nPlease see attached the report card\nThanks,\nSneh Foundation\nbhavani.shah.pdf",false]],"headers":["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Id","Email subject","Email body","Attachment","Has_sent_mail"]}
 
 POST on email_server: server_details 
   Input: {smtp_server: name, smtp_port: port, username: uname, password: pwd} 
