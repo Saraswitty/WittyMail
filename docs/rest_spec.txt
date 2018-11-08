@@ -1,0 +1,69 @@
+REST specification 
+
+An email is compared to cattle and the analogy is used throughout. Sometimes, stretched to the point of it being nauseating! Blame Omkar Ekbote for it.
+
+POST on fodder: 
+  Input: Data stream of donor details. (Ideally an excel sheet) 
+  Output: 200/err_string
+
+GET on fodder/ingredients: Get headers from excel 
+  Input: None 
+  Output: List of headers
+  Test: curl -i http://localhost:5000/api/fodder/ingredients
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 148
+ContentType: application/json
+Access-Control-Allow-Origin: *
+Server: Werkzeug/0.14.1 Python/2.7.5
+Date: Thu, 08 Nov 2018 12:49:30 GMT
+
+["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Id","Email subject","Email body","Attachment","Has_sent_mail"]
+
+POST on attachment: Set attachment template and directory 
+  Input: {attachment_template: string, dir_path: string} 
+  Output: 200/err_string
+
+POST on email: Set template for to, cc, sub, body 
+  Input: {to: to_template,for: ...} 
+  Output: 200/err_string
+
+4.1 POST on email/test 
+  Input: data_stream, to_email 
+  Output: 200/err_string
+
+4.2 POST on email/send 
+  Input: data_stream 
+  Output: 200/err_string
+
+GET on vomit: Will include excel contents + pdf name + email + sent_mail + send_mail 
+  Input: None 
+  Output: data_stream
+  Test: curl -i http://localhost:5000/api/vomit
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 587
+ContentType: application/json
+Access-Control-Allow-Origin: *
+Server: Werkzeug/0.14.1 Python/2.7.5
+Date: Thu, 08 Nov 2018 12:46:36 GMT
+
+{"data":[["1","Avani Kulkarni","Nur","Amit Shah","Sumit Kumar","amit.shah@gmail.com","sumit.kumar@gmail.com","Report card","Hello Amit,\nPlease see attached the report card\nThanks,\nSneh Foundation\navani.kulkarni.pdf",false],["2","Bhavani ShahSenior","Amar Shinde","Sunil krishna","amar.shinde@gmail.com","sunilkrishna@gmail.com","Report card","Hello Amar,\nPlease see attached the report card\nThanks,\nSneh Foundation\nbhavani.shah.pdf",false]],"headers":["S.No","Name of Child","Class","Sponsor","Reference","Sponsor Mail Id","Reference Mail Id","Email subject","Email body","Attachment","Has_sent_mail"]}
+
+POST on email_server: server_details 
+  Input: {smtp_server: name, smtp_port: port, username: uname, password: pwd} 
+  Output: 200/err_string
+  Test: curl --header "Content-Type: application/json" --request POST --data '{smtp_server: smtp_name, smtp_port: 1234, "username":"xyz","password":"xyz"}' http://localhost:5000/api/email_server
+    
+Mapping of user action to REST calls:
+
+Selects excel to fetch email info: 1
+Maps columns in excel to donor name, child...: 2,3
+Selects pdf dir for attachment and specify the template: 3
+Set email template: i.e. to, cc, sub, body etc.: 4
+Get report: 5
+Sets server details: 6
+Send test mail: 4.1
+Send actual mail: 4.2
+View list of remaining emails: 5
+
