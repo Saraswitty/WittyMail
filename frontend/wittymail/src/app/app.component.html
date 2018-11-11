@@ -12,12 +12,12 @@
     </div>
     <div class="header-actions">
       <clr-dropdown>
-        <button class="nav-icon" clrDropdownTrigger>
+        <button class="nav-icon" clrDropdownTrigger (click)="showAboutModal=false;">
           <clr-icon shape="cog"></clr-icon>
           <clr-icon shape="caret down"></clr-icon>
         </button>
         <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
-          <a href="..." clrDropdownItem>
+          <a clrDropdownItem (click)="showAboutModal=true;">
             <clr-icon shape="info-standard"></clr-icon>
             About
           </a>
@@ -35,6 +35,7 @@
   </clr-header>
   <div class="content-container">
     <main class="content-area">
+      This is the content.
       <router-outlet></router-outlet>
     </main>
     <nav class="sidenav" [clr-nav-level]="2">
@@ -95,4 +96,5 @@
       </section>
     </nav>
   </div>
+  <app-about [showAboutModal]="showAboutModal"></app-about>
 </clr-main-container>
