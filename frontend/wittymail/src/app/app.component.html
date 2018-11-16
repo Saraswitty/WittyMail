@@ -35,7 +35,6 @@
   </clr-header>
   <div class="content-container">
     <main class="content-area">
-      This is the content.
       <router-outlet></router-outlet>
     </main>
     <nav class="sidenav" [clr-nav-level]="2">
@@ -47,11 +46,11 @@
             INPUTS
           </label>
           <ul class="nav-list">
-            <li><a class="nav-link active">
+            <li><a class="nav-link" routerLink="/input-sheet" routerLinkActive="active">
                 <clr-icon shape="envelope"></clr-icon>
                 E-mail Sheet
               </a></li>
-            <li><a class="nav-link">
+            <li><a class="nav-link" routerLink="/input-attachment" routerLinkActive="active">
                 <clr-icon shape="attachment"></clr-icon>
                 Attachments
               </a></li>

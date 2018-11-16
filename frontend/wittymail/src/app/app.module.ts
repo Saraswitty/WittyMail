@@ -6,11 +6,15 @@ import { AppComponent } from './app.component';
 import { ClarityModule } from '@clr/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AboutComponent } from './about/about.component';
+import { InputSheetComponent } from './process/input-sheet/input-sheet.component';
+import { InputAttachmentComponent } from './process/input-attachment/input-attachment.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AboutComponent
+    AboutComponent,
+    InputSheetComponent,
+    InputAttachmentComponent
   ],
   imports: [
     BrowserModule,
