@@ -1,3 +1,68 @@
-<p>
-  input-sheet works!
-</p>
+<form>
+  <section class="form-block">
+    <div class="form-group row">
+      <div class="col-xs-4">
+        <label for="aForm_1">Excel Sheet</label>
+      </div>
+      <div class="col-xs-4">
+        <input type="file" name="sheet" ng2FileSelect [uploader]="uploader" />
+      </div>
+      <div class="col-xs-4">
+        <i>(Select an Excel sheet on your computer that contains the list of donors (e-mail addresses) and
+          beneficiaries)</i>
+      </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-xs-4"></div>
+      <div class="col-xs-4">
+        <button type="button" class="btn btn-primary" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+          Analyze
+        </button>
+      </div>
+    </div>
+    <div *ngIf="(showColumnSelectionForm)">
+      <div class="form-group row">
+        <div class="col-xs-4">
+          <label for="aForm_3">Column for donor e-mail (To)</label>
+        </div>
+        <div class="col-xs-4">
+          <div class="select">
+            <select id="aForm_3">
+              <option *ngFor="let header of sheetHeaders">{{header}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-xs-4">
+          <label for="aForm_4">Column for reference e-mail (CC)</label>
+        </div>
+        <div class="col-xs-4">
+          <div class="select">
+            <select id="aForm_4">
+              <option *ngFor="let header of sheetHeaders">{{header}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-xs-4">
+          <label for="aForm_5">Column for attachment file name (*.pdf)</label>
+        </div>
+        <div class="col-xs-4">
+          <div class="select">
+            <select id="aForm_5">
+              <option *ngFor="let header of sheetHeaders">{{header}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <i>(The text in this column is expected to be the file name of the attachment)</i>
+        </div>
+      </div>
+      <div class="form-group row">
+        <button type="submit" class="btn btn-primary">NEXT</button>
+      </div>
+    </div>
+  </section>
+</form>
