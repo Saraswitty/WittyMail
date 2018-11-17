@@ -7,6 +7,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ReportSummaryComponent implements OnInit {
 
+  summaryList = [
+    {childName: 'Peter Nelson',
+     class: 'Nur',
+     sponsor: 'John Doe',
+     reference: 'Bob Jones',
+    },
+    {childName: 'Jenna Paulson',
+     class: 'LKG',
+     sponsor: 'James May',
+     reference: 'Anna Peterson',
+    }
+  ];
+
+  selectedRows = this.summaryList;
+
   constructor() { }
 
   ngOnInit() {

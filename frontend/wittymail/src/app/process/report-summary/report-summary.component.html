@@ -1,6 +1,48 @@
 <h2 style="margin-top:0;">Report > Summary</h2>
 <p>
   <i><b>WittyMail</b> will automate sending emails based on your sheet below.
-     Review the mappings to your column headers and click on the 'view e-mail' 
+    Review the mappings to your column headers and click on the 'view e-mail'
     button to preview the e-mail contents for a particular row.</i>
 </p>
+
+<clr-datagrid [(clrDgSelected)]="selectedRows">
+  <clr-dg-action-bar>
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-primary" (click)="onSendTestEmail()">
+        <clr-icon shape="envelope"></clr-icon> Send Test E-mail
+      </button>
+    </div>
+    <clr-signpost>
+        <clr-signpost-content *clrIfOpen>
+          <div class="p5" style="margin-top:0;">
+            You can specify an e-mail address to use instead of the actual sponsor's e-mail address 
+          to test how the e-mail would look like in your inbox.
+          </div>
+        </clr-signpost-content>
+      </clr-signpost>
+  </clr-dg-action-bar>
+
+  <clr-dg-column [clrDgField]="'childName'">Child Name</clr-dg-column>
+  <clr-dg-column [clrDgField]="'class'">Class</clr-dg-column>
+  <clr-dg-column [clrDgField]="'sponsor'">Sponsor</clr-dg-column>
+  <clr-dg-column [clrDgField]="'reference'">Reference</clr-dg-column>
+  <clr-dg-column>E-Mail</clr-dg-column>
+
+  <clr-dg-row *clrDgItems="let row of summaryList" [clrDgItem]="row">
+    <clr-dg-cell>{{row.childName}}</clr-dg-cell>
+    <clr-dg-cell>{{row.class}}</clr-dg-cell>
+    <clr-dg-cell>{{row.sponsor}}</clr-dg-cell>
+    <clr-dg-cell>{{row.reference}}</clr-dg-cell>
+    <clr-dg-cell>
+      <button class="btn btn-outline btn-sm" style="margin: 0;">View E-Mail</button>
+    </clr-dg-cell>
+  </clr-dg-row>
+
+  <clr-dg-footer>{{summaryList.length}} e-mails will be sent.</clr-dg-footer>
+</clr-datagrid>
+
+<br />
+
+<a routerLink="/report-send">
+  <button type="submit" class="btn btn-success">SEND EMAILS TO SELECTED SPONSORS</button>
+</a>
