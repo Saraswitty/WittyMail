@@ -12,6 +12,7 @@ import { InputSheetComponent } from './process/input-sheet/input-sheet.component
 import { InputAttachmentComponent } from './process/input-attachment/input-attachment.component';
 import { DesignContentsComponent } from './process/design-contents/design-contents.component';
 import { FormsModule } from '@angular/forms';
+import { ReportSummaryComponent } from './process/report-summary/report-summary.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { FormsModule } from '@angular/forms';
     AboutComponent,
     InputSheetComponent,
     InputAttachmentComponent,
-    DesignContentsComponent
+    DesignContentsComponent,
+    ReportSummaryComponent
   ],
   imports: [
     BrowserModule,
