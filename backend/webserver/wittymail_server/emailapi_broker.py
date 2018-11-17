@@ -105,7 +105,7 @@ def send_email(to = None):
       to = email_fodder[EMAIL_FODDER_TO_INDEX]
       cc = email_fodder[EMAIL_FODDER_CC_INDEX]
     else:
-      log.debug('Test mail to be sent to+cc %s ', % (to))
+      log.debug('Test mail to be sent to+cc %s' % (to))
       cc = to
 
     email_subject = e[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]

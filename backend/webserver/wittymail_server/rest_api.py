@@ -8,6 +8,9 @@ from wittymail_server import flask_app
 import util.logger as logger
 from flask import jsonify, request, json
 import util.version as version
+import util.logger as logger
+
+log = logger.get_logger(__name__)
 
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 

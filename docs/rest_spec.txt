@@ -1,5 +1,19 @@
 REST specification 
 
+Start wittymail server: 
+python wittymail_web_gui.py
+
+Run quick CURL test to send a test email.
+Modify emailid and passwd and copy paste the following to your terminal
+
+#-----------------------------------
+curl -v -X POST -H "Content-Type: multipart/form-data" -F "fodder=@/home/user/gmail-api-python/donorDetails_test.xlsx" http://localhost:5000/api/fodder
+curl --header "Content-Type: application/json" --request POST --data '{"smtp_server": "smtp.gmail.com", "smtp_port": 587, "username":"emailid","password":"passwd"}' http://localhost:5000/api/email_server
+curl -v -X POST -H "Content-Type: multipart/form-data" -F 'attachment[]=@/home/user/gmail-api-python/Yogini Bhosale.pdf' http://localhost:5000/api/attachment
+curl --header "Content-Type: application/json" --request POST --data '{"to_index" : 5, "cc_index" : 6, "subject_template" : "Report of #1", "body_template" : "Hello #5 #6,\n Please see attached the report card\n" }' http://localhost:5000/api/email
+curl --header "Content-Type: application/json" --request POST --data '{"to" : "emailid" }' http://localhost:5000/api/email/test
+#-----------------------------------
+
 An email is compared to cattle and the analogy is used throughout. Sometimes, stretched to the point of it being nauseating! Blame Omkar Ekbote for it.
 
 POST on fodder: 
@@ -30,7 +44,7 @@ curl -v -X POST -H "Content-Type: multipart/form-data" -F 'file[]=@/home/user/gm
 POST on email: Set template for to, cc, sub, body 
   Input: {to: to_template,for: ...} 
   Output: 200/err_string
-curl --header "Content-Type: application/json" --request POST --data '{"sub" : "Report of #1", "body" : "Hello #5 #6,\n Please see attached the report card\n" }' http://localhost:5000/api/email
+curl --header "Content-Type: application/json" --request POST --data '{"to_index" : 5, "cc_index" : 6, "subject_template" : "Report of #1", "body_template" : "Hello #5 #6,\n Please see attached the report card\n" }' http://localhost:5000/api/email
 
 4.1 POST on email/test 
   Input: data_stream, to_email 

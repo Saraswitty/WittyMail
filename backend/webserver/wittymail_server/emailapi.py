@@ -41,7 +41,7 @@ def send_email(frm, to, subject, body, cc = None, attachment = None):
   assert                  \
   frm is not None and     \
   to is not None and      \
-  suject is not None and  \
+  subject is not None and  \
   body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
                               % (frm, to, subject, body))    
 
