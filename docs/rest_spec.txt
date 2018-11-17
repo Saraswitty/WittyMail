@@ -5,6 +5,7 @@ An email is compared to cattle and the analogy is used throughout. Sometimes, st
 POST on fodder: 
   Input: Data stream of donor details. (Ideally an excel sheet) 
   Output: 200/err_string
+curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/user/gmail-api-python/donorDetails_test.xlsx" http://localhost:5000/api/fodder
 
 GET on fodder/ingredients: Get headers from excel 
   Input: None 
@@ -24,9 +25,12 @@ POST on attachment: Set attachment template and directory
   Input: {attachment_template: string, dir_path: string} 
   Output: 200/err_string
 
+curl -v -X POST -H "Content-Type: multipart/form-data" -F 'file[]=@/home/user/gmail-api-python/donorDetails_test.xlsx' -F 'file[]=@/home/user/gmail-api-python/donorDetails_test.csv' http://localhost:5000/api/attachment
+
 POST on email: Set template for to, cc, sub, body 
   Input: {to: to_template,for: ...} 
   Output: 200/err_string
+curl --header "Content-Type: application/json" --request POST --data '{"sub" : "Report of #1", "body" : "Hello #5 #6,\n Please see attached the report card\n" }' http://localhost:5000/api/email
 
 4.1 POST on email/test 
   Input: data_stream, to_email 
