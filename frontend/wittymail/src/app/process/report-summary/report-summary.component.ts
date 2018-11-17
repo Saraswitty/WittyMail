@@ -21,10 +21,16 @@ export class ReportSummaryComponent implements OnInit {
   ];
 
   selectedRows = this.summaryList;
+  showEmailContentsModal: boolean = false;
 
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onViewEmail(currentRow) {
+    console.log("Showing e-mail for: " + currentRow);
+    this.showEmailContentsModal = true;
   }
 
 }

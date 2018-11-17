@@ -13,13 +13,13 @@
       </button>
     </div>
     <clr-signpost>
-        <clr-signpost-content *clrIfOpen>
-          <div class="p5" style="margin-top:0;">
-            You can specify an e-mail address to use instead of the actual sponsor's e-mail address 
+      <clr-signpost-content *clrIfOpen>
+        <div class="p5" style="margin-top:0;">
+          You can specify an e-mail address to use instead of the actual sponsor's e-mail address
           to test how the e-mail would look like in your inbox.
-          </div>
-        </clr-signpost-content>
-      </clr-signpost>
+        </div>
+      </clr-signpost-content>
+    </clr-signpost>
   </clr-dg-action-bar>
 
   <clr-dg-column [clrDgField]="'childName'">Child Name</clr-dg-column>
@@ -34,7 +34,7 @@
     <clr-dg-cell>{{row.sponsor}}</clr-dg-cell>
     <clr-dg-cell>{{row.reference}}</clr-dg-cell>
     <clr-dg-cell>
-      <button class="btn btn-outline btn-sm" style="margin: 0;">View E-Mail</button>
+      <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row.childName)">View E-Mail</button>
     </clr-dg-cell>
   </clr-dg-row>
 
@@ -46,3 +46,76 @@
 <a routerLink="/report-send">
   <button type="submit" class="btn btn-success">SEND EMAILS TO SELECTED SPONSORS</button>
 </a>
+
+<clr-modal [(clrModalOpen)]="showEmailContentsModal">
+  <h3 class="modal-title">E-mail Contents</h3>
+  <div class="modal-body">
+    <form class="compact" style="padding-top: 0;">
+      <section class="form-block">
+          <div class="form-group row">
+              <div class="col-xs-2">
+                <label for="aForm_7">From</label>
+              </div>
+              <div class="col-xs-6">
+                <input type="text" id="aForm_7" value="wittymail@acme.com" disabled>
+              </div>
+            </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_1">To</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_1" value="john.doe@acme.com" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_2">CC</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_2" value="bob.jones@acme.com" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_3">Subject</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_3" value="Report card for Peter Nelson" size="45" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_5">Attachment</label>
+          </div>
+          <div class="col-xs-6">
+            <clr-icon shape="attachment"></clr-icon>
+            <a href=""> Peter Nelson.pdf</a>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_4">Content</label>
+          </div>
+          <div class="col-xs-10">
+            <textarea id="aForm_4" rows="10" disabled>
+Dear John,
+
+Greetings from Sneh Foundation.
+
+Thank you for sponsoring a child at our Rainbow pre-school for the year 2018-19.
+
+Please find attached the semi-annual report card for Peter Nelson.
+
+Best Regards,
+S
+          </textarea>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <!-- TODO: Add a 'send test email' button here -->
+  </div>
+</clr-modal>
