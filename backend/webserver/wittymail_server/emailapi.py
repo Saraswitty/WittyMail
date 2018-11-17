@@ -11,32 +11,56 @@ import util.logger as logger
 
 log = logger.get_logger(__name__)
 
+# Boolean to make sure we do not try to send an email before login
 INITIALIZED = False
 
 def set_login_details(server, port, username, password):
+  assert server is not None and port is not None and username is not None and password is not None,\
+  log.error('server, port number, username or password is None')
+
+  # s is a global object used to interact with the SMTP server
   global s
+
+  # Connect to the SMTP server and login
   try:
     s = smtplib.SMTP(server, port)
     s.ehlo()
     s.starttls() 
     s.login(username, password) 
+
   except Exception as e:
-    raise Exception("Invalid server/user details provided")
+     log.error('Incorrect server/user information provided')
+     return [-1, 'Incorrect server/user information provided']
 
   global INITIALIZED
   INITIALIZED = True
-  log.debug('emailapi initialized successfully')
+  log.debug('Login successful')
+  return [0, 'Login successful']
 
-def send_email(frm, to, cc, subject, body, attachment = None):
+def send_email(frm, to, subject, body, cc = None, attachment = None):
+  assert                  \
+  frm is not None and     \
+  to is not None and      \
+  suject is not None and  \
+  body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
+                              % (frm, to, subject, body))    
+
   if not INITIALIZED:
-    log.error('Email cannot be sent before emailapi is initialized')
-    return
+    log.error('send_email() called before set_login_details()')
+    return [-1, "Server or user details not yet set"]
 
-  # assert to, subject, body is not None or empty
+  log.debug('Email information: from=%s to=%s subject=%s body=%s cc=%s attachment=%s' 
+            % (frm, to, subject, body, cc, attachment))
+
   msg = MIMEMultipart() 
   msg['From'] = frm
   msg['To'] = to
-  msg['Cc'] = cc
+
+  if cc is not None:
+    msg['Cc'] = cc
+  else:
+    log.debug('No cc email provided')
+
   msg['Subject'] = subject
   msg.attach(MIMEText(body, 'plain'))  
 
@@ -52,11 +76,12 @@ def send_email(frm, to, cc, subject, body, attachment = None):
 
   msg_str = msg.as_string()
   s.sendmail(msg['From'], msg['To'], msg_str) 
-  log.debug('Email sent')
+  log.debug('Email sent by %s to %s' % (msg['From'], msg['To']))
+  return [0, 'Email sent successfully']
   
 def teardown():
   if not INITIALIZED:
-    log.error('Email cannot be sent before emailapi is initialized')
+    log.error('teardown() called before set_login_details()')
     return
 
   s.quit() 

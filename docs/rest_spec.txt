@@ -57,7 +57,7 @@ Date: Thu, 08 Nov 2018 12:46:36 GMT
 POST on email_server: server_details 
   Input: {smtp_server: name, smtp_port: port, username: uname, password: pwd} 
   Output: 200/err_string
-  Test: curl --header "Content-Type: application/json" --request POST --data '{smtp_server: smtp_name, smtp_port: 1234, "username":"xyz","password":"xyz"}' http://localhost:5000/api/email_server
+  Test: curl --header "Content-Type: application/json" --request POST --data '{"smtp_server": "smtp_name", "smtp_port": 1234, "username":"xyz","password":"xyz"}' http://localhost:5000/api/email_server
     
 Mapping of user action to REST calls:
 
