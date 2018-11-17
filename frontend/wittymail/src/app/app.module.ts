@@ -10,6 +10,8 @@ import { FileSelectDirective } from 'ng2-file-upload';
 import { AboutComponent } from './about/about.component';
 import { InputSheetComponent } from './process/input-sheet/input-sheet.component';
 import { InputAttachmentComponent } from './process/input-attachment/input-attachment.component';
+import { DesignContentsComponent } from './process/design-contents/design-contents.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -18,13 +20,15 @@ import { InputAttachmentComponent } from './process/input-attachment/input-attac
     AppComponent,
     AboutComponent,
     InputSheetComponent,
-    InputAttachmentComponent
+    InputAttachmentComponent,
+    DesignContentsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ClarityModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
