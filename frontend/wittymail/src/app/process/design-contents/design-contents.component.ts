@@ -10,23 +10,28 @@ export class DesignContentsComponent implements OnInit {
   columnHeadersWithSamples = [
     {
       columnName: 'Name of Child',
-      sampleValue: 'Peter Nelson'
+      sampleValue: 'Peter Nelson',
+      sampleValue2: 'Jenna Paulson'
     },
     {
       columnName: 'Class',
-      sampleValue: 'Nur'
+      sampleValue: 'Nur',
+      sampleValue2: 'LKG'
     },
     {
       columnName: 'Sponsor',
-      sampleValue: 'John Doe'
+      sampleValue: 'John Doe',
+      sampleValue2: 'James May'
     },
     {
       columnName: 'Reference',
-      sampleValue: 'Bob Jones'
+      sampleValue: 'Bob Jones',
+      sampleValue2: 'Anna Peterson'
     },
     {
       columnName: 'Mail ID',
-      sampleValue: 'john.doe@acme.com'
+      sampleValue: 'john.doe@acme.com',
+      sampleValue2: 'james.may@acme.com'
     }
   ];
 

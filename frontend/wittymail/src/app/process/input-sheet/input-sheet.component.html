@@ -1,68 +1,71 @@
+<h2 style="margin-top:0;">Inputs > Sponsor List</h2>
+<p><i>Select an Excel sheet on your computer that contains the list of sponsors
+    with their e-mail addresses and children's names.</i></p>
 <form>
   <section class="form-block">
     <div class="form-group row">
-      <div class="col-xs-4">
+      <div class="col-xs-2">
         <label for="aForm_1">Excel Sheet</label>
       </div>
-      <div class="col-xs-4">
+      <div class="col-xs-6">
         <input type="file" name="sheet" ng2FileSelect [uploader]="uploader" />
-      </div>
-      <div class="col-xs-4">
-        <i>(Select an Excel sheet on your computer that contains the list of donors (e-mail addresses) and
-          beneficiaries)</i>
       </div>
     </div>
     <div class="form-group row">
-        <div class="col-xs-4"></div>
-      <div class="col-xs-4">
+      <div class="col-xs-2"></div>
+      <div class="col-xs-6">
         <button type="button" class="btn btn-primary" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
           Analyze
         </button>
       </div>
     </div>
-    <div *ngIf="(showColumnSelectionForm)">
-      <div class="form-group row">
-        <div class="col-xs-4">
-          <label for="aForm_3">Column for donor e-mail (To)</label>
-        </div>
-        <div class="col-xs-4">
-          <div class="select">
-            <select id="aForm_3">
-              <option *ngFor="let header of sheetHeaders">{{header}}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="form-group row">
-        <div class="col-xs-4">
-          <label for="aForm_4">Column for reference e-mail (CC)</label>
-        </div>
-        <div class="col-xs-4">
-          <div class="select">
-            <select id="aForm_4">
-              <option *ngFor="let header of sheetHeaders">{{header}}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="form-group row">
-        <div class="col-xs-4">
-          <label for="aForm_5">Column for attachment file name (*.pdf)</label>
-        </div>
-        <div class="col-xs-4">
-          <div class="select">
-            <select id="aForm_5">
-              <option *ngFor="let header of sheetHeaders">{{header}}</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-xs-4">
-          <i>(The text in this column is expected to be the file name of the attachment)</i>
-        </div>
-      </div>
-      <div class="form-group row">
-        <a routerLink="/input-attachment"><button type="submit" class="btn btn-primary">NEXT</button></a>
-      </div>
-    </div>
   </section>
 </form>
+<div *ngIf="!(showColumnSelectionForm)">
+  <p>
+    <i>These are the headers in your Excel sheet. Select which column should be used for what purpose.</i>
+  </p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th *ngFor="let col of columnHeadersWithSamples; index as i">{{col.columnName}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td *ngFor="let col of columnHeadersWithSamples; index as i">
+          <clr-icon shape="arrow down"></clr-icon>
+        </td>
+      </tr>
+    </tbody>
+    <thead>
+      <tr>
+        <th *ngFor="let col of columnHeadersWithSamples; index as i">
+          <div class="select">
+            <select id="'columnSelection' + i">
+              <option value="" disabled selected>(select one)</option>
+              <option *ngFor="let role of columnRoles" value="{{role}}">{{role}}</option>
+            </select>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td *ngFor="let col of columnHeadersWithSamples; index as i">
+          {{col.sampleValue}}
+        </td>
+      </tr>
+      <tr>
+        <td *ngFor="let col of columnHeadersWithSamples; index as i">
+          {{col.sampleValue2}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br />
+  <a routerLink="/input-attachment"><button type="submit" class="btn btn-primary">NEXT</button></a>
+
+</div>

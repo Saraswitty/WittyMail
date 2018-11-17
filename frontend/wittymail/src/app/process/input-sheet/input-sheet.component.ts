@@ -11,17 +11,49 @@ const URL = 'http://localhost:3000/api/upload';
 })
 export class InputSheetComponent implements OnInit {
 
-  public uploader: FileUploader = new FileUploader({url: URL, itemAlias: 'sheet'});
+  public uploader: FileUploader = new FileUploader({ url: URL, itemAlias: 'sheet' });
   showColumnSelectionForm: boolean = false;
-  sheetHeaders: string[] = ['Column 1', 'Column 2', 'Column 3', 'Column 4']
+  columnRoles: string[] =
+    ["E-mail Address (To)",
+      "E-mail Address (CC)",
+      "Attachment PDF filename"]
+
+  columnHeadersWithSamples = [
+    {
+      columnName: 'Name of Child',
+      sampleValue: 'Peter Nelson',
+      sampleValue2: 'Jenna Paulson'
+    },
+    {
+      columnName: 'Class',
+      sampleValue: 'Nur',
+      sampleValue2: 'LKG'
+    },
+    {
+      columnName: 'Sponsor',
+      sampleValue: 'John Doe',
+      sampleValue2: 'James May'
+    },
+    {
+      columnName: 'Reference',
+      sampleValue: 'Bob Jones',
+      sampleValue2: 'Anna Peterson'
+    },
+    {
+      columnName: 'Mail ID',
+      sampleValue: 'john.doe@acme.com',
+      sampleValue2: 'james.may@acme.com'
+    }
+  ];
+
   constructor() { }
 
   ngOnInit() {
     this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-         console.log('ImageUpload:uploaded:', item, status, response);
-         this.showColumnSelectionForm = true;
-     };
+      console.log('ImageUpload:uploaded:', item, status, response);
+      this.showColumnSelectionForm = true;
+    };
   }
 
 }
