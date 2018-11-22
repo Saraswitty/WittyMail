@@ -58,7 +58,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
     for r in email_fodder:
         extended_email_fodder = list(extended_default_email_fodder)
         # TODO Add template support for attachment and support different filetypes
-        extended_email_fodder[2] = r[1] + ".pdf"
+        extended_email_fodder[2] = r[1] + b".pdf"
         r.extend(extended_email_fodder)
 
 def get_email_fodder_names():

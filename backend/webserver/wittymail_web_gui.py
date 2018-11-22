@@ -29,7 +29,7 @@ def start_flask_server():
     # See wittymail_server/__init__.py for the Flask app bootstrap
     import wittymail_server
     flask_app = wittymail_server.flask_app
-    flask_app.run()
+    flask_app.run(host= '0.0.0.0')
 
 def open_browser():
     print("A new browser window will open shortly, please wait...")

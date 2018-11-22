@@ -33,16 +33,20 @@ def get_version():
 
 @flask_app.route("/api/fodder", methods=['POST'])
 def post_fodder():
-  fodder_dir = tempfile.gettempdir() + "/" + FODDER_DIRNAME
-  if not os.path.exists(fodder_dir):
-    os.mkdir(fodder_dir) 
+  log.info(request.files)
+  try:
+    fodder_dir = os.path.join(tempfile.gettempdir(), FODDER_DIRNAME) 
+    if not os.path.exists(fodder_dir):
+      os.mkdir(fodder_dir) 
 
-  f = request.files['fodder']
-  fodder_file = fodder_dir + f.filename
-  f.save(fodder_file)
-  log.debug('fodder file save as = %s' % (fodder_file))
+    f = request.files['fodder']
+    fodder_file = os.path.join(fodder_dir, f.filename)
+    f.save(fodder_file)
+    log.debug('fodder file save as = %s' % (fodder_file))
 
-  emailapi_broker.save_fodder_from_file(fodder_file)
+    emailapi_broker.save_fodder_from_file(fodder_file)
+  except:
+    log.exception("Message")
   return "Data sheet saved successfully", HTTP_OK
 
 @flask_app.route("/api/fodder/ingredients", methods=['GET'])
@@ -59,12 +63,12 @@ def get_fodder_ingredients():
 def post_attachment():
   attachments = request.files.getlist("attachment[]")
 
-  attachment_dir = tempfile.gettempdir() + "/" + ATTACHMENTS_DIRNAME
+  attachment_dir = os.path.join(tempfile.gettempdir(), ATTACHMENTS_DIRNAME)
   if not os.path.exists(attachment_dir):
     os.mkdir(attachment_dir)
 
   for a in attachments:
-    a.save(attachment_dir + a.filename)
+    a.save(os.path.join(attachment_dir, a.filename))
     log.debug('attachment file save as = %s' % (attachment_dir + a.filename))
 
   emailapi_broker.save_attachment_dir(attachment_dir)
@@ -100,7 +104,7 @@ def get_vomit():
   if len(fodder_names) == 0 or len(fodder) == 0:    
     return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
 
-  return (jsonify({'fodder_names': fodder_names, 'fodder': fodder}),
+  return (jsonify({'fodder_names': str(fodder_names), 'fodder': str(fodder)}),
           HTTP_OK,
           {'ContentType':'application/json'})
 
