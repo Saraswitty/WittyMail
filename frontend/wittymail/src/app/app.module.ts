@@ -13,6 +13,8 @@ import { InputAttachmentComponent } from './process/input-attachment/input-attac
 import { DesignContentsComponent } from './process/design-contents/design-contents.component';
 import { FormsModule } from '@angular/forms';
 import { ReportSummaryComponent } from './process/report-summary/report-summary.component';
+import { ConsoleLoggerService } from './util/console-logger.service';
+import { LoggerService } from './util/logger.service';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { ReportSummaryComponent } from './process/report-summary/report-summary.
     BrowserAnimationsModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    { provide: LoggerService, useClass: ConsoleLoggerService }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

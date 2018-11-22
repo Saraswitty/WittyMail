@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LoggerService } from './util/logger.service';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,8 @@ export class AppComponent {
   title = 'wittymail';
 
   showAboutModal: boolean = false;
+
+  constructor(private log: LoggerService) {
+    this.log.info("Created: ", this);
+  }
 }
