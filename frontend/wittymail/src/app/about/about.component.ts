@@ -1,4 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
+import { LoggerService } from '../util/logger.service';
+import { WittymailService, VersionInfo } from '../wittymail.service';
 
 @Component({
   selector: 'app-about',
@@ -11,10 +13,20 @@ export class AboutComponent implements OnInit {
 
   wittyMailVersion: string = "";
 
-  constructor() { }
+  constructor(private log: LoggerService, private wittymail: WittymailService) { 
+
+  }
 
   ngOnInit() {
-    // TODO: Call REST API to get version
-    this.wittyMailVersion = "v0.1.0 beta released on 11/Nov/2018";
+    this.wittyMailVersion = "";
+
+    this.wittymail.getVersion()
+    .subscribe(
+      data => {
+        let version: VersionInfo = data;
+        this.log.info("Version from backend: ", version);
+        this.wittyMailVersion = version.version;
+      }
+    )
   }
 }

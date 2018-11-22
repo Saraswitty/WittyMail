@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { ClarityModule } from '@clr/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FileSelectDirective } from 'ng2-file-upload';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AboutComponent } from './about/about.component';
 import { InputSheetComponent } from './process/input-sheet/input-sheet.component';
@@ -32,7 +33,8 @@ import { LoggerService } from './util/logger.service';
     AppRoutingModule,
     ClarityModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule,
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }
