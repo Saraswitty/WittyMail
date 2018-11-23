@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { ReportSummaryComponent } from './process/report-summary/report-summary.component';
 import { ConsoleLoggerService } from './util/console-logger.service';
 import { LoggerService } from './util/logger.service';
+import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { LoggerService } from './util/logger.service';
     InputSheetComponent,
     InputAttachmentComponent,
     DesignContentsComponent,
-    ReportSummaryComponent
+    ReportSummaryComponent,
+    ErrorDialogComponent
   ],
   imports: [
     BrowserModule,
