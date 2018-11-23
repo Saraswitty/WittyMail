@@ -8,15 +8,7 @@
         <label for="aForm_1">Excel Sheet</label>
       </div>
       <div class="col-xs-6">
-        <input type="file" name="sheet" ng2FileSelect [uploader]="uploader" />
-      </div>
-    </div>
-    <div class="form-group row">
-      <div class="col-xs-2"></div>
-      <div class="col-xs-6">
-        <button type="button" class="btn btn-primary" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
-          Analyze
-        </button>
+        <input type="file" name="fodder" ng2FileSelect [uploader]="uploader" />
       </div>
     </div>
   </section>
@@ -43,9 +35,9 @@
       <tr>
         <th *ngFor="let col of columnHeadersWithSamples; index as i">
           <div class="select">
-            <select id="'columnSelection' + i">
-              <option value="" disabled selected>(select one)</option>
-              <option *ngFor="let role of columnRoles" value="{{role}}">{{role}}</option>
+            <select id="'columnSelection' + i" [(ngModel)]="columnMappings[i]">
+              <option [value]="" selected></option>
+              <option *ngFor="let role of columnRoles" [value]="role">{{role}}</option>
             </select>
           </div>
         </th>
@@ -66,6 +58,8 @@
   </table>
 
   <br />
-  <a routerLink="/input-attachment"><button type="submit" class="btn btn-primary">NEXT</button></a>
+  <a routerLink="/input-attachment"><button type="submit" class="btn btn-primary" (click)="sendColumnMapping()">NEXT</button></a>
 
 </div>
+
+<app-error-dialog [showErrorModal]="errorDialog.show" [errorMessage]="errorDialog.message"></app-error-dialog>

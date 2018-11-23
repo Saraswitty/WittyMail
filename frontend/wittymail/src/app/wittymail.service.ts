@@ -16,7 +16,8 @@ export interface VersionInfo {
 export class WittymailService {
 
   urls = {
-    version: 'api/version'
+    version: 'api/version', // GET
+    fodder: 'api/fodder'    // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -57,6 +58,10 @@ export class WittymailService {
     .pipe(
       catchError(this.handleError('getVersion', version))
     );
+  }
+
+  getFodderUploadUrl(): string {
+    return this.urls.fodder;
   }
 
 }
