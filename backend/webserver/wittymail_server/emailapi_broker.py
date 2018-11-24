@@ -8,6 +8,12 @@ import util.logger as logger
 
 log = logger.get_logger(__name__)
 
+global email_fodder
+global email_fodder_names
+global EMAIL_FODDER_TO_INDEX
+global EMAIL_FODDER_CC_INDEX
+global attachment_dir 
+
 # Names of the fodder to be used to create the emails
 email_fodder_names = []
 # Fodder content used to create the emails
@@ -34,7 +40,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
    
     _email_fodder = []  
 
-    # TODO Check if we should read wb_obj.active or wb_obj[0]
+    # TODO Check if we should read wb_obj.active or wb_obj[0]. Do we have to close?
     wb_obj = openpyxl.load_workbook(loc)   
     sheet_obj = wb_obj.active
 
@@ -69,6 +75,7 @@ def get_email_fodder_names():
 def get_email_fodder():
     return email_fodder
 
+# #{no} in _st will be replaced by l[no]
 def _template_to_str(_st, l):
   log.debug('_template_to_str() str = %s' % (_st))
   st = ''.join(_st)

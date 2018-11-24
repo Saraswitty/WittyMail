@@ -2,6 +2,8 @@
 # coding=utf-8
 
 import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
+
 import emailapi_broker
 import tempfile
 from wittymail_server import flask_app
@@ -11,8 +13,6 @@ import util.version as version
 import util.logger as logger
 
 log = logger.get_logger(__name__)
-
-sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
 # These directories will be created within a tmp directory
 ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
@@ -42,7 +42,7 @@ def post_fodder():
     f = request.files['fodder']
     fodder_file = os.path.join(fodder_dir, f.filename)
     f.save(fodder_file)
-    log.debug('fodder file save as = %s' % (fodder_file))
+    log.info('fodder file saved as = %s' % (fodder_file))
 
     emailapi_broker.save_fodder_from_file(fodder_file)
   except:

@@ -14,6 +14,7 @@ log = logger.get_logger(__name__)
 # Boolean to make sure we do not try to send an email before login
 INITIALIZED = False
 
+# TODO Can you check if SMTPlib has different types of Exception (*Error) classes and write an except block for each?
 def set_login_details(server, port, username, password):
   assert server is not None and port is not None and username is not None and password is not None,\
   log.error('server, port number, username or password is None')
@@ -29,7 +30,7 @@ def set_login_details(server, port, username, password):
     s.login(username, password) 
 
   except Exception as e:
-     log.error('Incorrect server/user information provided')
+     log.exception('Incorrect server/user information provided')
      return [-1, 'Incorrect server/user information provided']
 
   global INITIALIZED
@@ -50,7 +51,7 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
     return [-1, "Server or user details not yet set"]
 
   log.debug('Email information: from=%s to=%s subject=%s body=%s cc=%s attachment=%s' 
-            % (frm, to, subject, body, cc, attachment))
+            % (frm, to, subject[:50], body, cc, attachment))
 
   msg = MIMEMultipart() 
   msg['From'] = frm
@@ -75,7 +76,7 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
 
   msg_str = msg.as_string()
   s.sendmail(msg['From'], tos, msg_str) 
-  log.debug('Email sent by %s to %s' % (msg['From'], msg['To']))
+  log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
   return [0, 'Email sent successfully']
   
 def teardown():
