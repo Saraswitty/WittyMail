@@ -119,8 +119,9 @@ def send_email(tos = None):
 
     email_subject = e[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]
     email_body = e[extended_email_fodder_names_EMAIL_BODY_INDEX]
-    
-    attachments = attachment_dir + a for a in e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]]
+
+    attachment_list = e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX].split(',')    
+    attachments = [attachment_dir + a for a in attachment_list]
 
     return emailapi.send_email("ajaynair59@gmail.com", tos, email_subject, email_body, ccs, attachments)
 

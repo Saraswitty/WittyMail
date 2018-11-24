@@ -104,7 +104,11 @@ def get_vomit():
   if len(fodder_names) == 0 or len(fodder) == 0:    
     return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
 
-  return (jsonify({'fodder_names': str(fodder_names), 'fodder': str(fodder)}),
+  fodder_list = []
+  for f in fodder:
+    fodder_list.append(dict(zip(fodder_names, f)))
+
+  return (jsonify({'fodder_list': fodder_list}),
           HTTP_OK,
           {'ContentType':'application/json'})
 

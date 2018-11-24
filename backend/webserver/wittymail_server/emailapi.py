@@ -41,7 +41,7 @@ def set_login_details(server, port, username, password):
 def send_email(frm, tos, subject, body, ccs = None, attachments = None):
   assert                  \
   frm is not None and     \
-  to is not None and      \
+  tos is not None and      \
   subject is not None and  \
   body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
                               % (frm, to, subject, body))    
@@ -51,13 +51,13 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
     return [-1, "Server or user details not yet set"]
 
   log.debug('Email information: from=%s to=%s subject=%s body=%s cc=%s attachment=%s' 
-            % (frm, to, subject[:50], body, cc, attachment))
+            % (frm, tos, subject[:50], body, ccs, attachments))
 
   msg = MIMEMultipart() 
   msg['From'] = frm
   msg['To'] = ", ".join(tos)
 
-  if cc is not None:
+  if ccs is not None:
     msg['Cc'] = ", ".join(ccs)
   else:
     log.debug('No cc email provided')
