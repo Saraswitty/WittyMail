@@ -10,6 +10,17 @@ export interface VersionInfo {
   version: string;
 }
 
+export interface ColumnHeadersWithRowContent {
+  headers: string[];
+  contents: any[];
+}
+
+export interface ColumnMappings {
+  to_column: string;
+  cc_column: string;
+  attachment_column: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,27 +52,55 @@ export class WittymailService {
     return new ErrorObservable();
   }
 
-  private handleError<T> (operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-   
+
       this.log.error(error); // log to console instead
       this.log.error(`${operation} failed: ${error.message}`);
-   
+
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
   }
 
   getVersion(): Observable<VersionInfo> {
-    let version: VersionInfo = {version: ''}
+    let version: VersionInfo = { version: '' }
     return this.http.get<VersionInfo>(this.urls.version)
-    .pipe(
-      catchError(this.handleError('getVersion', version))
-    );
+      .pipe(
+        catchError(this.handleError('getVersion', version))
+      );
   }
 
   getFodderUploadUrl(): string {
     return this.urls.fodder;
+  }
+
+  getColumnHeadersWithSampleRows(): ColumnHeadersWithRowContent {
+    let res: ColumnHeadersWithRowContent = {
+      headers: [
+        'Name of Child', 'Class', 'Sponsor', 'Reference', 'Mail ID', 'Reference mail ID'
+      ],
+      contents: [
+        {
+          'Name of Child': 'Aradhya Karche',
+          'Class': 'Jr. KG- shanti nagar',
+          'Sponsor': 'Jaya Singh',
+          'Reference': 'Akshay Kokne',
+          'Mail ID': 'jaya.singh753@gmail.com',
+          'Reference mail ID': 'amboreravi@gmail.com'
+        },
+        {
+          'Name of Child': 'Aradhya Karche',
+          'Class': 'Jr. KG- shanti nagar',
+          'Sponsor': 'Jaya Singh',
+          'Reference': 'Akshay Kokne',
+          'Mail ID': 'jaya.singh753@gmail.com',
+          'Reference mail ID': 'amboreravi@gmail.com'
+        }
+      ]
+    };
+
+    return res;
   }
 
 }

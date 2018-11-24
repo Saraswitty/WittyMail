@@ -21,19 +21,19 @@
   <table class="table">
     <thead>
       <tr>
-        <th *ngFor="let col of columnHeadersWithSamples; index as i">{{col.columnName}}</th>
+        <th *ngFor="let col of headers">{{col}}</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td *ngFor="let col of columnHeadersWithSamples; index as i">
+        <td *ngFor="let col of headers; index as i">
           <clr-icon shape="arrow down"></clr-icon>
         </td>
       </tr>
     </tbody>
     <thead>
       <tr>
-        <th *ngFor="let col of columnHeadersWithSamples; index as i">
+        <th *ngFor="let col of headers; index as i">
           <div class="select">
             <select id="'columnSelection' + i" [(ngModel)]="columnMappings[i]">
               <option [value]="" selected></option>
@@ -44,21 +44,16 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td *ngFor="let col of columnHeadersWithSamples; index as i">
-          {{col.sampleValue}}
-        </td>
-      </tr>
-      <tr>
-        <td *ngFor="let col of columnHeadersWithSamples; index as i">
-          {{col.sampleValue2}}
+      <tr *ngFor="let row of tableContent">
+        <td *ngFor="let col of headers; index as i">
+          {{row[col]}}
         </td>
       </tr>
     </tbody>
   </table>
 
   <br />
-  <a routerLink="/input-attachment"><button type="submit" class="btn btn-primary" (click)="sendColumnMapping()">NEXT</button></a>
+  <button type="submit" class="btn btn-primary" (click)="sendColumnMapping()">NEXT</button>
 
 </div>
 
