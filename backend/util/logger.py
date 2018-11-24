@@ -10,7 +10,7 @@ import logging, sys, traceback
 _logger = None
 
 LOG_LEVEL_IN_FILE = logging.DEBUG
-LOG_LEVEL_ON_CONSOLE = logging.INFO
+LOG_LEVEL_ON_CONSOLE = logging.DEBUG
 
 import os
 LOG_FILE_PATH = os.path.join(os.path.abspath(os.getcwd()), 'wittymail_log.txt')
