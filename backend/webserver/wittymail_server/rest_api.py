@@ -107,7 +107,7 @@ def get_vomit():
 @flask_app.route("/api/email_server", methods=['POST'])
 def post_email_server():
   data = json.loads(request.data)
-  e = emailapi_broker.set_login_details(data['smtp_server'], data['smtp_port'], data['username'], data['password'])
+  e = emailapi_broker.set_login_details(data['username'], data['password'])
   if e[0] is not 0:
     return e[1], HTTP_NOT_FOUND
   return e[1], HTTP_OK

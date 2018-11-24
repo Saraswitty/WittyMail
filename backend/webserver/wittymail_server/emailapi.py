@@ -37,7 +37,7 @@ def set_login_details(server, port, username, password):
   log.debug('Login successful')
   return [0, 'Login successful']
 
-def send_email(frm, to, subject, body, cc = None, attachment = None):
+def send_email(frm, tos, subject, body, ccs = None, attachments = None):
   assert                  \
   frm is not None and     \
   to is not None and      \
@@ -54,28 +54,27 @@ def send_email(frm, to, subject, body, cc = None, attachment = None):
 
   msg = MIMEMultipart() 
   msg['From'] = frm
-  msg['To'] = to
+  msg['To'] = ", ".join(tos)
 
   if cc is not None:
-    msg['Cc'] = cc
+    msg['Cc'] = ", ".join(ccs)
   else:
     log.debug('No cc email provided')
 
   msg['Subject'] = subject
   msg.attach(MIMEText(body, 'plain'))  
 
-  if (attachment is not None):
-    log.debug('No attachment found')
-    a = open(attachment, "rb")
-
-    p = MIMEBase('application', 'octet-stream') 
-    p.set_payload((a).read()) 
-    encoders.encode_base64(p) 
-    p.add_header('Content-Disposition', "attachment; filename= %s" % os.path.basename(attachment)) 
-    msg.attach(p)
+  if (attachments is not None):
+    for attachment in attachments:
+      a = open(attachment, "rb")
+      p = MIMEBase('application', 'octet-stream') 
+      p.set_payload((a).read()) 
+      encoders.encode_base64(p) 
+      p.add_header('Content-Disposition', "attachment; filename= %s" % os.path.basename(attachment)) 
+      msg.attach(p)
 
   msg_str = msg.as_string()
-  s.sendmail(msg['From'], msg['To'], msg_str) 
+  s.sendmail(msg['From'], tos, msg_str) 
   log.debug('Email sent by %s to %s' % (msg['From'], msg['To']))
   return [0, 'Email sent successfully']
   

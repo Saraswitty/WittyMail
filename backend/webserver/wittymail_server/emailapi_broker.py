@@ -58,6 +58,8 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
     for r in email_fodder:
         extended_email_fodder = list(extended_default_email_fodder)
         # TODO Add template support for attachment and support different filetypes
+        _attachments = r[1].split(',')
+        attachments = [a + ".pdf" for a in _attachments]
         extended_email_fodder[2] = r[1] + ".pdf"
         r.extend(extended_email_fodder)
 
@@ -99,23 +101,24 @@ def save_attachment_dir(dir_loc, filename_mapping = None):
     global attachment_dir 
     attachment_dir = dir_loc
 
-def send_email(to = None):
+def send_email(tos = None):
   for e in email_fodder:
-    if not to:
-      to = email_fodder[EMAIL_FODDER_TO_INDEX]
-      cc = email_fodder[EMAIL_FODDER_CC_INDEX]
+    if not tos:
+      tos = email_fodder[EMAIL_FODDER_TO_INDEX]
+      ccs = email_fodder[EMAIL_FODDER_CC_INDEX]
     else:
-      log.debug('Test mail to be sent to+cc %s' % (to))
-      cc = to
+      log.debug('Test mail to be sent to+cc %s' % (''.join(tos)))
+      ccs = tos
 
     email_subject = e[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]
     email_body = e[extended_email_fodder_names_EMAIL_BODY_INDEX]
-    attachment = attachment_dir + e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]
+    
+    attachments = attachment_dir + a for a in e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]]
 
-    return emailapi.send_email("ajaynair59@gmail.com", to, email_subject, email_body, cc, attachment)
+    return emailapi.send_email("ajaynair59@gmail.com", tos, email_subject, email_body, ccs, attachments)
 
-def set_login_details(server, port, username, password):
-  assert server is not None and port is not None and username is not None and password is not None,\
+def set_login_details(username, password, server="smtp.gmail.com", port=587):
+  assert username is not None and password is not None,\
   log.error('server, port number, username or password is None')
 
   return emailapi.set_login_details(server, port, username, password)
