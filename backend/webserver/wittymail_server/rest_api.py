@@ -49,6 +49,18 @@ def post_fodder():
     log.exception("Message")
   return "Data sheet saved successfully", HTTP_OK
 
+# TODO Change this to a get request because using post for get is, well, stupid
+# Check how to send multi line data in GET request 
+@flask_app.route("/api/fodder/template", methods=['POST'])
+def get_fodder_template():
+  data = json.loads(request.data)
+  fodder = emailapi_broker.get_email_fodder() 
+  result_str = emailapi_broker.template_to_str(data['template'], fodder[0])
+ 
+  return (jsonify(result_str),
+          HTTP_OK,
+            {'ContentType':'application/json'})
+
 @flask_app.route("/api/fodder/ingredients", methods=['GET'])
 def get_fodder_ingredients():
   fodder_names = emailapi_broker.get_email_fodder_names()
@@ -83,7 +95,9 @@ def post_email():
 @flask_app.route("/api/email/test", methods=['POST'])
 def post_email_test():
   data = json.loads(request.data)
-  e = emailapi_broker.send_email(data['to'])
+  tos = []
+  tos.append(data['to'])
+  e = emailapi_broker.send_email(tos)
   if e[0] is not 0:
     return e[1], HTTP_NOT_FOUND
   return e[1], HTTP_OK

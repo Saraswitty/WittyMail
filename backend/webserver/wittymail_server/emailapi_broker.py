@@ -76,8 +76,8 @@ def get_email_fodder():
     return email_fodder
 
 # #{no} in _st will be replaced by l[no]
-def _template_to_str(_st, l):
-  log.debug('_template_to_str() str = %s' % (_st))
+def template_to_str(_st, l):
+  log.debug('template_to_str() str = %s' % (_st))
   st = ''.join(_st)
 
   str_to_replace = list(set(re.findall(r'#\d+', st)))
@@ -90,7 +90,7 @@ def _template_to_str(_st, l):
   for i in range(len(index)):
     st = st.replace(str_to_replace[i], l[index[i]])
 
-  log.debug('_template_to_str() final str = %s' % st)
+  log.debug('template_to_str() final str = %s' % st)
   return st
 
 def save_extended_fodder(to_index, cc_index, subject_template, body_template):
@@ -101,8 +101,8 @@ def save_extended_fodder(to_index, cc_index, subject_template, body_template):
   EMAIL_FODDER_CC_INDEX = cc_index
 
   for r in email_fodder:
-    r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = _template_to_str(subject_template, r)
-    r[extended_email_fodder_names_EMAIL_BODY_INDEX] = _template_to_str(body_template, r)
+    r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = template_to_str(subject_template, r)
+    r[extended_email_fodder_names_EMAIL_BODY_INDEX] = template_to_str(body_template, r)
 
 def save_attachment_dir(dir_loc, filename_mapping = None):
     global attachment_dir 
@@ -111,8 +111,8 @@ def save_attachment_dir(dir_loc, filename_mapping = None):
 def send_email(tos = None):
   for e in email_fodder:
     if not tos:
-      tos = email_fodder[EMAIL_FODDER_TO_INDEX]
-      ccs = email_fodder[EMAIL_FODDER_CC_INDEX]
+      tos = email_fodder[EMAIL_FODDER_TO_INDEX].split(',')
+      ccs = email_fodder[EMAIL_FODDER_CC_INDEX].split(',')
     else:
       log.debug('Test mail to be sent to+cc %s' % (''.join(tos)))
       ccs = tos
