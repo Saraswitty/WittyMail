@@ -4,7 +4,7 @@ import { HttpErrorResponse, HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { catchError, retry } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { throwError } from 'rxjs';
 
 export interface VersionInfo {
   version: string;
@@ -32,6 +32,12 @@ export interface AttachmentMetadata {
   attachment_column: string;
 }
 
+export interface EmailServerDetails {
+  service: string;
+  username: string;
+  password: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,7 +50,8 @@ export class WittymailService {
     version: 'api/version',  // GET
     fodder: 'api/fodder',    // POST
     attachment: 'api/attachment',  // POST
-    email: 'api/email' // POST
+    email: 'api/email', // POST
+    email_server: 'api/email_server' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -70,14 +77,19 @@ export class WittymailService {
     return new ErrorObservable();
   }
 
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
+  private handleError(operation = 'operation') {
+    return (error: any) => {
+      let errorMessage = error.message;
+      
+      if (error instanceof HttpErrorResponse) {
+        // Sample: {operation} failed with HTTP 400 (BAD REQUEST): {custom error msg string from server} 
+        this.log.error(`${operation} failed with HTTP ${error.status} (${error.statusText}): `, error.error);
+        errorMessage = error.error;
+      } else {
+        this.log.error(`${operation} failed: `, error.message);
+      }
 
-      this.log.error(error); // log to console instead
-      this.log.error(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
+      return throwError(errorMessage);
     };
   }
 
@@ -85,7 +97,7 @@ export class WittymailService {
     let version: VersionInfo = { version: '' }
     return this.http.get<VersionInfo>(this.urls.version)
       .pipe(
-        catchError(this.handleError('getVersion', version))
+        catchError(this.handleError('getVersion'))
       );
   }
 
@@ -199,7 +211,15 @@ export class WittymailService {
     this.log.info("POSTing email metadata: ", this.emailMetadataInstance);
     return this.http.post<string>(this.urls.email, this.emailMetadataInstance)
       .pipe(
-        catchError(this.handleError('postEmailMetadata', ''))
+        catchError(this.handleError('postEmailMetadata'))
+      );
+  }
+
+  postEmailServerDetails(payload: EmailServerDetails): Observable<string> {
+    this.log.info("POSTing email server details: ", payload);
+    return this.http.post<string>(this.urls.email_server, payload)
+      .pipe(
+        catchError(this.handleError('postEmailServerDetails'))
       );
   }
 

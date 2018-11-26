@@ -47,7 +47,7 @@ export class InputAttachmentComponent implements OnInit {
 
   validateInputsAndContinue() {
     // TODO: Call REST API to fetch missing PDFs
-    this.router.navigate(['design-contents']);
+    this.router.navigate(['email-server']);
   }
 
 }

@@ -5,9 +5,6 @@ import { WittymailService, ColumnHeadersWithRowContent, ColumnMappings } from 's
 import { Router } from '@angular/router';
 import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
-// TODO: Move this to the REST API service
-const URL = 'http://localhost:3000/api/upload';
-
 @Component({
   selector: 'app-input-sheet',
   templateUrl: './input-sheet.component.html',

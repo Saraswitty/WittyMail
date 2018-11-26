@@ -17,6 +17,7 @@ import { ReportSummaryComponent } from './process/report-summary/report-summary.
 import { ConsoleLoggerService } from './util/console-logger.service';
 import { LoggerService } from './util/logger.service';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
+import { EmailServerComponent } from './process/email-server/email-server.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { ErrorDialogComponent } from './common/error-dialog/error-dialog.compone
     InputAttachmentComponent,
     DesignContentsComponent,
     ReportSummaryComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    EmailServerComponent
   ],
   imports: [
     BrowserModule,
