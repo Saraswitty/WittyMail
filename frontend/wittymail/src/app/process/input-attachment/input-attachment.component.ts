@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FileUploader, FileSelectDirective } from 'ng2-file-upload/ng2-file-upload';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
+import { LoggerService } from 'src/app/util/logger.service';
+import { WittymailService } from 'src/app/wittymail.service';
+import { Router } from '@angular/router';
 
 // TODO: Move this to the REST API service
 const URL = 'http://localhost:3000/api/upload';
@@ -11,18 +15,27 @@ const URL = 'http://localhost:3000/api/upload';
 })
 export class InputAttachmentComponent implements OnInit {
 
-  public uploader: FileUploader = new FileUploader({url: URL, itemAlias: 'attachments'});
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+
+  public uploader: FileUploader;
   showDirectoryContents: boolean = false;
   numFiles: number = 23;
 
-  constructor() { }
+  constructor(private log: LoggerService,
+    private wittymail: WittymailService,
+    private router: Router) { }
 
   ngOnInit() {
-    this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
+    this.uploader = new FileUploader({ url: this.wittymail.getAttachmentUploadUrl(), itemAlias: 'attachment' });
+    this.uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+      this.uploader.uploadAll();
+    };
+
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-         console.log('ImageUpload:uploaded:', item, status, response);
-         this.showDirectoryContents = true;
-     };
+      this.log.info("Attachment uploaded: ", item.file.name, status);
+      this.showDirectoryContents = true;
+    };
   }
 
   onFilesSelected(event: any) {

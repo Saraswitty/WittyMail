@@ -10,7 +10,7 @@
           </label>
         </div>
         <div class="col-xs-4">
-            <input type="file" (change)="onFilesSelected($event)" multiple />
+            <input type="file" name="attachment" ng2FileSelect [uploader]="uploader" multiple />
         </div>
         <div class="col-xs-4">
           

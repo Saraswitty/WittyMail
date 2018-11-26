@@ -27,8 +27,9 @@ export interface ColumnMappings {
 export class WittymailService {
 
   urls = {
-    version: 'api/version', // GET
-    fodder: 'api/fodder'    // POST
+    version: 'api/version',  // GET
+    fodder: 'api/fodder',    // POST
+    attachment: 'api/attachment'  // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -73,6 +74,10 @@ export class WittymailService {
 
   getFodderUploadUrl(): string {
     return this.urls.fodder;
+  }
+
+  getAttachmentUploadUrl(): string {
+    return this.urls.attachment;
   }
 
   getColumnHeadersWithSampleRows(): ColumnHeadersWithRowContent {
