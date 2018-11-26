@@ -11,7 +11,7 @@ import util.logger as logger
 
 log = logger.get_logger(__name__)
 
-# Boolean to make sure we do not try to send an email before login
+# Boolean to make sure we do not try to send an mailer before login
 INITIALIZED = False
 
 # TODO Can you check if SMTPlib has different types of Exception (*Error) classes and write an except block for each?
@@ -60,7 +60,7 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
   if ccs is not None:
     msg['Cc'] = ", ".join(ccs)
   else:
-    log.debug('No cc email provided')
+    log.debug('No cc mailer provided')
 
   msg['Subject'] = subject
   msg.attach(MIMEText(body, 'plain'))  
