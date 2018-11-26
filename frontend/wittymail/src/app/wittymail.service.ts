@@ -37,6 +37,9 @@ export interface EmailServerDetails {
   username: string;
   password: string;
 }
+export interface TestEmailDetails {
+  to: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +54,8 @@ export class WittymailService {
     fodder: 'api/fodder',    // POST
     attachment: 'api/attachment',  // POST
     email: 'api/email', // POST
-    email_server: 'api/email_server' // POST
+    email_server: 'api/email_server', // POST
+    email_test: 'api/email/test' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -222,6 +226,14 @@ export class WittymailService {
     return this.http.post<string>(this.urls.email_server, payload)
       .pipe(
         catchError(this.handleError('postEmailServerDetails'))
+      );
+  }
+
+  postTestEmail(payload: TestEmailDetails): Observable<string> {
+    this.log.info("POSTing test email details: ", payload);
+    return this.http.post<string>(this.urls.email_test, payload)
+      .pipe(
+        catchError(this.handleError('postTestEmail'))
       );
   }
 

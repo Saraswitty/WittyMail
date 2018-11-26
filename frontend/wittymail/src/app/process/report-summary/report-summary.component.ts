@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WittymailService, ColumnHeadersWithRowContent } from 'src/app/wittymail.service';
+import { WittymailService, ColumnHeadersWithRowContent, TestEmailDetails } from 'src/app/wittymail.service';
 import { LoggerService } from 'src/app/util/logger.service';
 
 @Component({
@@ -62,8 +62,18 @@ export class ReportSummaryComponent implements OnInit {
   }
 
   sendTestEmail() {
-    this.log.info("Sending test e-mail to '", this.testEmailDetails.to_address, "' for: ", this.tableContent[0]);
-    this.testEmailDetails.success = true;
+    this.log.info("Sending test e-mail to '", this.testEmailDetails.to_address);
+    let d: TestEmailDetails = {
+      to: this.testEmailDetails.to_address
+    }
+    this.wittymail.postTestEmail(d).subscribe(
+      data => {
+        this.testEmailDetails.success = true;
+      },
+      error => {
+        this.testEmailDetails.errorMessage = error.error_message;
+        this.testEmailDetails.error = true;
+      }
+    )
   }
-
 }

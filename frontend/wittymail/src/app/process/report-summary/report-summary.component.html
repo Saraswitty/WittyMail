@@ -129,9 +129,11 @@
         </div>
 
         <div class="form-group row">
-          <button type="submit" class="btn btn-primary" [disabled]="testEmailForm.form.invalid">
-            <clr-icon shape="envelope"></clr-icon> SEND
-          </button>
+          <div class="col-xs-3">
+            <button type="submit" class="btn btn-primary" [disabled]="testEmailForm.form.invalid">
+              <clr-icon shape="envelope"></clr-icon> SEND
+            </button>
+          </div>
         </div>
       </section>
     </form>
