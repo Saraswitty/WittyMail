@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import openpyxl
-import emailapi
+import mailer.emailapi as emailapi
 import re
 import util.logger as logger
 
