@@ -5,6 +5,7 @@ import openpyxl
 import emailapi
 import re
 import util.logger as logger
+import gender_guesser
 
 log = logger.get_logger(__name__)
 
@@ -25,13 +26,14 @@ EMAIL_FODDER_TO_INDEX = 0
 EMAIL_FODDER_CC_INDEX = 0
 
 # Extended fodder names that will be appended to the fodder names provided by the user (i.e. email_fodder_names)
-extended_email_fodder_names = ['email_subject', 'email_body', 'email_attachment', 'email_sent']
-extended_email_fodder_names_EMAIL_BODY_INDEX = -3
+extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
+extended_email_fodder_names_PRONOUN_INDEX = -5
 extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -4
+extended_email_fodder_names_EMAIL_BODY_INDEX = -3
 extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -2
 
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
-extended_default_email_fodder = [None, None, None, False]
+extended_default_email_fodder = ["his", None, None, None, False]
 
 # TODO Add check to detect extention type
 def save_fodder_from_file(loc, email_fodder_names_template = None):
@@ -101,6 +103,12 @@ def save_extended_fodder(to_index, cc_index, subject_template, body_template):
   EMAIL_FODDER_CC_INDEX = cc_index
 
   for r in email_fodder:
+    name = r[1].split()
+    if len(name) == 1:
+      gender = gender_guesser.guess_gender(name[0]) 
+    else:
+      gender = gender_guesser.guess_gender(name[0], name[1])
+    r[extended_email_fodder_names_PRONOUN_INDEX] = "her" if gender == "female" else "his" 
     r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = template_to_str(subject_template, r)
     r[extended_email_fodder_names_EMAIL_BODY_INDEX] = template_to_str(body_template, r)
 
