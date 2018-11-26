@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { LoggerService } from 'src/app/util/logger.service';
+import { WittymailService, ColumnHeadersWithRowContent } from 'src/app/wittymail.service';
+import { Router } from '@angular/router';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-design-contents',
@@ -7,33 +11,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DesignContentsComponent implements OnInit {
 
-  columnHeadersWithSamples = [
-    {
-      columnName: 'Name of Child',
-      sampleValue: 'Peter Nelson',
-      sampleValue2: 'Jenna Paulson'
-    },
-    {
-      columnName: 'Class',
-      sampleValue: 'Nur',
-      sampleValue2: 'LKG'
-    },
-    {
-      columnName: 'Sponsor',
-      sampleValue: 'John Doe',
-      sampleValue2: 'James May'
-    },
-    {
-      columnName: 'Reference',
-      sampleValue: 'Bob Jones',
-      sampleValue2: 'Anna Peterson'
-    },
-    {
-      columnName: 'Mail ID',
-      sampleValue: 'john.doe@acme.com',
-      sampleValue2: 'james.may@acme.com'
-    }
-  ];
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+  
+  headers: string[] = [];
+  tableContent: any[] = [];
 
   subjectTemplate: string = "";
   subjectTemplateRealtimeSample: string = "";
@@ -41,9 +22,19 @@ export class DesignContentsComponent implements OnInit {
   bodyTemplate: string = "";
   bodyTemplateRealtimeSample: string = "";
 
-  constructor() { }
+  constructor(private log: LoggerService, private wittymail: WittymailService,
+    private router: Router) { }
 
   ngOnInit() {
+    this.displayColumnMappingUi();
+  }
+
+  displayColumnMappingUi() {
+    let r: ColumnHeadersWithRowContent = this.wittymail.getColumnHeadersWithSampleRows();
+    this.headers = r.headers;
+    this.tableContent = r.contents;
+
+    this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
   }
 
   onSubjectTemplateChanged(value: string) {
@@ -55,6 +46,34 @@ export class DesignContentsComponent implements OnInit {
     value = value.replace(new RegExp('\n', 'g'), "<br />");
     // TODO: Replace #num with sample value from columnHeadersWithSamples
     this.bodyTemplateRealtimeSample = value;
+  }
+
+  saveSubjectAndBodyTemplate() {
+    this.wittymail.saveEmailSubjectBodyTemplate(this.subjectTemplate, this.bodyTemplate);
+  }
+
+  sendEmailMetadata() {
+    this.wittymail.postEmailMetadata()
+    .subscribe(
+      data => {
+        this.log.info("POST complete: ", data);
+      }
+    )
+  }
+
+  validateInputsAndContinue() {
+    if (this.subjectTemplate.length == 0) {
+      this.errorDialog.showError("Please type a subject for the e-mails");
+      return;
+    }
+    if (this.bodyTemplate.length == 0) {
+      this.errorDialog.showError("Please type some content for the e-mails");
+      return;
+    }
+
+    this.saveSubjectAndBodyTemplate();
+    this.sendEmailMetadata();
+    this.router.navigate(['report-summary']);
   }
 
 }

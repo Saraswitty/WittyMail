@@ -23,12 +23,13 @@ export class InputSheetComponent implements OnInit {
   headers: string[] = [];
   tableContent: any[] = [];
 
-  columnMappings: string[] = [];
+  rawColumnMappings: string[] = [];
   columnRoles: string[] =
     ["E-mail Address (To)",
       "E-mail Address (CC)",
       "Attachment PDF filename"]
 
+  columnMappings: ColumnMappings;
   num_mappings_done: number = 0;
 
   constructor(private log: LoggerService, private wittymail: WittymailService,
@@ -44,20 +45,20 @@ export class InputSheetComponent implements OnInit {
     this.showColumnSelectionForm = true;
   }
 
-  sendColumnMapping() {
-    this.log.info("Raw column mappings from UI: ", this.columnMappings);
-    let m = <ColumnMappings>{};
+  processColumnMapping() {
+    this.log.info("Raw column mappings from UI: ", this.rawColumnMappings);
+    this.columnMappings = <ColumnMappings>{};
     this.num_mappings_done = 0;
-    for (let i in this.columnMappings) {
-      switch (this.columnMappings[i]) {
+    for (let i in this.rawColumnMappings) {
+      switch (this.rawColumnMappings[i]) {
         case this.columnRoles[0]:
-          m.to_column = this.headers[i];
+          this.columnMappings.to_column = this.headers[i];
           break;
         case this.columnRoles[1]:
-          m.cc_column = this.headers[i];
+          this.columnMappings.cc_column = this.headers[i];
           break;
         case this.columnRoles[2]:
-          m.attachment_column = this.headers[i];
+          this.columnMappings.attachment_column = this.headers[i];
           break;
         default:
           this.log.info("Column %d does not map to anything", i);
@@ -66,14 +67,18 @@ export class InputSheetComponent implements OnInit {
       this.num_mappings_done++;
     }
     this.log.info("num_mappings_done: ", this.num_mappings_done);
-    this.log.info("Processed column mappings: ", m);
+    this.log.info("Processed column mappings: ", this.columnMappings);
+  }
 
-    this.validateInputsAndContinue();
+  saveMappings() {
+    this.wittymail.saveEmailToCCColumns(this.columnMappings.to_column, this.columnMappings.cc_column);
+    this.wittymail.saveAttachmentMetadata(this.columnMappings.attachment_column);
   }
 
   validateInputsAndContinue() {
-    let dedupedColumnMappings = this.columnMappings.filter((el, i, a) => i === a.indexOf(el))
-    if (dedupedColumnMappings.length != this.columnMappings.length) {
+    this.processColumnMapping();
+    let dedupedColumnMappings = this.rawColumnMappings.filter((el, i, a) => i === a.indexOf(el))
+    if (dedupedColumnMappings.length != this.rawColumnMappings.length) {
       this.errorDialog.showError("Please select only a single column for each field in the dropdown");
       return;
     }
@@ -82,6 +87,7 @@ export class InputSheetComponent implements OnInit {
       return;
     }
     
+    this.saveMappings();
     this.router.navigate(['input-attachment']);
   }
 

@@ -35,7 +35,7 @@
       <tr>
         <th *ngFor="let col of headers; index as i">
           <div class="select">
-            <select id="'columnSelection' + i" [(ngModel)]="columnMappings[i]">
+            <select id="'columnSelection' + i" [(ngModel)]="rawColumnMappings[i]">
               <option [value]="" selected></option>
               <option *ngFor="let role of columnRoles" [value]="role">{{role}}</option>
             </select>
@@ -53,7 +53,7 @@
   </table>
 
   <br />
-  <button type="submit" class="btn btn-primary" (click)="sendColumnMapping()">NEXT</button>
+  <button type="submit" class="btn btn-primary" (click)="validateInputsAndContinue()">NEXT</button>
 
 </div>
 

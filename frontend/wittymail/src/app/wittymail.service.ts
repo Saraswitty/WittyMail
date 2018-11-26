@@ -21,19 +21,36 @@ export interface ColumnMappings {
   attachment_column: string;
 }
 
+export interface EmailMetadata {
+  to_column: string;
+  cc_column: string;
+  subject_template: string;
+  body_template: string;
+}
+
+export interface AttachmentMetadata {
+  attachment_column: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class WittymailService {
 
+  emailMetadataInstance: EmailMetadata;
+  attachmentMetadataInstance: AttachmentMetadata;
+
   urls = {
     version: 'api/version',  // GET
     fodder: 'api/fodder',    // POST
-    attachment: 'api/attachment'  // POST
+    attachment: 'api/attachment',  // POST
+    email: 'api/email' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
     this.log.info("Created: ", this);
+    this.emailMetadataInstance = <EmailMetadata>{};
+    this.attachmentMetadataInstance = <AttachmentMetadata>{};
   }
 
   /**
@@ -83,29 +100,57 @@ export class WittymailService {
   getColumnHeadersWithSampleRows(): ColumnHeadersWithRowContent {
     let res: ColumnHeadersWithRowContent = {
       headers: [
-        'Name of Child', 'Class', 'Sponsor', 'Reference', 'Mail ID', 'Reference mail ID'
+        'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference mail ID'
       ],
       contents: [
         {
           'Name of Child': 'Aradhya Karche',
-          'Class': 'Jr. KG- shanti nagar',
-          'Sponsor': 'Jaya Singh',
-          'Reference': 'Akshay Kokne',
-          'Mail ID': 'jaya.singh753@gmail.com',
+          'Class': 'Nursery- kalewadi',
+          'Sponsor': 'Kalubai pratishthan',
+          'Mail ID': 'Sanjaysandhu8090@gmail.com',
+          'Reference': 'Ravi',
           'Reference mail ID': 'amboreravi@gmail.com'
         },
         {
-          'Name of Child': 'Aradhya Karche',
-          'Class': 'Jr. KG- shanti nagar',
-          'Sponsor': 'Jaya Singh',
-          'Reference': 'Akshay Kokne',
-          'Mail ID': 'jaya.singh753@gmail.com',
-          'Reference mail ID': 'amboreravi@gmail.com'
+          'Name of Child': 'Vedika Shirgire',
+          'Class': 'Nursery- kalewadi',
+          'Sponsor': 'Apurva kumar',
+          'Mail ID': 'apurv07vit@gmail.com',
+          'Reference': 'Anish',
+          'Reference mail ID': 'anishgarg07@gmail.com'
         }
       ]
     };
 
     return res;
+  }
+
+  saveEmailToCCColumns(to_column: string, cc_column: string) {
+    this.emailMetadataInstance.to_column = to_column;
+    this.emailMetadataInstance.cc_column = cc_column;
+
+    this.log.info("emailMetadataInstance: ", this.emailMetadataInstance);
+  }
+
+  saveEmailSubjectBodyTemplate(subject_template: string, body_template: string) {
+    this.emailMetadataInstance.subject_template = subject_template;
+    this.emailMetadataInstance.body_template = body_template;
+
+    this.log.info("emailMetadataInstance: ", this.emailMetadataInstance);
+  }
+
+  saveAttachmentMetadata(attachment_column: string) {
+    this.attachmentMetadataInstance.attachment_column = attachment_column;
+
+    this.log.info("attachmentMetadataInstance: ", this.attachmentMetadataInstance);
+  }
+
+  postEmailMetadata(): Observable<string> {
+    this.log.info("POSTing email metadata: ", this.emailMetadataInstance);
+    return this.http.post<string>(this.urls.email, this.emailMetadataInstance)
+      .pipe(
+        catchError(this.handleError('postEmailMetadata', ''))
+      );
   }
 
 }
