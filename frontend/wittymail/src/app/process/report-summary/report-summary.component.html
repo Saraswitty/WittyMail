@@ -12,20 +12,20 @@
         <clr-icon shape="envelope"></clr-icon> Send Test E-mail
       </button>
       <clr-signpost>
-          <clr-signpost-content *clrIfOpen>
-            <div class="p5" style="margin-top:0;">
-              You can specify an e-mail address to use instead of the actual sponsor's e-mail address
-              to test how the e-mail would look like in your inbox.
-            </div>
-          </clr-signpost-content>
-        </clr-signpost>
+        <clr-signpost-content *clrIfOpen>
+          <div class="p5" style="margin-top:0;">
+            You can specify an e-mail address to use instead of the actual sponsor's e-mail address
+            to test how the e-mail would look like in your inbox.
+          </div>
+        </clr-signpost-content>
+      </clr-signpost>
     </div>
     <div class="btn-group">
       <button type="submit" class="btn btn-sm btn-success" (click)="onSendAllEmails()">
         <clr-icon shape="envelope"></clr-icon> SEND EMAILS TO SELECTED SPONSORS
       </button>
     </div>
-    
+
   </clr-dg-action-bar>
 
   <clr-dg-column>E-Mail</clr-dg-column>
@@ -103,5 +103,59 @@
   </div>
   <div class="modal-footer">
     <!-- TODO: Add a 'send test email' button here -->
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="showTestEmailModal">
+  <h3 class="modal-title">Send Test E-mail</h3>
+  <div class="modal-body">
+    A test e-mail will be sent for the first row in the sheet to the following address instead of the actual sponsor.
+    <form class="compact" style="padding-top: 0;" #testEmailForm="ngForm" (ngSubmit)="sendTestEmail()">
+      <section class="form-block">
+        <div class="form-group row">
+          <div class="col-xs-1">
+            <label for="aForm_3">To</label>
+          </div>
+          <div class="col-xs-6">
+            <label for="aForm_3" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md"
+              [class.invalid]="toEmailInput.invalid && (toEmailInput.dirty || toEmailInput.touched)">
+              <input name="test_email_to" type="email" id="aForm_3" placeholder="eg.pigeons.are.idiots99@gmail.com"
+                required [(ngModel)]="testEmailDetails.to_address" size="30" #toEmailInput="ngModel" ngModel email>
+              <span class="tooltip-content">
+                Please check your e-mail address.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <button type="submit" class="btn btn-primary" [disabled]="testEmailForm.form.invalid">
+            <clr-icon shape="envelope"></clr-icon> SEND
+          </button>
+        </div>
+      </section>
+    </form>
+    <div class="alert alert-success" role="alert" *ngIf="testEmailDetails.success">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+          </div>
+          <span class="alert-text">Test e-mail sent successfully, please check your inbox.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-danger" role="alert" *ngIf="testEmailDetails.error">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+          </div>
+          <span class="alert-text">Failed to send test e-mail: {{testEmailDetails.errorMessage}}</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </clr-modal>

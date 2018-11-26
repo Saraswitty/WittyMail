@@ -17,6 +17,14 @@ export class ReportSummaryComponent implements OnInit {
 
   emailDetails = {};
 
+  showTestEmailModal: boolean = false;
+  testEmailDetails = {
+    to_address: '',
+    success: false,
+    error: false,
+    errorMessage: ''
+  }
+
   constructor(private log: LoggerService, private wittymail: WittymailService) { }
 
   displaySummaryTable() {
@@ -36,7 +44,7 @@ export class ReportSummaryComponent implements OnInit {
   onViewEmail(selectedEmail) {
     this.log.info("Showing e-mail for: ", selectedEmail);
     this.emailDetails = {
-      from: 'aaa',
+      from: selectedEmail['from'],
       to: selectedEmail['to'],
       cc: selectedEmail['cc'],
       subject: selectedEmail['subject'],
@@ -45,6 +53,17 @@ export class ReportSummaryComponent implements OnInit {
       body: selectedEmail['body']
     }
     this.showEmailContentsModal = true;
+  }
+
+  onSendTestEmail() {
+    this.testEmailDetails.success = false;
+    this.testEmailDetails.error = false;
+    this.showTestEmailModal = true;
+  }
+
+  sendTestEmail() {
+    this.log.info("Sending test e-mail to '", this.testEmailDetails.to_address, "' for: ", this.tableContent[0]);
+    this.testEmailDetails.success = true;
   }
 
 }

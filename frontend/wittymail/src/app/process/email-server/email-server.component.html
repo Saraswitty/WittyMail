@@ -31,8 +31,8 @@
       <div class="col-xs-6">
         <label for="aForm_3" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md"
           [class.invalid]="emailUsernameInput.invalid && (emailUsernameInput.dirty || emailUsernameInput.touched)">
-          <input name="email_username" type="text" id="aForm_3" placeholder="eg.pigeons.are.idiots99@gmail.com"
-            required [(ngModel)]="emailSettings.username" size="30" #emailUsernameInput="ngModel">
+          <input name="email_username" type="email" id="aForm_3" placeholder="eg.pigeons.are.idiots99@gmail.com"
+            required [(ngModel)]="emailSettings.username" size="30" #emailUsernameInput="ngModel" ngModel email>
           <span class="tooltip-content">
             Please check your e-mail address.
           </span>

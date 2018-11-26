@@ -152,6 +152,7 @@ export class WittymailService {
           'Reference mail ID': 'amboreravi@gmail.com',
           'status': 'Pending',
           'email': {
+            'from': 'wittymail@acme.com',
             'to': 'Sanjaysandhu8090@gmail.com',
             'cc': 'amboreravi@gmail.com',
             'attachment': {
@@ -171,6 +172,7 @@ export class WittymailService {
           'Reference mail ID': 'anishgarg07@gmail.com',
           'status': 'Pending',
           'email': {
+            'from': 'wittymail@acme.com',
             'to': 'apurv07vit@gmail.com',
             'cc': 'anishgarg07@gmail.com',
             'attachment': {
