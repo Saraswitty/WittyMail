@@ -96,7 +96,7 @@ export class InputSheetComponent implements OnInit {
     this.displayColumnMappingUi();
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      this.log.info('Fodder uploaded: ', item, status, response);
+      this.log.info('Fodder uploaded: ', item.file.name, status);
       if (status === 200) {
         this.displayColumnMappingUi();
       } else {
