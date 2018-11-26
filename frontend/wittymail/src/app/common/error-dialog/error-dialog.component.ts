@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { LoggerService } from 'src/app/util/logger.service';
 
 @Component({
@@ -8,11 +8,21 @@ import { LoggerService } from 'src/app/util/logger.service';
 })
 export class ErrorDialogComponent implements OnInit {
 
-  @Input() showErrorModal: boolean;
-  @Input() errorMessage: string;
+  private showErrorModal: boolean = false;
+  errorMessage: string = "";
 
   constructor(private log: LoggerService) { 
+    log.info("Error dialog: ", this);
+  }
 
+  updateVisibilityState(newState: boolean) {
+    this.showErrorModal = newState;
+  }
+
+  showError(message: string) {
+    this.log.error(message);
+    this.errorMessage = message;
+    this.showErrorModal = true;
   }
 
   ngOnInit() {

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FileUploader, FileSelectDirective } from 'ng2-file-upload/ng2-file-upload';
 import { LoggerService } from 'src/app/util/logger.service';
 import { WittymailService, ColumnHeadersWithRowContent, ColumnMappings } from 'src/app/wittymail.service';
 import { Router } from '@angular/router';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
 // TODO: Move this to the REST API service
 const URL = 'http://localhost:3000/api/upload';
@@ -14,11 +15,9 @@ const URL = 'http://localhost:3000/api/upload';
 })
 export class InputSheetComponent implements OnInit {
 
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+
   public uploader: FileUploader;
-  errorDialog = {
-    show: false,
-    message: ""
-  }
   showColumnSelectionForm: boolean = true;
 
   headers: string[] = [];
@@ -75,13 +74,11 @@ export class InputSheetComponent implements OnInit {
   validateInputsAndContinue() {
     let dedupedColumnMappings = this.columnMappings.filter((el, i, a) => i === a.indexOf(el))
     if (dedupedColumnMappings.length != this.columnMappings.length) {
-      this.errorDialog.message = "Please select only a single column for each field in the dropdown";
-      this.errorDialog.show = true;
+      this.errorDialog.showError("Please select only a single column for each field in the dropdown");
       return;
     }
     if (this.num_mappings_done != this.columnRoles.length) {
-      this.errorDialog.message = "Please select a column for each field in the dropdown";
-      this.errorDialog.show = true;
+      this.errorDialog.showError("Please select a column for each field in the dropdown");
       return;
     }
     
@@ -103,8 +100,7 @@ export class InputSheetComponent implements OnInit {
       if (status === 200) {
         this.displayColumnMappingUi();
       } else {
-        this.errorDialog.message = "Failed to upload the sheet to the backend";
-        this.errorDialog.show = true;
+        this.errorDialog.showError("Failed to upload the sheet to the backend");
       }
     };
   }
