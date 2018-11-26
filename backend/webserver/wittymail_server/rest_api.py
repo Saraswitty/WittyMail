@@ -17,26 +17,42 @@ log = logger.get_logger(__name__)
 ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
 FODDER_DIRNAME      = "fodder_dir/"     # Dir to store fodder file
 
+# Actual temp directory, populated on first use
+root_temp_dir = None
+
 _logger = logger.get_logger(__name__)
 
 HTTP_OK         = 200
 HTTP_CREATED    = 201
 HTTP_NOT_FOUND  = 404
 
+def _get_root_temporary_dir():
+    global root_temp_dir
+    if not root_temp_dir:
+        root_temp_dir = tempfile.mkdtemp(prefix="WittyMail_")
+        _logger.info("Created new temporary directory: %s", root_temp_dir)
+        
+    return root_temp_dir
+    
 @flask_app.route("/api/version", methods=['GET'])
 def get_version():
     log.debug('Current version = %s' % (version.__pretty_version__))
     return (jsonify({'version': version.__pretty_version__}),
               HTTP_OK,
               {'ContentType':'application/json'})
+    
+def _get_fodder_dir():
+    fodder_dir = os.path.join(_get_root_temporary_dir(), FODDER_DIRNAME)
+    if not os.path.exists(fodder_dir):
+        os.mkdir(fodder_dir)
+    
+    return fodder_dir
 
 @flask_app.route("/api/fodder", methods=['POST'])
 def post_fodder():
     log.info(request.files)
     try:
-        fodder_dir = os.path.join(tempfile.gettempdir(), FODDER_DIRNAME) 
-        if not os.path.exists(fodder_dir):
-            os.mkdir(fodder_dir) 
+        fodder_dir = _get_fodder_dir()
 
         f = request.files['fodder']
         fodder_file = os.path.join(fodder_dir, f.filename)
@@ -70,20 +86,33 @@ def get_fodder_ingredients():
               HTTP_OK,
                 {'ContentType':'application/json'})
 
-@flask_app.route("/api/attachment", methods=['POST'])
-def post_attachment():
-    attachments = request.files.getlist("attachment[]")
-
-    attachment_dir = os.path.join(tempfile.gettempdir(), ATTACHMENTS_DIRNAME)
+def _get_attachments_dir():
+    attachment_dir = os.path.join(_get_root_temporary_dir(), ATTACHMENTS_DIRNAME)
     if not os.path.exists(attachment_dir):
         os.mkdir(attachment_dir)
-
-    for a in attachments:
+    
+    return attachment_dir
+    
+@flask_app.route("/api/attachment", methods=['POST'])
+def post_attachment():
+    '''
+    The 3rd party Angular plugin ng6-file-upload makes one POST call per file instead of 
+    sending them all at once.
+    
+    To workaround this stupitidy, this API is idempotent and will just keep saving
+    all files in the same dir
+    '''
+    try:
+        a = request.files['attachment']
+        attachment_dir = _get_attachments_dir()
+    
         a.save(os.path.join(attachment_dir, a.filename))
-        log.debug('attachment file save as = %s' % (attachment_dir + a.filename))
-
-    emailapi_broker.save_attachment_dir(attachment_dir)
-    return "Attachments saved successfully", HTTP_OK
+        log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
+    
+        emailapi_broker.save_attachment_dir(attachment_dir)
+        return "Attachments saved successfully", HTTP_OK
+    except:
+        _logger.exception("")
 
 @flask_app.route("/api/email", methods=['POST'])
 def post_email():
