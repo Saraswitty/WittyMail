@@ -11,39 +11,36 @@
       <button type="button" class="btn btn-sm btn-primary" (click)="onSendTestEmail()">
         <clr-icon shape="envelope"></clr-icon> Send Test E-mail
       </button>
+      <clr-signpost>
+          <clr-signpost-content *clrIfOpen>
+            <div class="p5" style="margin-top:0;">
+              You can specify an e-mail address to use instead of the actual sponsor's e-mail address
+              to test how the e-mail would look like in your inbox.
+            </div>
+          </clr-signpost-content>
+        </clr-signpost>
     </div>
-    <clr-signpost>
-      <clr-signpost-content *clrIfOpen>
-        <div class="p5" style="margin-top:0;">
-          You can specify an e-mail address to use instead of the actual sponsor's e-mail address
-          to test how the e-mail would look like in your inbox.
-        </div>
-      </clr-signpost-content>
-    </clr-signpost>
+    <div class="btn-group">
+      <button type="submit" class="btn btn-sm btn-success" (click)="onSendAllEmails()">
+        <clr-icon shape="envelope"></clr-icon> SEND EMAILS TO SELECTED SPONSORS
+      </button>
+    </div>
+    
   </clr-dg-action-bar>
 
-  <clr-dg-column *ngFor="let col of headers">{{col}}</clr-dg-column>
   <clr-dg-column>E-Mail</clr-dg-column>
-  <clr-dg-column>Status</clr-dg-column>
+  <clr-dg-column *ngFor="let col of headers">{{col}}</clr-dg-column>
 
   <clr-dg-row *clrDgItems="let row of tableContent" [clrDgItem]="row">
-    <clr-dg-cell *ngFor="let col of headers">{{row[col]}}</clr-dg-cell>
     <clr-dg-cell>
       <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row['email'])">View E-Mail</button>
+      <p class="p8" style="margin-top:5px;">{{row['status']}}</p>
     </clr-dg-cell>
-    <clr-dg-cell>
-      {{row['status']}}
-    </clr-dg-cell>
+    <clr-dg-cell *ngFor="let col of headers">{{row[col]}}</clr-dg-cell>
   </clr-dg-row>
 
   <clr-dg-footer>{{selectedRows.length}} e-mails will be sent.</clr-dg-footer>
 </clr-datagrid>
-
-<br />
-
-<a routerLink="/report-send">
-  <button type="submit" class="btn btn-success">SEND EMAILS TO SELECTED SPONSORS</button>
-</a>
 
 <clr-modal [(clrModalOpen)]="showEmailContentsModal">
   <h3 class="modal-title">E-mail Contents</h3>
