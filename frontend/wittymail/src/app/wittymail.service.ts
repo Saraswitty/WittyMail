@@ -125,6 +125,56 @@ export class WittymailService {
     return res;
   }
 
+  getVomit(): ColumnHeadersWithRowContent {
+    let res: ColumnHeadersWithRowContent = {
+      headers: [
+        'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference mail ID'
+      ],
+      contents: [
+        {
+          'Name of Child': 'Aradhya Karche',
+          'Class': 'Nursery- kalewadi',
+          'Sponsor': 'Kalubai pratishthan',
+          'Mail ID': 'Sanjaysandhu8090@gmail.com',
+          'Reference': 'Ravi',
+          'Reference mail ID': 'amboreravi@gmail.com',
+          'status': 'Pending',
+          'email': {
+            'to': 'Sanjaysandhu8090@gmail.com',
+            'cc': 'amboreravi@gmail.com',
+            'attachment': {
+              'name': 'Aradhya Karche.pdf',
+              'url': 'api/attachment/Aradhya%20Karche.pdf'
+            },
+            'subject': 'First term progress report for Aradhya Karche',
+            'body': 'Dear Kalubai pratishthan,'
+          }
+        },
+        {
+          'Name of Child': 'Vedika Shirgire',
+          'Class': 'Nursery- kalewadi',
+          'Sponsor': 'Apurva kumar',
+          'Mail ID': 'apurv07vit@gmail.com',
+          'Reference': 'Anish',
+          'Reference mail ID': 'anishgarg07@gmail.com',
+          'status': 'Pending',
+          'email': {
+            'to': 'apurv07vit@gmail.com',
+            'cc': 'anishgarg07@gmail.com',
+            'attachment': {
+              'name': 'Vedika Shirgire.pdf',
+              'url': 'api/attachment/Vedika%20Shirgire.pdf'
+            },
+            'subject': 'First term progress report for Vedika Shirgire',
+            'body': 'Dear Apurva kumar,'
+          }
+        }
+      ]
+    };
+
+    return res;
+  }
+
   saveEmailToCCColumns(to_column: string, cc_column: string) {
     this.emailMetadataInstance.to_column = to_column;
     this.emailMetadataInstance.cc_column = cc_column;

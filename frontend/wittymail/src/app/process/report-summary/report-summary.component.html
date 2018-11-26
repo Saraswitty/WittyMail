@@ -22,23 +22,21 @@
     </clr-signpost>
   </clr-dg-action-bar>
 
-  <clr-dg-column [clrDgField]="'childName'">Child Name</clr-dg-column>
-  <clr-dg-column [clrDgField]="'class'">Class</clr-dg-column>
-  <clr-dg-column [clrDgField]="'sponsor'">Sponsor</clr-dg-column>
-  <clr-dg-column [clrDgField]="'reference'">Reference</clr-dg-column>
+  <clr-dg-column *ngFor="let col of headers">{{col}}</clr-dg-column>
   <clr-dg-column>E-Mail</clr-dg-column>
+  <clr-dg-column>Status</clr-dg-column>
 
-  <clr-dg-row *clrDgItems="let row of summaryList" [clrDgItem]="row">
-    <clr-dg-cell>{{row.childName}}</clr-dg-cell>
-    <clr-dg-cell>{{row.class}}</clr-dg-cell>
-    <clr-dg-cell>{{row.sponsor}}</clr-dg-cell>
-    <clr-dg-cell>{{row.reference}}</clr-dg-cell>
+  <clr-dg-row *clrDgItems="let row of tableContent" [clrDgItem]="row">
+    <clr-dg-cell *ngFor="let col of headers">{{row[col]}}</clr-dg-cell>
     <clr-dg-cell>
-      <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row.childName)">View E-Mail</button>
+      <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row['email'])">View E-Mail</button>
+    </clr-dg-cell>
+    <clr-dg-cell>
+      {{row['status']}}
     </clr-dg-cell>
   </clr-dg-row>
 
-  <clr-dg-footer>{{summaryList.length}} e-mails will be sent.</clr-dg-footer>
+  <clr-dg-footer>{{selectedRows.length}} e-mails will be sent.</clr-dg-footer>
 </clr-datagrid>
 
 <br />
@@ -52,20 +50,20 @@
   <div class="modal-body">
     <form class="compact" style="padding-top: 0;">
       <section class="form-block">
-          <div class="form-group row">
-              <div class="col-xs-2">
-                <label for="aForm_7">From</label>
-              </div>
-              <div class="col-xs-6">
-                <input type="text" id="aForm_7" value="wittymail@acme.com" disabled>
-              </div>
-            </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_7">From</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_7" value="{{emailDetails.from}}" disabled>
+          </div>
+        </div>
         <div class="form-group row">
           <div class="col-xs-2">
             <label for="aForm_1">To</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_1" value="john.doe@acme.com" disabled>
+            <input type="text" id="aForm_1" value="{{emailDetails.to}}" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -73,7 +71,7 @@
             <label for="aForm_2">CC</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_2" value="bob.jones@acme.com" disabled>
+            <input type="text" id="aForm_2" value="{{emailDetails.cc}}" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -81,7 +79,7 @@
             <label for="aForm_3">Subject</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_3" value="Report card for Peter Nelson" size="45" disabled>
+            <input type="text" id="aForm_3" value="{{emailDetails.subject}}" size="45" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -90,7 +88,7 @@
           </div>
           <div class="col-xs-6">
             <clr-icon shape="attachment"></clr-icon>
-            <a href=""> Peter Nelson.pdf</a>
+            <a href="{{emailDetails.attachment_url}}"> {{emailDetails.attachment}}</a>
           </div>
         </div>
         <div class="form-group row">
@@ -99,16 +97,7 @@
           </div>
           <div class="col-xs-10">
             <textarea id="aForm_4" rows="10" disabled>
-Dear John,
-
-Greetings from Sneh Foundation.
-
-Thank you for sponsoring a child at our Rainbow pre-school for the year 2018-19.
-
-Please find attached the semi-annual report card for Peter Nelson.
-
-Best Regards,
-S
+{{emailDetails.body}}
           </textarea>
           </div>
         </div>
