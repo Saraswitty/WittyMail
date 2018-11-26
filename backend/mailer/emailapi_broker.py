@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding=utf-8
-
+import os, sys
 import openpyxl
 import mailer.emailapi as emailapi
 import re
 import util.logger as logger
 import ai.gender_guesser as gender_guesser
+import tempfile
 
 log = logger.get_logger(__name__)
 
@@ -14,6 +15,35 @@ global email_fodder_names
 global EMAIL_FODDER_TO_INDEX
 global EMAIL_FODDER_CC_INDEX
 global attachment_dir 
+
+# These directories will be created within a tmp directory
+ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
+FODDER_DIRNAME      = "fodder_dir/"     # Dir to store fodder file
+
+# Actual temp directory, populated on first use
+root_temp_dir = None
+
+def _get_root_temporary_dir():
+    global root_temp_dir
+    if not root_temp_dir:
+        root_temp_dir = tempfile.mkdtemp(prefix="WittyMail_")
+        log.info("Created new temporary directory: %s", root_temp_dir)
+
+    return root_temp_dir
+
+def get_fodder_dir():
+    fodder_dir = os.path.join(_get_root_temporary_dir(), FODDER_DIRNAME)
+    if not os.path.exists(fodder_dir):
+        os.mkdir(fodder_dir)
+
+    return fodder_dir
+
+def get_attachments_dir():
+    attachment_dir = os.path.join(_get_root_temporary_dir(), ATTACHMENTS_DIRNAME)
+    if not os.path.exists(attachment_dir):
+        os.mkdir(attachment_dir)
+
+    return attachment_dir
 
 # Names of the fodder to be used to create the emails
 email_fodder_names = []
@@ -26,20 +56,21 @@ EMAIL_FODDER_TO_INDEX = 0
 EMAIL_FODDER_CC_INDEX = 0
 
 # Extended fodder names that will be appended to the fodder names provided by the user (i.e. email_fodder_names)
-extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
-extended_email_fodder_names_PRONOUN_INDEX = -5
-extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -4
-extended_email_fodder_names_EMAIL_BODY_INDEX = -3
-extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -2
+extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent', 'issue']
+extended_email_fodder_names_PRONOUN_INDEX = -6
+extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -5
+extended_email_fodder_names_EMAIL_BODY_INDEX = -4
+extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -3
+extended_email_fodder_names_ISSUE_INDEX = -1
 
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
-extended_default_email_fodder = ["his", None, None, None, False]
+extended_default_email_fodder = ["his", None, None, None, False, "All is well"]
 
 # TODO Add check to detect extention type
 def save_fodder_from_file(loc, email_fodder_names_template = None):
         global email_fodder
         global email_fodder_names
-     
+
         _email_fodder = []  
 
         # TODO Check if we should read wb_obj.active or wb_obj[0]. Do we have to close?
@@ -62,14 +93,6 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
         email_fodder_names.extend(extended_email_fodder_names)
 
         email_fodder = _email_fodder[1:]
-
-        for r in email_fodder:
-            extended_email_fodder = list(extended_default_email_fodder)
-            # TODO Add template support for attachment and support different filetypes
-            _attachments = r[1].split(',')
-            attachments = [a + ".pdf" for a in _attachments]
-            extended_email_fodder[2] = r[1] + b".pdf"
-            r.extend(extended_email_fodder)
 
 def get_email_fodder_names():
         return email_fodder_names
@@ -95,27 +118,40 @@ def template_to_str(_st, l):
     log.debug('template_to_str() final str = %s' % st)
     return st
 
-def save_extended_fodder(to_index, cc_index, subject_template, body_template):
+def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     global EMAIL_FODDER_TO_INDEX
     global EMAIL_FODDER_CC_INDEX
 
-    EMAIL_FODDER_TO_INDEX = to_index
-    EMAIL_FODDER_CC_INDEX = cc_index
+    EMAIL_FODDER_TO_INDEX = email_fodder_names.index(to_column)
+    EMAIL_FODDER_CC_INDEX = email_fodder_names.index(cc_column)
 
     for r in email_fodder:
         name = r[1].split()
         # TODO: FixMe! "TypeError: can only concatenate str (not "bytes") to str"
-#         if len(name) == 1:
-#             gender = gender_guesser.guess_gender(name[0]) 
-#         else:
-#             gender = gender_guesser.guess_gender(name[0], name[1])
-#         r[extended_email_fodder_names_PRONOUN_INDEX] = "her" if gender == "female" else "his" 
+        if len(name) == 1:
+            gender = gender_guesser.guess_gender(name[0]) 
+        else:
+            gender = gender_guesser.guess_gender(name[0], name[1])
+        r.extend(extended_default_email_fodder)
+        r[extended_email_fodder_names_PRONOUN_INDEX] = "her" if gender == "female" else "his" 
         r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = template_to_str(subject_template, r)
         r[extended_email_fodder_names_EMAIL_BODY_INDEX] = template_to_str(body_template, r)
 
-def save_attachment_dir(dir_loc, filename_mapping = None):
+def save_attachment_dir(dir_loc):
         global attachment_dir 
         attachment_dir = dir_loc
+
+def save_attachment_column(attachment_column):
+    attachment_index = email_fodder_names.index(attachment_column)
+    for r in email_fodder:
+        _attachments = r[attachment_index].split(',')
+        attachments = [a + ".pdf" for a in _attachments]
+        r[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX] = attachments
+        for a in attachments:
+            if not os.path.isfile(os.path.join(get_attachments_dir(), a)):
+                r[extended_email_fodder_names_ISSUE_INDEX] = "pdf not found"
+            else:
+                r[extended_email_fodder_names_ISSUE_INDEX] = "All is well"
 
 def send_email(tos = None):
     for e in email_fodder:

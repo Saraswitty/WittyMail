@@ -9,8 +9,8 @@ Modify emailid and passwd and copy paste the following to your terminal
 #-----------------------------------
 curl -v -X POST -H "Content-Type: multipart/form-data" -F "fodder=@/home/user/gmail-api-python/donorDetails_test.xlsx" http://localhost:5000/api/fodder
 curl --header "Content-Type: application/json" --request POST --data '{"username":"abc@gmail.com","password":"passwd"}' http://localhost:5000/api/email_server
-curl -v -X POST -H "Content-Type: multipart/form-data" -F 'attachment[]=@/home/user/gmail-api-python/Yogini Bhosale.pdf' http://localhost:5000/api/attachment
-curl --header "Content-Type: application/json" --request POST --data '{"to_index" : 5, "cc_index" : 6, "subject_template" : "Report of #1", "body_template" : "Hello #5 #6,\n Please see attached the report card\n" }' http://localhost:5000/api/email
+curl -v -X POST -H "Content-Type: multipart/form-data" -F 'attachment=@/home/user/gmail-api-python/Yogini Bhosale.pdf' http://localhost:5000/api/attachment
+curl --header "Content-Type: application/json" --request POST --data '{"to_column" : 5, "cc_column" : 6, "subject_template" : "Report of #1", "body_template" : "Hello #5,\n Please see attached the report card\n" }' http://localhost:5000/api/email
 curl --header "Content-Type: application/json" --request POST --data '{"to" : "abc@gmail.com"}' http://localhost:5000/api/email/test
 #-----------------------------------
 

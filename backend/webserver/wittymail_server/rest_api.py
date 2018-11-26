@@ -5,20 +5,12 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
 import mailer.emailapi_broker as emailapi_broker
-import tempfile
 from wittymail_server import flask_app
 from flask import jsonify, request, json
 import util.version as version
 import util.logger as logger
 
 log = logger.get_logger(__name__)
-
-# These directories will be created within a tmp directory
-ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
-FODDER_DIRNAME      = "fodder_dir/"     # Dir to store fodder file
-
-# Actual temp directory, populated on first use
-root_temp_dir = None
 
 _logger = logger.get_logger(__name__)
 
@@ -27,14 +19,6 @@ HTTP_CREATED    = 201
 HTTP_NOT_FOUND  = 404
 HTTP_BAD_INPUT  = 400
 
-def _get_root_temporary_dir():
-    global root_temp_dir
-    if not root_temp_dir:
-        root_temp_dir = tempfile.mkdtemp(prefix="WittyMail_")
-        _logger.info("Created new temporary directory: %s", root_temp_dir)
-        
-    return root_temp_dir
-    
 @flask_app.route("/api/version", methods=['GET'])
 def get_version():
     log.debug('Current version = %s' % (version.__pretty_version__))
@@ -42,18 +26,33 @@ def get_version():
               HTTP_OK,
               {'ContentType':'application/json'})
     
-def _get_fodder_dir():
-    fodder_dir = os.path.join(_get_root_temporary_dir(), FODDER_DIRNAME)
-    if not os.path.exists(fodder_dir):
-        os.mkdir(fodder_dir)
-    
-    return fodder_dir
+@flask_app.route("/api/fodder/regurgitate", methods=['GET'])
+def get_fodder_regurgitate():
+    fodder_names = emailapi_broker.get_email_fodder_names()
+    fodder = emailapi_broker.get_email_fodder()
+
+    if len(fodder_names) == 0 or len(fodder) == 0:    
+        return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
+
+    cnt = 0
+    fodder_list = []
+    for f in fodder:
+        if cnt >= 2:
+          break
+        fodder_list.append(dict(zip(fodder_names, f)))
+        cnt += 1
+
+    return (jsonify({'headers': fodder_names, 'contents': fodder_list}),
+              HTTP_OK,
+              {'ContentType':'application/json'})
+
+  
 
 @flask_app.route("/api/fodder", methods=['POST'])
 def post_fodder():
     log.info(request.files)
     try:
-        fodder_dir = _get_fodder_dir()
+        fodder_dir = emailapi_broker.get_fodder_dir()
 
         f = request.files['fodder']
         fodder_file = os.path.join(fodder_dir, f.filename)
@@ -87,13 +86,32 @@ def get_fodder_ingredients():
               HTTP_OK,
                 {'ContentType':'application/json'})
 
-def _get_attachments_dir():
-    attachment_dir = os.path.join(_get_root_temporary_dir(), ATTACHMENTS_DIRNAME)
-    if not os.path.exists(attachment_dir):
-        os.mkdir(attachment_dir)
-    
-    return attachment_dir
-    
+@flask_app.route("/api/attachment/mapping", methods=['POST'])
+def post_attachment_mapping():
+    data = json.loads(request.data)
+    emailapi_broker.save_attachment_column(data['attachment_column'])
+    return "Attachment mapping saved successfully", HTTP_OK
+
+@flask_app.route("/api/attachment/validate", methods=['GET'])
+def get_attachment_validate:
+  fodder_names = emailapi_broker.get_email_fodder_names()
+  fodder = emailapi_broker.get_email_fodder()
+
+  if len(fodder_names) == 0 or len(fodder) == 0:    
+      return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
+
+  issue_index = fodder_names.index("issue")
+
+  fodder_list = []
+  for f in fodder:
+      if f[issue_index] != "All is well":
+        fodder_list.append(dict(zip(fodder_names, f)))
+
+   return (jsonify({'headers': fodder_names, 'content': fodder_list}),
+            HTTP_OK,
+            {'ContentType':'application/json'})
+
+def post_attachment():
 @flask_app.route("/api/attachment", methods=['POST'])
 def post_attachment():
     '''
@@ -105,7 +123,7 @@ def post_attachment():
     '''
     try:
         a = request.files['attachment']
-        attachment_dir = _get_attachments_dir()
+        attachment_dir = emailapi_broker.get_attachments_dir()
     
         a.save(os.path.join(attachment_dir, a.filename))
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
