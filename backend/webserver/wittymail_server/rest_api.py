@@ -25,6 +25,7 @@ _logger = logger.get_logger(__name__)
 HTTP_OK         = 200
 HTTP_CREATED    = 201
 HTTP_NOT_FOUND  = 404
+HTTP_BAD_INPUT  = 400
 
 def _get_root_temporary_dir():
     global root_temp_dir
@@ -117,7 +118,7 @@ def post_attachment():
 @flask_app.route("/api/email", methods=['POST'])
 def post_email():
     data = json.loads(request.data)
-    emailapi_broker.save_extended_fodder(data['to_index'], data['cc_index'], data['subject_template'], data['body_template']) 
+    emailapi_broker.save_extended_fodder(data['to_column'], data['cc_column'], data['subject_template'], data['body_template']) 
     return "Email related information saved successfully", HTTP_OK
 
 @flask_app.route("/api/email/test", methods=['POST'])
@@ -159,5 +160,9 @@ def post_email_server():
     data = json.loads(request.data)
     e = emailapi_broker.set_login_details(data['username'], data['password'])
     if e[0] is not 0:
-        return e[1], HTTP_NOT_FOUND
-    return e[1], HTTP_OK
+        return (jsonify({'error_message': e[1]}),
+              HTTP_BAD_INPUT,
+              {'ContentType':'application/json'})
+    return (jsonify({'error_message': e[1]}),
+              HTTP_OK,
+              {'ContentType':'application/json'})
