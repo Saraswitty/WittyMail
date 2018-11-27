@@ -66,13 +66,13 @@ def post_fodder():
 
 # TODO Change this to a get request because using post for get is, well, stupid
 # Check how to send multi line data in GET request 
-@flask_app.route("/api/fodder/template", methods=['POST'])
-def get_fodder_template():
+@flask_app.route("/api/email/template", methods=['POST'])
+def get_email_template():
     data = json.loads(request.data)
     fodder = emailapi_broker.get_email_fodder() 
     result_str = emailapi_broker.template_to_str(data['template'], fodder[0])
- 
-    return (jsonify(result_str),
+
+    return (jsonify({'reality': result_str}), 
               HTTP_OK,
                 {'ContentType':'application/json'})
 
