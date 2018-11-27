@@ -75,7 +75,9 @@ export class InputSheetComponent implements OnInit {
   validateInputsAndContinue() {
     this.processColumnMapping();
     let dedupedColumnMappings = this.rawColumnMappings.filter((el, i, a) => i === a.indexOf(el))
-    if (dedupedColumnMappings.length != this.rawColumnMappings.length) {
+    // The rawColumnMappings array can have holes for columns with nothing selects, so dump them before comparing
+    let noHolesRawColumnMappings = this.rawColumnMappings.filter((el) => el);
+    if (dedupedColumnMappings.length != noHolesRawColumnMappings.length) {
       this.errorDialog.showError("Please select only a single column for each field in the dropdown");
       return;
     }
