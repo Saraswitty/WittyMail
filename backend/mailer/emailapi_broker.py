@@ -133,11 +133,12 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     email_fodder_names.extend(extended_email_fodder_names)
     for r in email_fodder:
         name = r[1].split()
+        gender = "his"
         # TODO: FixMe! "TypeError: can only concatenate str (not "bytes") to str"
-        if len(name) == 1:
-            gender = gender_guesser.guess_gender(name[0]) 
-        else:
-            gender = gender_guesser.guess_gender(name[0], name[1])
+        # if len(name) == 1:
+        #    gender = gender_guesser.guess_gender(name[0]) 
+        # else:
+        #    gender = gender_guesser.guess_gender(name[0], name[1])
         r.extend(extended_default_email_fodder)
         r[extended_email_fodder_names_PRONOUN_INDEX] = "her" if gender == "female" else "his" 
         r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = template_to_str(subject_template, r)
