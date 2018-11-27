@@ -81,7 +81,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
             cells = []
 
             for j in range(1, sheet_obj.max_column + 1):
-                cells.append(str(sheet_obj.cell(row = i, column = j).value).encode('UTF8'))
+                cells.append(str(sheet_obj.cell(row = i, column = j).value))
             _email_fodder.append(cells)
 
         assert email_fodder_names_template == None or email_fodder_names == email_fodder_names_template, \
@@ -93,6 +93,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
         email_fodder_names.extend(extended_email_fodder_names)
 
         email_fodder = _email_fodder[1:]
+        
 
 def get_email_fodder_names():
         return email_fodder_names
