@@ -52,7 +52,7 @@
             <label for="aForm_7">From</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_7" value="{{emailDetails.from}}" disabled>
+            <input type="text" id="aForm_7" value="{{emailDetails['from']}}" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -60,7 +60,7 @@
             <label for="aForm_1">To</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_1" value="{{emailDetails.to}}" disabled>
+            <input type="text" id="aForm_1" value="{{emailDetails['to']}}" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -68,7 +68,7 @@
             <label for="aForm_2">CC</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_2" value="{{emailDetails.cc}}" disabled>
+            <input type="text" id="aForm_2" value="{{emailDetails['cc']}}" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -76,7 +76,7 @@
             <label for="aForm_3">Subject</label>
           </div>
           <div class="col-xs-6">
-            <input type="text" id="aForm_3" value="{{emailDetails.subject}}" size="45" disabled>
+            <input type="text" id="aForm_3" value="{{emailDetails['subject']}}" size="45" disabled>
           </div>
         </div>
         <div class="form-group row">
@@ -85,7 +85,7 @@
           </div>
           <div class="col-xs-6">
             <clr-icon shape="attachment"></clr-icon>
-            <a href="{{emailDetails.attachment_url}}"> {{emailDetails.attachment}}</a>
+            <a href="{{emailDetails['attachment_url']}}"> {{emailDetails['attachment']}}</a>
           </div>
         </div>
         <div class="form-group row">

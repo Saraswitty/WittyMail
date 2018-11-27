@@ -87,4 +87,8 @@ export class ReportSummaryComponent implements OnInit {
       }
     )
   }
+
+  onSendAllEmails() {
+    
+  }
 }

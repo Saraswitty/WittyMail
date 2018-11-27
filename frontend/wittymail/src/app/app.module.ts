@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ClarityModule } from '@clr/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FileSelectDirective } from 'ng2-file-upload';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AboutComponent } from './about/about.component';
@@ -19,11 +18,10 @@ import { LoggerService } from './util/logger.service';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 import { EmailServerComponent } from './process/email-server/email-server.component';
 import { QuillModule } from 'ngx-quill'
+import { FileUploadModule } from 'ng2-file-upload';
 
 @NgModule({
   declarations: [
-    FileSelectDirective,
-    
     AppComponent,
     AboutComponent,
     InputSheetComponent,
@@ -34,6 +32,7 @@ import { QuillModule } from 'ngx-quill'
     EmailServerComponent
   ],
   imports: [
+    FileUploadModule,
     BrowserModule,
     AppRoutingModule,
     ClarityModule,

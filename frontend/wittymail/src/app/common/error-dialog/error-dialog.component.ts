@@ -8,7 +8,7 @@ import { LoggerService } from 'src/app/util/logger.service';
 })
 export class ErrorDialogComponent implements OnInit {
 
-  private showErrorModal: boolean = false;
+  showErrorModal: boolean = false;
   errorMessage: string = "";
 
   constructor(private log: LoggerService) { 
