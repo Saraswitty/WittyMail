@@ -56,12 +56,12 @@ EMAIL_FODDER_TO_INDEX = 0
 EMAIL_FODDER_CC_INDEX = 0
 
 # Extended fodder names that will be appended to the fodder names provided by the user (i.e. email_fodder_names)
-extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent', 'issue']
-extended_email_fodder_names_PRONOUN_INDEX = -6
-extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -5
-extended_email_fodder_names_EMAIL_BODY_INDEX = -4
-extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -3
-extended_email_fodder_names_ISSUE_INDEX = -1
+extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
+email_fodder_names_STATUS_INDEX = -6
+extended_email_fodder_names_PRONOUN_INDEX = -5
+extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -4
+extended_email_fodder_names_EMAIL_BODY_INDEX = -3
+extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -2
 
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
 extended_default_email_fodder = ["his", None, None, None, False, "All is well"]
@@ -82,6 +82,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
 
             for j in range(1, sheet_obj.max_column + 1):
                 cells.append(str(sheet_obj.cell(row = i, column = j).value))
+            cells.append("E-mail pending") 
             _email_fodder.append(cells)
 
         assert email_fodder_names_template == None or email_fodder_names == email_fodder_names_template, \
@@ -90,7 +91,8 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
                "**** There are no entries in the excel sheet! ****"
 
         email_fodder_names = _email_fodder[0]
-        email_fodder_names.extend(extended_email_fodder_names)
+        email_fodder_names = email_fodder_names[:-1]
+        email_fodder_names.append("Status")
 
         email_fodder = _email_fodder[1:]
         
@@ -126,6 +128,7 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     EMAIL_FODDER_TO_INDEX = email_fodder_names.index(to_column)
     EMAIL_FODDER_CC_INDEX = email_fodder_names.index(cc_column)
 
+    email_fodder_names.extend(extended_email_fodder_names)
     for r in email_fodder:
         name = r[1].split()
         # TODO: FixMe! "TypeError: can only concatenate str (not "bytes") to str"
@@ -150,9 +153,9 @@ def save_attachment_column(attachment_column):
         r[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX] = attachments
         for a in attachments:
             if not os.path.isfile(os.path.join(get_attachments_dir(), a)):
-                r[extended_email_fodder_names_ISSUE_INDEX] = "pdf not found"
+                r[email_fodder_names_STATUS_INDEX] = "pdf not found"
             else:
-                r[extended_email_fodder_names_ISSUE_INDEX] = "All is well"
+                r[email_fodder_names_STATUS_INDEX] = "All is well"
 
 def send_email(tos = None):
     for e in email_fodder:
