@@ -15,7 +15,7 @@ export class InputSheetComponent implements OnInit {
   @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
 
   public uploader: FileUploader;
-  showColumnSelectionForm: boolean = true;
+  showColumnSelectionForm: boolean = false;
 
   headers: string[] = [];
   tableContent: any[] = [];
@@ -33,13 +33,21 @@ export class InputSheetComponent implements OnInit {
     private router: Router) { }
 
   displayColumnMappingUi() {
+    this.wittymail.getColumnHeadersWithSampleRows().subscribe(
+      data => {
+        this.log.info("Regurgitate complete: ", data);
+        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
+        this.headers = r.headers;
+        this.tableContent = r.contents;
+    
+        this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
 
-    let r: ColumnHeadersWithRowContent = this.wittymail.getColumnHeadersWithSampleRows();
-    this.headers = r.headers;
-    this.tableContent = r.contents;
-
-    this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
-    this.showColumnSelectionForm = true;
+        this.showColumnSelectionForm = true;
+      },
+      error => {
+        this.errorDialog.showError("Failed to analyze the Excel sheet");
+      }
+    );
   }
 
   processColumnMapping() {
@@ -96,9 +104,6 @@ export class InputSheetComponent implements OnInit {
       file.withCredentials = false;
       this.uploader.uploadAll();
     };
-
-    // TODO: Remove this call! Short-circuit to populate table
-    this.displayColumnMappingUi();
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       this.log.info('Fodder uploaded: ', item.file.name, status);

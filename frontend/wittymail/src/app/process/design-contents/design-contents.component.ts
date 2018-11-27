@@ -30,11 +30,20 @@ export class DesignContentsComponent implements OnInit {
   }
 
   displayColumnMappingUi() {
-    let r: ColumnHeadersWithRowContent = this.wittymail.getColumnHeadersWithSampleRows();
-    this.headers = r.headers;
-    this.tableContent = r.contents;
-
-    this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
+    this.wittymail.getColumnHeadersWithSampleRows().subscribe(
+      data => {
+        this.log.info("Regurgitate complete: ", data);
+        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
+        this.headers = r.headers;
+        this.tableContent = r.contents;
+    
+        this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
+      },
+      error => {
+        this.errorDialog.showError("Failed to analyze the Excel sheet");
+      }
+    );
+    
   }
 
   onSubjectTemplateChanged(value: string) {

@@ -52,6 +52,7 @@ export class WittymailService {
   urls = {
     version: 'api/version',  // GET
     fodder: 'api/fodder',    // POST
+    regurgitate: 'api/fodder/regurgitate',    // POST
     attachment: 'api/attachment',  // POST
     email: 'api/email', // POST
     email_server: 'api/email_server', // POST
@@ -113,32 +114,11 @@ export class WittymailService {
     return this.urls.attachment;
   }
 
-  getColumnHeadersWithSampleRows(): ColumnHeadersWithRowContent {
-    let res: ColumnHeadersWithRowContent = {
-      headers: [
-        'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference mail ID'
-      ],
-      contents: [
-        {
-          'Name of Child': 'Aradhya Karche',
-          'Class': 'Nursery- kalewadi',
-          'Sponsor': 'Kalubai pratishthan',
-          'Mail ID': 'Sanjaysandhu8090@gmail.com',
-          'Reference': 'Ravi',
-          'Reference mail ID': 'amboreravi@gmail.com'
-        },
-        {
-          'Name of Child': 'Vedika Shirgire',
-          'Class': 'Nursery- kalewadi',
-          'Sponsor': 'Apurva kumar',
-          'Mail ID': 'apurv07vit@gmail.com',
-          'Reference': 'Anish',
-          'Reference mail ID': 'anishgarg07@gmail.com'
-        }
-      ]
-    };
-
-    return res;
+  getColumnHeadersWithSampleRows(): Observable<ColumnHeadersWithRowContent> {
+    return this.http.get<ColumnHeadersWithRowContent>(this.urls.regurgitate)
+      .pipe(
+        catchError(this.handleError('getColumnHeadersWithSampleRows'))
+      );
   }
 
   getVomit(): ColumnHeadersWithRowContent {
