@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { LoggerService } from 'src/app/util/logger.service';
-import { WittymailService, ColumnHeadersWithRowContent } from 'src/app/wittymail.service';
+import { WittymailService, ColumnHeadersWithRowContent, TemplateInput, TemplateOutput } from 'src/app/wittymail.service';
 import { Router } from '@angular/router';
 import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
@@ -47,13 +47,47 @@ export class DesignContentsComponent implements OnInit {
   }
 
   onSubjectTemplateChanged(value: string) {
-    // TODO: Replace #num with sample value from columnHeadersWithSamples
-    this.subjectTemplateRealtimeSample = value;
+    // Optimization: Don't bother the backend if there is no template to be substituted yet
+    if (value.indexOf("#") == -1) {
+      this.subjectTemplateRealtimeSample = value;
+      return;
+    }
+
+    let v: TemplateInput = {
+      template: value
+    }
+    this.wittymail.resolveTemplate(v).subscribe(
+      data => {
+        this.log.info("Template resolved to: ", data);
+        let r: TemplateOutput = <TemplateOutput> data;
+        this.subjectTemplateRealtimeSample = r.reality;
+      },
+      error => {
+        this.errorDialog.showError("Your subject template is weird, try making it more realistic");
+      }
+    );
   }
 
   onBodyTemplateChanged(event: any) {
-    // TODO: Replace #num with sample value from columnHeadersWithSamples
-    this.bodyTemplateRealtimeSample = this.bodyTemplate;
+    // Optimization: Don't bother the backend if there is no template to be substituted yet
+    if (this.bodyTemplate.indexOf("#") == -1) {
+      this.bodyTemplateRealtimeSample = this.bodyTemplate;
+      return;
+    }
+
+    let v: TemplateInput = {
+      template: this.bodyTemplate
+    }
+    this.wittymail.resolveTemplate(v).subscribe(
+      data => {
+        this.log.info("Template resolved to: ", data);
+        let r: TemplateOutput = <TemplateOutput> data;
+        this.bodyTemplateRealtimeSample = r.reality;
+      },
+      error => {
+        this.errorDialog.showError("Your body template is weird, try making it more realistic");
+      }
+    );
   }
 
   saveSubjectAndBodyTemplate() {

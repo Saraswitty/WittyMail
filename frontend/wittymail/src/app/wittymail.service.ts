@@ -37,8 +37,17 @@ export interface EmailServerDetails {
   username: string;
   password: string;
 }
+
 export interface TestEmailDetails {
   to: string;
+}
+
+export interface TemplateInput {
+  template: string;
+}
+
+export interface TemplateOutput {
+  reality: string;
 }
 
 @Injectable({
@@ -56,7 +65,8 @@ export class WittymailService {
     attachment: 'api/attachment',  // POST
     email: 'api/email', // POST
     email_server: 'api/email_server', // POST
-    email_test: 'api/email/test' // POST
+    email_test: 'api/email/test', // POST
+    template_resolver: 'api/email/template' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -191,6 +201,14 @@ export class WittymailService {
     this.attachmentMetadataInstance.attachment_column = attachment_column;
 
     this.log.info("attachmentMetadataInstance: ", this.attachmentMetadataInstance);
+  }
+
+  resolveTemplate(input: TemplateInput): Observable<TemplateOutput> {
+    this.log.info("POSTing template: ", input);
+    return this.http.post<TemplateOutput>(this.urls.template_resolver, input)
+      .pipe(
+        catchError(this.handleError('resolveTemplate'))
+      );
   }
 
   postEmailMetadata(): Observable<string> {
