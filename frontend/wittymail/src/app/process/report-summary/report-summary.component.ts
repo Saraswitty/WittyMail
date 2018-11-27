@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { WittymailService, ColumnHeadersWithRowContent, TestEmailDetails } from 'src/app/wittymail.service';
 import { LoggerService } from 'src/app/util/logger.service';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-report-summary',
@@ -9,6 +10,8 @@ import { LoggerService } from 'src/app/util/logger.service';
 })
 export class ReportSummaryComponent implements OnInit {
 
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+  
   headers: string[] = [];
   tableContent: any[] = [];
 
@@ -28,13 +31,21 @@ export class ReportSummaryComponent implements OnInit {
   constructor(private log: LoggerService, private wittymail: WittymailService) { }
 
   displaySummaryTable() {
-    let r: ColumnHeadersWithRowContent = this.wittymail.getVomit();
-    this.headers = r.headers;
-    this.tableContent = r.contents;
-    // Select all rows by default
-    this.selectedRows = this.tableContent;
-
-    this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
+    this.wittymail.getVomit().subscribe(
+      data => {
+        this.log.info("Vomit complete: ", data);
+        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
+        this.headers = r.headers;
+        this.tableContent = r.contents;
+        // Select all rows by default
+        this.selectedRows = this.tableContent;
+    
+        this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
+      },
+      error => {
+        this.errorDialog.showError("Something really bad happened. Let's blame it on Ajay.");
+      }
+    );
   }
 
   ngOnInit() {
