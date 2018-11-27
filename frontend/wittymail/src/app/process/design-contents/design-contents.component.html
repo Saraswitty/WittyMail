@@ -24,12 +24,12 @@
     </tr>
   </thead>
   <tbody>
-      <tr *ngFor="let row of tableContent">
-        <td *ngFor="let col of headers; index as i">
-          {{row[col]}}
-        </td>
-      </tr>
-    </tbody>
+    <tr *ngFor="let row of tableContent">
+      <td *ngFor="let col of headers; index as i">
+        {{row[col]}}
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <form>
@@ -63,20 +63,18 @@
       <div class="col-xs-3">
         <label for="aForm_3">E-mail Contents template</label>
       </div>
-      <div class="col-xs-6">
-        <textarea name="emailBodyTemplate" type="text" id="formFields_3" placeholder="(type email contents here)"
-          [(ngModel)]="bodyTemplate" (input)="onBodyTemplateChanged($event.target.value)"></textarea>
-        <br />
-        <div class="p8" style="margin-top:0;" *ngIf="bodyTemplateRealtimeSample">
-          <b>Actual contents of the 1st e-mail:</b>
-          <br />
-          <div [innerHTML]="bodyTemplateRealtimeSample"></div>
-        </div>
-      </div>
     </div>
-
+    <quill-editor name="emailBodyTemplate" [(ngModel)]="bodyTemplate" [sanitize]="true" (onContentChanged)="onBodyTemplateChanged($event)"></quill-editor>
+    <br />
+    <div class="p8" style="margin-top:0;" *ngIf="bodyTemplateRealtimeSample">
+      <b>Actual contents of the 1st e-mail:</b>
+      <div [innerHTML]="bodyTemplateRealtimeSample" class="body-template-preview"></div>
+    </div>
+    <br />
     <div class="form-group row">
-      <button type="submit" class="btn btn-primary" (click)="validateInputsAndContinue()">NEXT</button>
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary" (click)="validateInputsAndContinue()">NEXT</button>
+      </div>
     </div>
   </section>
 </form>

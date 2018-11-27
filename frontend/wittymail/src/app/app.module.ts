@@ -18,6 +18,7 @@ import { ConsoleLoggerService } from './util/console-logger.service';
 import { LoggerService } from './util/logger.service';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 import { EmailServerComponent } from './process/email-server/email-server.component';
+import { QuillModule } from 'ngx-quill'
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { EmailServerComponent } from './process/email-server/email-server.compon
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
+    QuillModule
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }

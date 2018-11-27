@@ -1,0 +1,11 @@
+.body-template-preview {
+    background: white !important;
+    background-clip: border-box;
+    border-radius: .3em;
+    border: 1px solid #cccccc;
+    padding: 5px;
+}
+
+:host ::ng-deep p {
+    margin-top: 0 !important;
+}

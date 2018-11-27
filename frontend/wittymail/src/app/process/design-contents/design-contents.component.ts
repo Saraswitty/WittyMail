@@ -42,10 +42,9 @@ export class DesignContentsComponent implements OnInit {
     this.subjectTemplateRealtimeSample = value;
   }
 
-  onBodyTemplateChanged(value: string) {
-    value = value.replace(new RegExp('\n', 'g'), "<br />");
+  onBodyTemplateChanged(event: any) {
     // TODO: Replace #num with sample value from columnHeadersWithSamples
-    this.bodyTemplateRealtimeSample = value;
+    this.bodyTemplateRealtimeSample = this.bodyTemplate;
   }
 
   saveSubjectAndBodyTemplate() {
