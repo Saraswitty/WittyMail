@@ -15,6 +15,7 @@ global email_fodder_names
 global EMAIL_FODDER_TO_INDEX
 global EMAIL_FODDER_CC_INDEX
 global attachment_dir 
+global email_from
 
 # These directories will be created within a tmp directory
 ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
@@ -116,7 +117,7 @@ def template_to_str(_st, l):
     index = map(int, [remove_hash(s) for s in str_to_replace])
 
     for i in range(len(index)):
-        st = st.replace(str_to_replace[i], l[index[i]])
+        st = st.replace(str_to_replace[i], l[index[i] - 1])
 
     log.debug('template_to_str() final str = %s' % st)
     return st
@@ -177,5 +178,7 @@ def send_email(tos = None):
 def set_login_details(username, password, server="smtp.gmail.com", port=587):
     assert username is not None and password is not None,\
     log.error('server, port number, username or password is None')
+    global email_from
 
+    email_from = username
     return emailapi.set_login_details(server, port, username, password)

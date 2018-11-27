@@ -159,6 +159,8 @@ def post_email_send():
 @flask_app.route("/api/vomit", methods=['GET'])
 def get_vomit():
     fodder_names = emailapi_broker.get_email_fodder_names()
+    fodder_names = fodder_names[:-5]
+
     fodder = emailapi_broker.get_email_fodder()
 
     if len(fodder_names) == 0 or len(fodder) == 0:    
@@ -166,9 +168,21 @@ def get_vomit():
 
     fodder_list = []
     for f in fodder:
-        fodder_list.append(dict(zip(fodder_names, f)))
+        email = { \
+          "from": emailapi_broker.email_from,
+          "to": f[emailapi_broker.EMAIL_FODDER_TO_INDEX],
+          "cc": f[emailapi_broker.EMAIL_FODDER_CC_INDEX],
+          "attachment": {"name": f[-2], "url": "PDF URL"},
+          "subject": f[-4],
+          "body": f[-3],
+        }
+        f = f[:-5]
 
-    return (jsonify({'fodder_list': fodder_list}),
+        tmp = dict(zip(fodder_names, f))
+        tmp["email"] = email
+        fodder_list.append(tmp)
+
+    return (jsonify({'headers': fodder_names, 'contents': fodder_list}),
               HTTP_OK,
               {'ContentType':'application/json'})
 
