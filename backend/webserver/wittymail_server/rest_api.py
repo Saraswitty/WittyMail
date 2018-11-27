@@ -93,7 +93,7 @@ def post_attachment_mapping():
     return "Attachment mapping saved successfully", HTTP_OK
 
 @flask_app.route("/api/attachment/validate", methods=['GET'])
-def get_attachment_validate:
+def get_attachment_validate():
   fodder_names = emailapi_broker.get_email_fodder_names()
   fodder = emailapi_broker.get_email_fodder()
 
@@ -107,11 +107,10 @@ def get_attachment_validate:
       if f[issue_index] != "All is well":
         fodder_list.append(dict(zip(fodder_names, f)))
 
-   return (jsonify({'headers': fodder_names, 'content': fodder_list}),
+  return (jsonify({'headers': fodder_names, 'content': fodder_list}),
             HTTP_OK,
             {'ContentType':'application/json'})
 
-def post_attachment():
 @flask_app.route("/api/attachment", methods=['POST'])
 def post_attachment():
     '''
