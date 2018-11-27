@@ -63,7 +63,7 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
     log.debug('No cc mailer provided')
 
   msg['Subject'] = subject
-  msg.attach(MIMEText(body, 'plain'))  
+  msg.attach(MIMEText(body, 'html'))  
 
   if (attachments is not None):
     for attachment in attachments:
