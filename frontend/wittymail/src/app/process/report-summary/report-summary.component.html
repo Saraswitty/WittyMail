@@ -36,7 +36,7 @@
       <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row['email'])">View E-Mail</button>
       <p class="p8" style="margin-top:5px;">{{row['status']}}</p>
     </clr-dg-cell>
-    <clr-dg-cell *ngFor="let col of headers">{{row[col]}}</clr-dg-cell>
+    <clr-dg-cell *ngFor="let col of headers" ><div style="word-wrap:break-word">{{row[col]}}</div></clr-dg-cell>
   </clr-dg-row>
 
   <clr-dg-footer>{{selectedRows.length}} e-mails will be sent.</clr-dg-footer>
