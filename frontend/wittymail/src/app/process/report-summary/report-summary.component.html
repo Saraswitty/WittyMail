@@ -93,9 +93,7 @@
             <label for="aForm_4">Content</label>
           </div>
           <div class="col-xs-10">
-            <textarea id="aForm_4" rows="10" disabled>
-{{emailDetails.body}}
-          </textarea>
+              <div [innerHTML]="emailDetails.body" class="body-template-preview"></div>
           </div>
         </div>
       </section>
