@@ -12,7 +12,7 @@ import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.c
 export class DesignContentsComponent implements OnInit {
 
   @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
-  
+
   headers: string[] = [];
   tableContent: any[] = [];
 
@@ -33,17 +33,17 @@ export class DesignContentsComponent implements OnInit {
     this.wittymail.getColumnHeadersWithSampleRows().subscribe(
       data => {
         this.log.info("Regurgitate complete: ", data);
-        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
+        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent>data;
         this.headers = r.headers;
         this.tableContent = r.contents;
-    
+
         this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
       },
       error => {
         this.errorDialog.showError("Failed to analyze the Excel sheet");
       }
     );
-    
+
   }
 
   onSubjectTemplateChanged(value: string) {
@@ -59,7 +59,7 @@ export class DesignContentsComponent implements OnInit {
     this.wittymail.resolveTemplate(v).subscribe(
       data => {
         this.log.info("Template resolved to: ", data);
-        let r: TemplateOutput = <TemplateOutput> data;
+        let r: TemplateOutput = <TemplateOutput>data;
         this.subjectTemplateRealtimeSample = r.reality;
       },
       error => {
@@ -81,7 +81,7 @@ export class DesignContentsComponent implements OnInit {
     this.wittymail.resolveTemplate(v).subscribe(
       data => {
         this.log.info("Template resolved to: ", data);
-        let r: TemplateOutput = <TemplateOutput> data;
+        let r: TemplateOutput = <TemplateOutput>data;
         this.bodyTemplateRealtimeSample = r.reality;
       },
       error => {
@@ -96,11 +96,26 @@ export class DesignContentsComponent implements OnInit {
 
   sendEmailMetadata() {
     this.wittymail.postEmailMetadata()
-    .subscribe(
-      data => {
-        this.log.info("POST complete: ", data);
-      }
-    )
+      .subscribe(
+        data => {
+          this.log.info("POST complete: ", data);
+        },
+        error => {
+          this.errorDialog.showError("Something really bad happened. Let's blame it on Ajay.");
+        }
+      );
+  }
+
+  sendAttachmentMetadata() {
+    this.wittymail.postAttachmentMetadata()
+      .subscribe(
+        data => {
+          this.log.info("POST complete: ", data);
+        },
+        error => {
+          this.errorDialog.showError("Something really bad happened. Let's blame it on Ajay.");
+        }
+      );
   }
 
   validateInputsAndContinue() {
@@ -115,6 +130,7 @@ export class DesignContentsComponent implements OnInit {
 
     this.saveSubjectAndBodyTemplate();
     this.sendEmailMetadata();
+    this.sendAttachmentMetadata();
     this.router.navigate(['report-summary']);
   }
 

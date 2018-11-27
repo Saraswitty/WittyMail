@@ -64,6 +64,7 @@ export class WittymailService {
     regurgitate: 'api/fodder/regurgitate',    // POST
     vomit: 'api/vomit', //POST
     attachment: 'api/attachment',  // POST
+    attachment_metadata: 'api/attachment/mapping',  // POST
     email: 'api/email', // POST
     email_server: 'api/email_server', // POST
     email_test: 'api/email/test', // POST
@@ -222,6 +223,14 @@ export class WittymailService {
     return this.http.post<string>(this.urls.email, this.emailMetadataInstance)
       .pipe(
         catchError(this.handleError('postEmailMetadata'))
+      );
+  }
+
+  postAttachmentMetadata(): Observable<string> {
+    this.log.info("POSTing attachment metadata: ", this.attachmentMetadataInstance);
+    return this.http.post<string>(this.urls.attachment_metadata, this.attachmentMetadataInstance)
+      .pipe(
+        catchError(this.handleError('postAttachmentMetadata'))
       );
   }
 
