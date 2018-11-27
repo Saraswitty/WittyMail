@@ -115,6 +115,7 @@ def template_to_str(_st, l):
         return s[1:]
 
     index = map(int, [remove_hash(s) for s in str_to_replace])
+    index = list(index)
 
     for i in range(len(index)):
         st = st.replace(str_to_replace[i], l[index[i] - 1])
