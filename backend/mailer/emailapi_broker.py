@@ -7,6 +7,7 @@ import re
 import util.logger as logger
 import ai.gender_guesser as gender_guesser
 import tempfile
+import pdb
 
 log = logger.get_logger(__name__)
 
@@ -15,7 +16,8 @@ global email_fodder_names
 global EMAIL_FODDER_TO_INDEX
 global EMAIL_FODDER_CC_INDEX
 global attachment_dir 
-global email_from
+global email_from 
+email_from = "ajaynair59@gmail.com"
 
 # These directories will be created within a tmp directory
 ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
@@ -58,45 +60,50 @@ EMAIL_FODDER_CC_INDEX = 0
 
 # Extended fodder names that will be appended to the fodder names provided by the user (i.e. email_fodder_names)
 extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
-email_fodder_names_STATUS_INDEX = -6
+extended_email_fodder = []
+email_fodder_names_STATUS_INDEX = -1  # CHANGE to -1 of not extended
 extended_email_fodder_names_PRONOUN_INDEX = -5
 extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -4
 extended_email_fodder_names_EMAIL_BODY_INDEX = -3
 extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX = -2
 
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
-extended_default_email_fodder = ["his", None, None, None, False, "All is well"]
+extended_default_email_fodder = ["his", None, None, None, False]
 
 # TODO Add check to detect extention type
 def save_fodder_from_file(loc, email_fodder_names_template = None):
         global email_fodder
         global email_fodder_names
-
-        _email_fodder = []  
+        email_fodder = []  
 
         # TODO Check if we should read wb_obj.active or wb_obj[0]. Do we have to close?
         wb_obj = openpyxl.load_workbook(loc)   
         sheet_obj = wb_obj.active
 
-        for i in range(1, sheet_obj.max_row + 1):
+        # Get headers
+        email_fodder_names = []
+        for j in range(1, sheet_obj.max_column + 1):
+            email_fodder_names.append(str(sheet_obj.cell(row = 1, column = j).value))
+        
+        for i in range(2, sheet_obj.max_row + 1):
             cells = []
 
-            for j in range(1, sheet_obj.max_column + 1):
+            for j in range(1, len(email_fodder_names) + 1):
                 cells.append(str(sheet_obj.cell(row = i, column = j).value))
-            cells.append("E-mail pending") 
-            _email_fodder.append(cells)
+        
+            if all(c == 'None' for c in cells):
+                break
 
+            cells.append("E-mail pending") 
+            email_fodder.append(cells)
+            
         assert email_fodder_names_template == None or email_fodder_names == email_fodder_names_template, \
                "**** The headers in the excel sheet seems to be invalid ****"
-        assert len(_email_fodder) > 1,            \
+        assert len(email_fodder) > 0,            \
                "**** There are no entries in the excel sheet! ****"
 
-        email_fodder_names = _email_fodder[0]
-        email_fodder_names = email_fodder_names[:-1]
         email_fodder_names.append("Status")
 
-        email_fodder = _email_fodder[1:]
-        
 
 def get_email_fodder_names():
         return email_fodder_names
@@ -105,9 +112,8 @@ def get_email_fodder():
         return email_fodder
 
 # #{no} in _st will be replaced by l[no]
-def template_to_str(_st, l):
-    log.debug('template_to_str() str = %s' % (_st))
-    st = ''.join(_st)
+def template_to_str(st, l):
+    log.debug('template_to_str() str = %s' % (st))
 
     str_to_replace = list(set(re.findall(r'#\d+', st)))
 
@@ -139,10 +145,14 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
         #    gender = gender_guesser.guess_gender(name[0]) 
         # else:
         #    gender = gender_guesser.guess_gender(name[0], name[1])
-        r.extend(extended_default_email_fodder)
-        r[extended_email_fodder_names_PRONOUN_INDEX] = "her" if gender == "female" else "his" 
-        r[extended_email_fodder_names_EMAIL_SUBJECT_INDEX] = template_to_str(subject_template, r)
-        r[extended_email_fodder_names_EMAIL_BODY_INDEX] = template_to_str(body_template, r)
+
+        extended_fodder_entry = []
+        extended_fodder_entry.append(extended_default_email_fodder)
+        pronoun = "her" if gender == "female" else "his" 
+        extended_fodder_entry.append(pronoun)
+        extended_fodder_entry.append(template_to_str(subject_template, r)
+        extended_fodder_entry.append(template_to_str(body_template, r)
+        extended_fodder.append(extended_fodder_entry)
 
 def save_attachment_dir(dir_loc):
         global attachment_dir 
@@ -150,6 +160,7 @@ def save_attachment_dir(dir_loc):
 
 def save_attachment_column(attachment_column):
     attachment_index = email_fodder_names.index(attachment_column)
+    pdb.set_trace()
     for r in email_fodder:
         _attachments = r[attachment_index].split(',')
         attachments = [a + ".pdf" for a in _attachments]
@@ -157,8 +168,6 @@ def save_attachment_column(attachment_column):
         for a in attachments:
             if not os.path.isfile(os.path.join(get_attachments_dir(), a)):
                 r[email_fodder_names_STATUS_INDEX] = "pdf not found"
-            else:
-                r[email_fodder_names_STATUS_INDEX] = "All is well"
 
 def send_email(tos = None):
     for e in email_fodder:
@@ -172,9 +181,8 @@ def send_email(tos = None):
         email_subject = e[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]
         email_body = e[extended_email_fodder_names_EMAIL_BODY_INDEX]
 
-        attachment_list = e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX].split(',')    
+        attachment_list = e[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]    
         attachments = [attachment_dir + a for a in attachment_list]
-
         return emailapi.send_email("ajaynair59@gmail.com", tos, email_subject, email_body, ccs, attachments)
 
 def set_login_details(username, password, server="smtp.gmail.com", port=587):

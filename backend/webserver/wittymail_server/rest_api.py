@@ -4,6 +4,7 @@
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
+import pdb
 import mailer.emailapi_broker as emailapi_broker
 from wittymail_server import flask_app
 from flask import jsonify, request, json
@@ -100,7 +101,7 @@ def get_attachment_validate():
   if len(fodder_names) == 0 or len(fodder) == 0:    
       return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
 
-  issue_index = fodder_names.index("issue")
+  issue_index = fodder_names.index("status")
 
   fodder_list = []
   for f in fodder:
@@ -146,7 +147,9 @@ def post_email_test():
     e = emailapi_broker.send_email(tos)
     if e[0] is not 0:
         return e[1], HTTP_NOT_FOUND
-    return e[1], HTTP_OK
+    return (jsonify({}),
+              HTTP_OK,
+              {'ContentType':'application/json'})
 
 @flask_app.route("/api/email/send", methods=['POST'])
 def post_email_send():
@@ -154,7 +157,10 @@ def post_email_send():
     e = emailapi_broker.send_email()
     if e[0] is not 0:
         return e[1], HTTP_NOT_FOUND
-    return e[1], HTTP_OK
+    return (jsonify({}),
+              HTTP_OK,
+              {'ContentType':'application/json'})
+
 
 @flask_app.route("/api/vomit", methods=['GET'])
 def get_vomit():
@@ -166,13 +172,14 @@ def get_vomit():
     if len(fodder_names) == 0 or len(fodder) == 0:    
         return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
 
+    
     fodder_list = []
     for f in fodder:
         email = { \
           "from": emailapi_broker.email_from,
           "to": f[emailapi_broker.EMAIL_FODDER_TO_INDEX],
           "cc": f[emailapi_broker.EMAIL_FODDER_CC_INDEX],
-          "attachment": {"name": f[-2], "url": "PDF URL"},
+          "attachment": {"name": f[-2], "url": os.path.join("/api/attachment/", f[-2][0]) if f[-2] else "Not found"},
           "subject": f[-4],
           "body": f[-3],
         }
