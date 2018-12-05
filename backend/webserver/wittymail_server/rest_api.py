@@ -9,6 +9,7 @@ from wittymail_server import flask_app
 from flask import jsonify, request, json
 import util.version as version
 import util.logger as logger
+from flask import send_file
 
 log = logger.get_logger(__name__)
 
@@ -49,13 +50,16 @@ def get_fodder_regurgitate():
               HTTP_OK,
               {'ContentType':'application/json'})
 
-  
+@flask_app.route("/api/fodder", methods=['GET'])
+def get_fodder():
+    fodder_file = emailapi_broker.save_fodder_to_file()
+    return send_file(fodder_file)
 
 @flask_app.route("/api/fodder", methods=['POST'])
 def post_fodder():
     log.info(request.files)
     try:
-        fodder_dir = emailapi_broker.get_fodder_dir()
+        fodder_dir = flask_app.config['FODDER_DIR']
 
         f = request.files['fodder']
         fodder_file = os.path.join(fodder_dir, f.filename)
@@ -72,7 +76,7 @@ def post_fodder():
 
 # TODO Change this to a get request because using post for get is, well, stupid
 # Check how to send multi line data in GET request 
-@flask_app.route("/api/email/template", methods=['POST'])
+@flask_app.route("/api/burp/template", methods=['POST'])
 def get_email_template():
     data = json.loads(request.data)
     fodder = emailapi_broker.get_email_fodder() 
@@ -94,7 +98,7 @@ def get_fodder_ingredients():
             HTTP_OK,
             {'ContentType':'application/json'})
 
-@flask_app.route("/api/attachment/mapping", methods=['POST'])
+@flask_app.route("/api/fodder/achar/mapping", methods=['POST'])
 def post_attachment_mapping():
     data = json.loads(request.data)
     emailapi_broker.save_attachment_column(data['attachment_column'])
@@ -124,7 +128,7 @@ def get_attachment_validate():
             HTTP_OK,
             {'ContentType':'application/json'})
 
-@flask_app.route("/api/attachment", methods=['POST'])
+@flask_app.route("/api/fodder/achar", methods=['POST'])
 def post_attachment():
     '''
     The 3rd party Angular plugin ng6-file-upload makes one POST call per file instead of 
@@ -135,7 +139,7 @@ def post_attachment():
     '''
     try:
         a = request.files['attachment']
-        attachment_dir = emailapi_broker.get_attachments_dir()
+        attachment_dir = flask_app.config['ATTACHMENTS_DIR']
     
         a.save(os.path.join(attachment_dir, a.filename))
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
@@ -145,7 +149,7 @@ def post_attachment():
     except:
         log.exception("")
 
-@flask_app.route("/api/email", methods=['POST'])
+@flask_app.route("/api/burp", methods=['POST'])
 def post_email():
     data = json.loads(request.data)
     if data['to_column'] == None or data['cc_column'] == None or data['subject_template'] == None or data['body_template'] == None:
@@ -159,28 +163,43 @@ def post_email():
         {'ContentType':'application/json'})
 
 
-@flask_app.route("/api/email/test", methods=['POST'])
+@flask_app.route("/api/burp/test", methods=['POST'])
 def post_email_test():
     data = json.loads(request.data)
     tos = []
     tos.append(data['to'])
-    e = emailapi_broker.send_email(tos)
+    e = emailapi_broker.test_email(tos)
     if e[0] is not 0:
-        return e[1], HTTP_NOT_FOUND
+        return (jsonify({"err_msg": e[1]}),
+               HTTP_NOT_FOUND,
+               {'ContentType':'application/json'})
+
     return (jsonify({}),
               HTTP_OK,
               {'ContentType':'application/json'})
 
-@flask_app.route("/api/email/send", methods=['POST'])
+@flask_app.route("/api/burp/send", methods=['POST'])
 def post_email_send():
     data = json.loads(request.data)
-    e = emailapi_broker.send_email()
+
+    tos = []
+    tos.append(data['to'])
+
+    ccs = []
+    ccs.append(data['cc'])
+
+    attachments = []
+    attachments.append(data['attachment'])
+
+    e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
     if e[0] is not 0:
-        return e[1], HTTP_NOT_FOUND
+        return (jsonify({"err_msg": e[1]}),
+               HTTP_NOT_FOUND,
+               {'ContentType':'application/json'})
+
     return (jsonify({}),
               HTTP_OK,
               {'ContentType':'application/json'})
-
 
 @flask_app.route("/api/vomit", methods=['GET'])
 def get_vomit():
@@ -207,7 +226,7 @@ def get_vomit():
           "from": emailapi_broker.email_from,
           "to": f[emailapi_broker.EMAIL_FODDER_TO_INDEX],
           "cc": f[emailapi_broker.EMAIL_FODDER_CC_INDEX],
-          "attachment": {"name": e[-2][0], "url": os.path.join("/api/attachment/", e[-2][0]) if e[-2] else "Not found"},
+          "attachment": {"name": e[-2][0], "url": os.path.join("/api/fodder/achar/", e[-2][0]) if e[-2] else "Not found"},
           "subject": e[-4],
           "body": e[-3],
         }
@@ -220,7 +239,7 @@ def get_vomit():
               HTTP_OK,
               {'ContentType':'application/json'})
 
-@flask_app.route("/api/email_server", methods=['POST'])
+@flask_app.route("/api/burp/server", methods=['POST'])
 def post_email_server():
     data = json.loads(request.data)
 

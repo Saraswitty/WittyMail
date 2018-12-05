@@ -8,6 +8,7 @@ from email.mime.base import MIMEBase
 from email import encoders 
 import os
 import util.logger as logger
+import pdb
 
 log = logger.get_logger(__name__)
 
@@ -44,7 +45,7 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
   tos is not None and      \
   subject is not None and  \
   body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
-                              % (frm, to, subject, body))    
+                              % (frm, tos, subject, body))    
 
   if not INITIALIZED:
     log.error('send_email() called before set_login_details()')

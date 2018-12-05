@@ -3,10 +3,13 @@
 
 import os, sys
 import openpyxl
+from wittymail_server import flask_app
 import mailer.emailapi as emailapi
 import re
 import util.logger as logger
 import tempfile
+import pdb
+
 # import ai.gender_guesser as gender_guesser
 
 log = logger.get_logger(__name__)
@@ -37,37 +40,8 @@ global email_from
 global attachment_dir
 global attachment_index
 
-# These directories will be created within a tmp directory
-ATTACHMENTS_DIRNAME = "attachment_dir/" # Dir to store email attachments
-FODDER_DIRNAME      = "fodder_dir/"     # Dir to store fodder file
-
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
 extended_default_email_fodder = ["his", None, None, None, False]
-
-# Actual temp directory, populated on first use
-root_temp_dir = None
-
-def _get_root_temporary_dir():
-    global root_temp_dir
-    if not root_temp_dir:
-        root_temp_dir = tempfile.mkdtemp(prefix="WittyMail_")
-        log.info("Created new temporary directory: %s", root_temp_dir)
-
-    return root_temp_dir
-
-def get_fodder_dir():
-    fodder_dir = os.path.join(_get_root_temporary_dir(), FODDER_DIRNAME)
-    if not os.path.exists(fodder_dir):
-        os.mkdir(fodder_dir)
-
-    return fodder_dir
-
-def get_attachments_dir():
-    attachment_dir = os.path.join(_get_root_temporary_dir(), ATTACHMENTS_DIRNAME)
-    if not os.path.exists(attachment_dir):
-        os.mkdir(attachment_dir)
-
-    return attachment_dir
 
 def _init():
     global email_fodder
@@ -88,6 +62,24 @@ def _init():
     global attachment_index
     attachment_index = None
 
+def save_fodder_to_file():
+    wb=openpyxl.Workbook()
+    ws_write = wb.active
+
+    headers = []
+
+    headers.extend(email_fodder_names)
+
+    l = []
+    l.append(headers)
+    excel_data = l + email_fodder 
+
+    for row in excel_data:
+       ws_write.append(row)
+
+    wb.save(filename="wittymail_excel.xlsx")
+    return os.path.join(os.getcwd(), "wittymail_excel.xlsx")
+
 # TODO Add check to detect extention type
 def save_fodder_from_file(loc, email_fodder_names_template = None):
         global email_fodder
@@ -96,7 +88,7 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
 
         _init()
         # TODO Check if we should read wb_obj.active or wb_obj[0]. Do we have to close?
-        wb_obj = openpyxl.load_workbook(loc)   
+        wb_obj = openpyxl.load_workbook(loc, data_only=True)   
         sheet_obj = wb_obj.active
 
         # Get headers
@@ -174,7 +166,7 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
         extended_fodder_entry.append(attachments)
 
         for a in attachments:
-            if not os.path.isfile(os.path.join(get_attachments_dir(), a)):
+            if not os.path.isfile(os.path.join(flask_app.config['ATTACHMENTS_DIR'], a)):
                 r[email_fodder_names_STATUS_INDEX] = "pdf not found"
 
         extended_fodder_entry.append(False)
@@ -187,23 +179,24 @@ def save_attachment_dir(dir_loc):
 
 def save_attachment_column(attachment_column):
     global attachment_index
+    # pdb.set_trace()
     attachment_index = email_fodder_names.index(attachment_column)
 
-def send_email(tos = None):
-    for e,ex in zip(email_fodder, extended_email_fodder):
-        if not tos:
-            tos = e[EMAIL_FODDER_TO_INDEX].split(',')
-            ccs = e[EMAIL_FODDER_CC_INDEX].split(',')
-        else:
-            log.info('Test mail to be sent to+cc %s' % (''.join(tos)))
-            ccs = tos
+def test_email(tos):
+    ex = extended_email_fodder[0]
+    log.info('Test mail to be sent to+cc %s' % (''.join(tos)))
+    ccs = tos
 
-        email_subject = ex[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]
-        email_body = ex[extended_email_fodder_names_EMAIL_BODY_INDEX]
+    email_subject = ex[extended_email_fodder_names_EMAIL_SUBJECT_INDEX]
+    email_body = ex[extended_email_fodder_names_EMAIL_BODY_INDEX]
 
-        attachment_list = ex[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]    
-        attachments = [attachment_dir + a for a in attachment_list]
-        return emailapi.send_email(email_from, tos, email_subject, email_body, ccs, attachments)
+    attachment_list = ex[extended_email_fodder_names_EMAIL_ATTACHMENT_INDEX]    
+    attachments = [os.path.join(attachment_dir, a) for a in attachment_list]
+    return emailapi.send_email(email_from, tos, email_subject, email_body, ccs, attachments)
+
+def send_email(email_from, tos, subject, body, ccs, attachments):
+    attachments = [os.path.join(attachment_dir, a) for a in attachments]
+    return emailapi.send_email(email_from, tos, subject, body, ccs, attachments)
 
 def set_login_details(username, password, server="smtp.gmail.com", port=587):
     assert username is not None and password is not None,\
