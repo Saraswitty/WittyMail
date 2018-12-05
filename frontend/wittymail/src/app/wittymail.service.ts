@@ -42,6 +42,15 @@ export interface TestEmailDetails {
   to: string;
 }
 
+export interface SendEmailContent {
+  from: string;
+  to: string;
+  cc: string;
+  subject: string;
+  attachment: string;
+  body: string;
+}
+
 export interface TemplateInput {
   template: string;
 }
@@ -63,12 +72,13 @@ export class WittymailService {
     fodder: 'api/fodder',    // POST
     regurgitate: 'api/fodder/regurgitate',    // POST
     vomit: 'api/vomit', //POST
-    attachment: 'api/attachment',  // POST
-    attachment_metadata: 'api/attachment/mapping',  // POST
-    email: 'api/email', // POST
-    email_server: 'api/email_server', // POST
-    email_test: 'api/email/test', // POST
-    template_resolver: 'api/email/template' // POST
+    attachment: 'api/fodder/achar',  // POST
+    attachment_metadata: 'api/fodder/achar/mapping',  // POST
+    email: 'api/burp', // POST
+    email_server: 'api/burp/server', // POST
+    email_test: 'api/burp/test', // POST
+    email_send: 'api/burp/send', // POST
+    template_resolver: 'api/burp/template' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -247,6 +257,14 @@ export class WittymailService {
     return this.http.post<string>(this.urls.email_test, payload)
       .pipe(
         catchError(this.handleError('postTestEmail'))
+      );
+  }
+
+  postSendEmail(payload: SendEmailContent): Observable<string> {
+    this.log.info("POSTing email details: ", payload);
+    return this.http.post<string>(this.urls.email_send, payload)
+      .pipe(
+        catchError(this.handleError('postSendEmail'))
       );
   }
 

@@ -36,7 +36,9 @@
       <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row['email'])">View E-Mail</button>
       <p class="p8" style="margin-top:5px;">{{row['status']}}</p>
     </clr-dg-cell>
-    <clr-dg-cell *ngFor="let col of headers" ><div style="word-wrap:break-word">{{row[col]}}</div></clr-dg-cell>
+    <clr-dg-cell *ngFor="let col of headers">
+      <div style="word-wrap:break-word">{{row[col]}}</div>
+    </clr-dg-cell>
   </clr-dg-row>
 
   <clr-dg-footer>{{selectedRows.length}} e-mails will be sent.</clr-dg-footer>
@@ -85,7 +87,7 @@
           </div>
           <div class="col-xs-6">
             <clr-icon shape="attachment"></clr-icon>
-            <a href="{{emailDetails['attachment_url']}}"> {{emailDetails['attachment']}}</a>
+            <a href="{{emailDetails['attachment_url']}}"> {{emailDetails['attachment_name']}}</a>
           </div>
         </div>
         <div class="form-group row">
@@ -93,14 +95,51 @@
             <label for="aForm_4">Content</label>
           </div>
           <div class="col-xs-10">
-              <div [innerHTML]="emailDetails.body" class="body-template-preview"></div>
+            <div [innerHTML]="emailDetails.body" class="body-template-preview"></div>
           </div>
         </div>
       </section>
     </form>
-  </div>
-  <div class="modal-footer">
-    <!-- TODO: Add a 'send test email' button here -->
+
+    <div class="row">
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary" (click)="sendEmail(emailDetails, true)">
+          <clr-icon shape="envelope"></clr-icon> SEND
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="sendEmailDetails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="sendEmailDetails.success">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">E-mail sent successfully.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="sendEmailDetails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send e-mail: {{sendEmailDetails.errorMessage}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </clr-modal>
 
@@ -135,28 +174,84 @@
         </div>
       </section>
     </form>
-    <div class="alert alert-success" role="alert" *ngIf="testEmailDetails.success">
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="testEmailDetails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="testEmailDetails.success">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Test e-mail sent successfully, please check your inbox.</span>
+            </div>
           </div>
-          <span class="alert-text">Test e-mail sent successfully, please check your inbox.</span>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="testEmailDetails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send test e-mail: {{testEmailDetails.errorMessage}}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</clr-modal>
 
-    <div class="alert alert-danger" role="alert" *ngIf="testEmailDetails.error">
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+<clr-modal [(clrModalOpen)]="showSendAllEmailsModal">
+  <h3 class="modal-title">Send All E-mails</h3>
+  <div class="modal-body">
+    {{selectedRows.length}} e-mails are ready to be sent.
+
+    <div class="row">
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary" (click)="sendSelectedEmails()">
+          <clr-icon shape="envelope"></clr-icon> SEND ALL E-MAILS
+        </button>
+      </div>
+
+
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="sendAllEmails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="sendAllEmails.done && !sendAllEmails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">All e-mails sent successfully.</span>
+            </div>
           </div>
-          <span class="alert-text">Failed to send test e-mail: {{testEmailDetails.errorMessage}}</span>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="sendAllEmails.done && sendAllEmails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send some e-mails, view the report again for current status.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </clr-modal>
 
