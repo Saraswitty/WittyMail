@@ -99,6 +99,7 @@ export class DesignContentsComponent implements OnInit {
       .subscribe(
         data => {
           this.log.info("POST complete: ", data);
+          this.router.navigate(['report-summary']);
         },
         error => {
           this.errorDialog.showError("Something really bad happened. Let's blame it on Ajay.");
@@ -111,6 +112,7 @@ export class DesignContentsComponent implements OnInit {
       .subscribe(
         data => {
           this.log.info("POST complete: ", data);
+          this.sendEmailMetadata();
         },
         error => {
           this.errorDialog.showError("Something really bad happened. Let's blame it on Ajay.");
@@ -129,9 +131,7 @@ export class DesignContentsComponent implements OnInit {
     }
 
     this.saveSubjectAndBodyTemplate();
-    this.sendEmailMetadata();
     this.sendAttachmentMetadata();
-    this.router.navigate(['report-summary']);
   }
 
 }
