@@ -23,8 +23,9 @@ email_fodder = []
 email_fodder_names_FIRST_NAME = -2
 email_fodder_names_STATUS_INDEX = -1 
 
-extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
+extended_email_fodder_names = ['missing_attachment_count', 'pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
 
+extended_email_fodder_names_MISSINGATTACHMENTCOUNT_INDEX = -6
 extended_email_fodder_names_PRONOUN_INDEX = -5
 extended_email_fodder_names_EMAIL_SUBJECT_INDEX = -4
 extended_email_fodder_names_EMAIL_BODY_INDEX = -3
@@ -51,6 +52,7 @@ extended_default_email_fodder = ["his", None, None, None, False]
 
 EMAILPENDING = "E-mail pending"
 ATTACHMENTNOTFOUND = "Attachment not found"
+
 def _init():
     global email_fodder
     email_fodder = []  
@@ -113,7 +115,11 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
             if all(c == 'None' for c in cells):
                 break
 
-            cells.append(cells[1].split()[0])
+            tmp_str = _sanitize_names_str(cells[1])
+            tmp_str2 = [i.split()[0] for i in tmp_str]
+            tmp_str3 = ', '.join(tmp_str2[:-1])
+            tmp_str = tmp_str3 + " and " + tmp_str2[-1]
+            cells.append(tmp_str)
             cells.append(EMAILPENDING) 
             email_fodder.append(cells)
             
@@ -155,16 +161,28 @@ def template_to_str(st, l):
     log.debug('template_to_str() final str = %s' % st)
     return st
 
+def _sanitize_names_str(names_str):
+    tmp_str = names_str.replace(" and ", ",")
+    tmp_str = tmp_str.split(",")
+    return list(map(str.strip, tmp_str))
+
 def change_email_fodder_status(new_attachment):
-    pdb.set_trace()
     if attachment_index == None or len(email_fodder) == 0:
         return
 
-    for r in email_fodder:
-        attachments = r[attachment_index].split(',')
-        for a in attachments:
+    for r,e in zip(email_fodder, extended_email_fodder):
+        _attachments = _sanitize_names_str(r[attachment_index])
+        # _attachments = r[attachment_index].replace(" and ", ",").replace(" ","").split(",")
+
+        if e[extended_email_fodder_names_MISSINGATTACHMENTCOUNT_INDEX] == 0:
+            continue
+        
+        for a in _attachments:
             if a + ".pdf" == new_attachment:
-                r[email_fodder_names_STATUS_INDEX] = EMAILPENDING
+                e[extended_email_fodder_names_MISSINGATTACHMENTCOUNT_INDEX] -= 1
+                if e[extended_email_fodder_names_MISSINGATTACHMENTCOUNT_INDEX] == 0:
+                    r[email_fodder_names_STATUS_INDEX] = EMAILPENDING
+                break
 
 def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     global EMAIL_FODDER_TO_INDEX
@@ -183,19 +201,24 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
 
         extended_fodder_entry = []
 
+        _attachments = _sanitize_names_str(r[attachment_index])
+        # _attachments = r[attachment_index].replace(" and ", ",").replace(" ","").split(",")
+        extended_fodder_entry.append(len(_attachments))
+
         pronoun = "her" if gender == "female" else "his" 
         extended_fodder_entry.append(pronoun)
 
         extended_fodder_entry.append(template_to_str(subject_template, r))
         extended_fodder_entry.append(template_to_str(body_template, r))
 
-        _attachments = r[attachment_index].split(',')
         attachments = [a + ".pdf" for a in _attachments]
         extended_fodder_entry.append(attachments)
 
         for a in attachments:
             if not os.path.isfile(os.path.join(flask_app.config['ATTACHMENTS_DIR'], a)):
                 r[email_fodder_names_STATUS_INDEX] = ATTACHMENTNOTFOUND
+            else:
+                extended_fodder_entry[0] -= 1 
 
         extended_fodder_entry.append(False)
 
@@ -203,12 +226,11 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     return [0, "Data saved"]
 
 def save_attachment_dir(dir_loc):
-        global attachment_dir 
-        attachment_dir = dir_loc
+    global attachment_dir 
+    attachment_dir = dir_loc
 
 def save_attachment_column(attachment_column):
     global attachment_index
-    # pdb.set_trace()
     attachment_index = email_fodder_names.index(attachment_column)
 
 def test_email(tos):
