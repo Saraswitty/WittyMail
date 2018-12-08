@@ -4,6 +4,7 @@
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
+import pdb
 import mailer.emailapi_broker as emailapi_broker
 from wittymail_server import flask_app
 from flask import jsonify, request, json
@@ -27,11 +28,19 @@ def get_version():
     
 @flask_app.route("/api/fodder/regurgitate", methods=['GET'])
 def get_fodder_regurgitate():
-    fodder_names = emailapi_broker.get_email_fodder_names()
+    e = emailapi_broker.get_email_fodder_names()
+    if e[0] is not 0:
+        return (jsonify({"err_msg": e[1]}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
+
+    fodder_names = e[1]
     fodder = emailapi_broker.get_email_fodder()
 
     if len(fodder_names) == 0 or len(fodder) == 0:    
-        return "Data sheet is empty or data sheet is not provided", HTTP_NOT_FOUND
+        return (jsonify({"err_msg": "Data sheet is empty or not provided"}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
 
     cnt = 0
     fodder_list = []
@@ -43,7 +52,7 @@ def get_fodder_regurgitate():
 
     if cnt == 0:
         return (jsonify({'error_message': "Data sheet is empty or data sheet is not provided"}),
-            HTTP_NOT_FOUND,
+            HTTP_BAD_INPUT,
             {'ContentType':'application/json'})
 
     return (jsonify({'headers': fodder_names, 'contents': fodder_list}),
@@ -88,10 +97,16 @@ def get_email_template():
 
 @flask_app.route("/api/fodder/ingredients", methods=['GET'])
 def get_fodder_ingredients():
-    fodder_names = emailapi_broker.get_email_fodder_names()
+    e = emailapi_broker.get_email_fodder_names()
+    if e[0] is not 0:
+        return (jsonify({"err_msg": e[1]}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
+
+    fodder_names = e[1]    
     if len(fodder_names) == 0:
            return (jsonify({'error_message': "Data sheet is empty or data sheet is not provided"}),
-                  HTTP_NOT_FOUND,
+                  HTTP_BAD_INPUT,
                   {'ContentType':'application/json'})
 
     return (jsonify(fodder_names),
@@ -109,12 +124,19 @@ def post_attachment_mapping():
 
 @flask_app.route("/api/attachment/validate", methods=['GET'])
 def get_attachment_validate():
-  fodder_names = emailapi_broker.get_email_fodder_names()
+  e = emailapi_broker.get_email_fodder_names()
+  if e[0] is not 0:
+    return (jsonify({"err_msg": e[1]}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
+
+  fodder_names = e[1]  
+  
   fodder = emailapi_broker.get_email_fodder()
 
   if len(fodder_names) == 0 or len(fodder) == 0:    
     return (jsonify({'error_message': "Data sheet is empty or data sheet is not provided"}),
-            HTTP_NOT_FOUND,
+            HTTP_BAD_INPUT,
             {'ContentType':'application/json'})
 
   issue_index = fodder_names.index("status")
@@ -145,6 +167,7 @@ def post_attachment():
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
     
         emailapi_broker.save_attachment_dir(attachment_dir)
+        emailapi_broker.change_email_fodder_status(a.filename)
         return "Attachments saved successfully", HTTP_OK
     except:
         log.exception("")
@@ -154,10 +177,15 @@ def post_email():
     data = json.loads(request.data)
     if data['to_column'] == None or data['cc_column'] == None or data['subject_template'] == None or data['body_template'] == None:
         return (jsonify({'error_message': "to, cc, subject or body not provided"}),
-              HTTP_NOT_FOUND,
+              HTTP_BAD_INPUT,
               {'ContentType':'application/json'})
 
-    emailapi_broker.save_extended_fodder(data['to_column'], data['cc_column'], data['subject_template'], data['body_template']) 
+    e = emailapi_broker.save_extended_fodder(data['to_column'], data['cc_column'], data['subject_template'], data['body_template']) 
+    if e[0] is not 0:
+        return (jsonify({"err_msg": e[1]}),
+               HTTP_BAD_INPUT,
+               {'ContentType':'application/json'})
+
     return (jsonify({}),
         HTTP_OK,
         {'ContentType':'application/json'})
@@ -171,7 +199,7 @@ def post_email_test():
     e = emailapi_broker.test_email(tos)
     if e[0] is not 0:
         return (jsonify({"err_msg": e[1]}),
-               HTTP_NOT_FOUND,
+               HTTP_BAD_INPUT,
                {'ContentType':'application/json'})
 
     return (jsonify({}),
@@ -194,7 +222,7 @@ def post_email_send():
     e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
     if e[0] is not 0:
         return (jsonify({"err_msg": e[1]}),
-               HTTP_NOT_FOUND,
+               HTTP_BAD_INPUT,
                {'ContentType':'application/json'})
 
     return (jsonify({}),
@@ -203,21 +231,32 @@ def post_email_send():
 
 @flask_app.route("/api/vomit", methods=['GET'])
 def get_vomit():
-    fodder_names = emailapi_broker.get_email_fodder_names()
+    e = emailapi_broker.get_email_fodder_names()
+    if e[0] is not 0:
+        return (jsonify({"err_msg": e[1]}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
 
+    fodder_names = e[1]
+
+    if emailapi_broker.email_from == None:
+        return (jsonify({"err_msg": "Login details not yet provided"}),
+            HTTP_BAD_INPUT,
+            {'ContentType':'application/json'})
+        
     fodder = emailapi_broker.get_email_fodder()
     extended_fodder = emailapi_broker.get_extended_email_fodder()
 
     if len(fodder_names) == 0 or len(fodder) == 0 or len(extended_fodder) == 0:    
         return (jsonify({'error_message': "Data sheet or email template not provided"}),
-              HTTP_NOT_FOUND,
+              HTTP_BAD_INPUT,
               {'ContentType':'application/json'})
 
     assert len(fodder) == len(extended_fodder), "Count of fodder and extended_fodder do not match"    
 
     if emailapi_broker.EMAIL_FODDER_TO_INDEX == None or emailapi_broker.EMAIL_FODDER_CC_INDEX == None:
         return (jsonify({'error_message': "'To' or 'CC' index not provided"}),
-              HTTP_NOT_FOUND,
+              HTTP_BAD_INPUT,
               {'ContentType':'application/json'})
 
     fodder_list = []

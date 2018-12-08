@@ -15,8 +15,12 @@ import pdb
 log = logger.get_logger(__name__)
 
 global email_fodder_names
-global email_fodder
+email_fodder_names = []
 
+global email_fodder
+email_fodder = []
+
+email_fodder_names_FIRST_NAME = -2
 email_fodder_names_STATUS_INDEX = -1 
 
 extended_email_fodder_names = ['pronoun', 'email_subject', 'email_body', 'email_attachment', 'email_sent']
@@ -36,13 +40,17 @@ global EMAIL_FODDER_TO_INDEX
 global EMAIL_FODDER_CC_INDEX
 
 global email_from 
+email_from = None
 
 global attachment_dir
 global attachment_index
+attachment_index = None
 
 # Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
 extended_default_email_fodder = ["his", None, None, None, False]
 
+EMAILPENDING = "E-mail pending"
+ATTACHMENTNOTFOUND = "Attachment not found"
 def _init():
     global email_fodder
     email_fodder = []  
@@ -105,7 +113,8 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
             if all(c == 'None' for c in cells):
                 break
 
-            cells.append("E-mail pending") 
+            cells.append(cells[1].split()[0])
+            cells.append(EMAILPENDING) 
             email_fodder.append(cells)
             
         assert email_fodder_names_template == None or email_fodder_names == email_fodder_names_template, \
@@ -113,10 +122,14 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
         assert len(email_fodder) > 0,            \
                "**** There are no entries in the excel sheet! ****"
 
+        email_fodder_names.append("First Name")
         email_fodder_names.append("Status")
 
 def get_email_fodder_names():
-        return email_fodder_names
+        if len(email_fodder_names) == 0:
+            return [-1, "Excel sheet not yet uploaded"]
+
+        return [0, email_fodder_names]
 
 def get_email_fodder():
         return email_fodder
@@ -142,13 +155,28 @@ def template_to_str(st, l):
     log.debug('template_to_str() final str = %s' % st)
     return st
 
+def change_email_fodder_status(new_attachment):
+    pdb.set_trace()
+    if attachment_index == None or len(email_fodder) == 0:
+        return
+
+    for r in email_fodder:
+        attachments = r[attachment_index].split(',')
+        for a in attachments:
+            if a + ".pdf" == new_attachment:
+                r[email_fodder_names_STATUS_INDEX] = EMAILPENDING
+
 def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     global EMAIL_FODDER_TO_INDEX
     global EMAIL_FODDER_CC_INDEX
     global extended_email_fodder
 
+    extended_email_fodder = []
     EMAIL_FODDER_TO_INDEX = email_fodder_names.index(to_column)
     EMAIL_FODDER_CC_INDEX = email_fodder_names.index(cc_column)
+
+    if '@' not in email_fodder[0][EMAIL_FODDER_TO_INDEX] or '@' not in email_fodder[0][EMAIL_FODDER_CC_INDEX]:
+        return [-1, "Invalid to or cc provided"]
 
     for r in email_fodder:
         gender = "his"
@@ -167,11 +195,12 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
 
         for a in attachments:
             if not os.path.isfile(os.path.join(flask_app.config['ATTACHMENTS_DIR'], a)):
-                r[email_fodder_names_STATUS_INDEX] = "pdf not found"
+                r[email_fodder_names_STATUS_INDEX] = ATTACHMENTNOTFOUND
 
         extended_fodder_entry.append(False)
 
         extended_email_fodder.append(extended_fodder_entry)
+    return [0, "Data saved"]
 
 def save_attachment_dir(dir_loc):
         global attachment_dir 
@@ -194,9 +223,18 @@ def test_email(tos):
     attachments = [os.path.join(attachment_dir, a) for a in attachment_list]
     return emailapi.send_email(email_from, tos, email_subject, email_body, ccs, attachments)
 
+def _update_email_fodder_status(tos, subject, body, ccs, attachments):
+    for row in email_fodder:
+        if row[EMAIL_FODDER_TO_INDEX] in tos:
+            row[email_fodder_names_STATUS_INDEX] = "Email Sent"  
+
 def send_email(email_from, tos, subject, body, ccs, attachments):
     attachments = [os.path.join(attachment_dir, a) for a in attachments]
-    return emailapi.send_email(email_from, tos, subject, body, ccs, attachments)
+    
+    e = emailapi.send_email(email_from, tos, subject, body, ccs, attachments)
+    if e[0] == 0:
+        _update_email_fodder_status(tos, subject, body, ccs, attachments)
+    return e
 
 def set_login_details(username, password, server="smtp.gmail.com", port=587):
     assert username is not None and password is not None,\

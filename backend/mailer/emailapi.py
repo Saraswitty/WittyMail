@@ -68,6 +68,8 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
 
   if (attachments is not None):
     for attachment in attachments:
+      if not os.path.isfile(attachment):
+        return [-1, 'Attachment not found'] 
       a = open(attachment, "rb")
       p = MIMEBase('application', 'octet-stream') 
       p.set_payload((a).read()) 
