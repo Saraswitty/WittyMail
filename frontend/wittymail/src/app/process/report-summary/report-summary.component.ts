@@ -47,6 +47,8 @@ export class ReportSummaryComponent implements OnInit {
     error: false
   }
 
+  downloadSheetUrl:string = '';
+
   constructor(private log: LoggerService, private wittymail: WittymailService) { }
 
   displaySummaryTable() {
@@ -69,6 +71,7 @@ export class ReportSummaryComponent implements OnInit {
 
   ngOnInit() {
     this.displaySummaryTable();
+    this.downloadSheetUrl = this.wittymail.getFodderDownloadUrl();
   }
 
   onViewEmail(selectedEmail) {

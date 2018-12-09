@@ -69,7 +69,7 @@ export class WittymailService {
 
   urls = {
     version: 'api/version',  // GET
-    fodder: 'api/fodder',    // POST
+    fodder: 'api/fodder',    // POST, GET
     regurgitate: 'api/fodder/regurgitate',    // POST
     vomit: 'api/vomit', //POST
     attachment: 'api/fodder/achar',  // POST
@@ -129,6 +129,10 @@ export class WittymailService {
   }
 
   getFodderUploadUrl(): string {
+    return this.urls.fodder;
+  }
+
+  getFodderDownloadUrl(): string {
     return this.urls.fodder;
   }
 
