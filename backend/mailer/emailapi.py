@@ -39,14 +39,39 @@ def set_login_details(server, port, username, password):
   log.debug('Login successful')
   return [0, 'Login successful']
 
+#subject = SerialNo 
+def _test_values(frm, tos, subject, body, ccs, attachments):
+  index = subject.split()[1]
+  name_of_child = "Name Surname+" + index
+  class_val = "Class+" + index
+  sponsor_email_id = "ajaynair59+" + index + "@gmail.com"
+  sponsor = "Sponsor Name+" + index
+  reference = "Reference Name+" + index
+  reference_email_id = "ajaynair59+" + index + "cc@gmail.com"
+  test_attachment = name_of_child + ".pdf"
+
+  tmpstr = index + " " + name_of_child + " " + class_val + " " + sponsor_email_id + " " + sponsor + " " + reference + " " + reference_email_id + " Name E-mail pending"
+  test_subject = "Subject: " + tmpstr
+  print(test_subject)
+
+  test_body = "<p>Body: " + tmpstr + "</p>"
+  print(test_body)
+
+  assert test_subject == subject, "subject did not match"
+  assert test_body == body, "body did not match"
+  assert tos[0] == sponsor_email_id, "sponsor do not match"
+  assert ccs[0] == reference_email_id, "CCs do not match"
+  assert test_attachment in attachments[0] , "attachment do not match"
+
 def send_email(frm, tos, subject, body, ccs = None, attachments = None):
-  assert                  \
-  frm is not None and     \
+  assert                   \
+  frm is not None and      \
   tos is not None and      \
   subject is not None and  \
   body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
                               % (frm, tos, subject, body))    
 
+  # _test_values(frm, tos, subject, body, ccs, attachments)
   if not INITIALIZED:
     log.error('send_email() called before set_login_details()')
     return [-1, "Server or user details not yet set"]

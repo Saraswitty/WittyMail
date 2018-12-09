@@ -117,8 +117,11 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
 
             tmp_str = _sanitize_names_str(cells[1])
             tmp_str2 = [i.split()[0] for i in tmp_str]
-            tmp_str3 = ', '.join(tmp_str2[:-1])
-            tmp_str = tmp_str3 + " and " + tmp_str2[-1]
+            if len(tmp_str2) == 1:
+                tmp_str = tmp_str2[0]
+            else:
+                tmp_str3 = ', '.join(tmp_str2[:-1])
+                tmp_str = tmp_str3 + " and " + tmp_str2[-1]
             cells.append(tmp_str)
             cells.append(EMAILPENDING) 
             email_fodder.append(cells)

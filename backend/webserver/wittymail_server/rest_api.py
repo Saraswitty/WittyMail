@@ -217,7 +217,7 @@ def post_email_send():
     ccs.append(data['cc'])
 
     attachments = []
-    attachments.append(data['attachment'])
+    attachments = data['attachment']
 
     e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
     if e[0] is not 0:
@@ -261,11 +261,15 @@ def get_vomit():
 
     fodder_list = []
     for f, e in zip(fodder, extended_fodder):
+        at = []
+        for a in e[-2]:
+            at_dict = {"name": a, "url": os.path.join("/api/fodder/achar/", a)}
+            at.append(at_dict)
         email = { \
           "from": emailapi_broker.email_from,
           "to": f[emailapi_broker.EMAIL_FODDER_TO_INDEX],
           "cc": f[emailapi_broker.EMAIL_FODDER_CC_INDEX],
-          "attachment": {"name": e[-2][0], "url": os.path.join("/api/fodder/achar/", e[-2][0]) if e[-2] else "Not found"},
+          "attachment": at,
           "subject": e[-4],
           "body": e[-3],
         }
