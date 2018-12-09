@@ -82,8 +82,8 @@ export class ReportSummaryComponent implements OnInit {
       cc: selectedEmail['cc'],
       subject: selectedEmail['subject'],
       attachment: selectedEmail['attachment'],
-      attachment_name: selectedEmail['attachment']['name'],
-      attachment_url: selectedEmail['attachment']['url'],
+      //attachment_name: selectedEmail['attachment']['name'],
+      //attachment_url: selectedEmail['attachment']['url'],
       body: selectedEmail['body']
     }
     this.showEmailContentsModal = true;
@@ -122,7 +122,7 @@ export class ReportSummaryComponent implements OnInit {
       to: email_contents['to'],
       cc: email_contents['cc'],
       subject: email_contents['subject'],
-      attachment: email_contents['attachment']['name'],
+      attachment: email_contents['attachment'],
       body: email_contents['body']
     }
     this.wittymail.postSendEmail(d).subscribe(

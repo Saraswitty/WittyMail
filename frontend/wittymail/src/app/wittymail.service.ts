@@ -47,7 +47,7 @@ export interface SendEmailContent {
   to: string;
   cc: string;
   subject: string;
-  attachment: string;
+  attachment: any;
   body: string;
 }
 
