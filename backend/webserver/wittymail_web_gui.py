@@ -9,6 +9,7 @@ import util.bootstrap
 
 import time, webbrowser, threading, traceback
 import util.logger as logger
+from werkzeug.serving import make_server
 
 _logger = logger.get_logger(__name__)
 
@@ -29,7 +30,8 @@ def start_flask_server():
     # See wittymail_server/__init__.py for the Flask app bootstrap
     import wittymail_server
     flask_app = wittymail_server.flask_app
-    flask_app.run()
+    flask_server = make_server("0.0.0.0", "5000", flask_app)
+    flask_server.serve_forever()
 
 def open_browser():
     print("A new browser window will open shortly, please wait...")
