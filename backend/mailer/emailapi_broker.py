@@ -8,7 +8,6 @@ import mailer.emailapi as emailapi
 import re
 import util.logger as logger
 import tempfile
-import pdb
 
 # import ai.gender_guesser as gender_guesser
 
@@ -46,9 +45,6 @@ email_from = None
 global attachment_dir
 global attachment_index
 attachment_index = None
-
-# Extended fodder that will be appended to the fodder provided by the user (i.e. email_fodder[])
-extended_default_email_fodder = ["his", None, None, None, False]
 
 EMAILPENDING = "E-mail pending"
 ATTACHMENTNOTFOUND = "Attachment not found"
@@ -131,6 +127,8 @@ def save_fodder_from_file(loc, email_fodder_names_template = None):
         assert len(email_fodder) > 0,            \
                "**** There are no entries in the excel sheet! ****"
 
+        # Add new fodder names to the excel. If you modify fodder names count/order,
+        # make sure you change the count/order of fodder. 
         email_fodder_names.append("First Name")
         email_fodder_names.append("Status")
 
@@ -170,12 +168,12 @@ def _sanitize_names_str(names_str):
     return list(map(str.strip, tmp_str))
 
 def change_email_fodder_status(new_attachment):
+    # If excel is not yet provided or if the attachment column is not yet provided no need to change the state
     if attachment_index == None or len(email_fodder) == 0:
         return
 
     for r,e in zip(email_fodder, extended_email_fodder):
         _attachments = _sanitize_names_str(r[attachment_index])
-        # _attachments = r[attachment_index].replace(" and ", ",").replace(" ","").split(",")
 
         if e[extended_email_fodder_names_MISSINGATTACHMENTCOUNT_INDEX] == 0:
             continue

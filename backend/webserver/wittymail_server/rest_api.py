@@ -167,6 +167,7 @@ def post_attachment():
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
     
         emailapi_broker.save_attachment_dir(attachment_dir)
+        # TODO Call change_email_fodder_status() from save_attachment_dir()
         emailapi_broker.change_email_fodder_status(a.filename)
         return "Attachments saved successfully", HTTP_OK
     except:
@@ -261,6 +262,7 @@ def get_vomit():
               HTTP_BAD_INPUT,
               {'ContentType':'application/json'})
 
+    # Create fodder_list in email_broker
     fodder_list = []
     for f, e in zip(fodder, extended_fodder):
         at = []
