@@ -1,0 +1,27 @@
+<h2 style="margin-top:0;">Inputs > Attachments</h2>
+<form>
+  <section class="form-block">
+    <div class="form-group row">
+      <div class="col-xs-4">
+        <label for="aForm_1">
+          Attachments
+          <br />
+          <i>(Select all PDF files to be attached)</i>
+        </label>
+      </div>
+      <div class="col-xs-4">
+        <input type="file" name="attachment" ng2FileSelect [uploader]="uploader" multiple />
+      </div>
+      <div class="col-xs-4">
+
+      </div>
+    </div>
+    <div *ngIf="(showDirectoryContents)">
+      <div class="form-group row">
+        <button type="submit" class="btn btn-primary" (click)="validateInputsAndContinue()">NEXT</button>
+      </div>
+    </div>
+  </section>
+</form>
+
+<app-error-dialog #errorDialog></app-error-dialog>

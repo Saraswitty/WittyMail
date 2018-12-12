@@ -1,0 +1,265 @@
+<h2 style="margin-top:0;">Report > Summary</h2>
+<p>
+  <i><b>WittyMail</b> will automate sending emails based on your sheet below.
+    Review the mappings to your column headers and click on the 'view e-mail'
+    button to preview the e-mail contents for a particular row.</i>
+</p>
+
+<clr-datagrid [(clrDgSelected)]="selectedRows">
+  <clr-dg-action-bar>
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-primary" (click)="onSendTestEmail()">
+        <clr-icon shape="envelope"></clr-icon> Send Test E-mail
+      </button>
+      <clr-signpost>
+        <clr-signpost-content *clrIfOpen>
+          <div class="p5" style="margin-top:0;">
+            You can specify an e-mail address to use instead of the actual sponsor's e-mail address
+            to test how the e-mail would look like in your inbox.
+          </div>
+        </clr-signpost-content>
+      </clr-signpost>
+    </div>
+    <div class="btn-group">
+      <button type="submit" class="btn btn-sm btn-success" (click)="onSendAllEmails()">
+        <clr-icon shape="envelope"></clr-icon> SEND EMAILS TO SELECTED SPONSORS
+      </button>
+    </div>
+    <div class="btn-group">
+      <a href="{{downloadSheetUrl}}"><button type="submit" class="btn btn-sm">
+          <clr-icon shape="download"></clr-icon> Download Updated Sheet
+        </button> </a>
+    </div>
+
+  </clr-dg-action-bar>
+
+  <clr-dg-column>E-Mail</clr-dg-column>
+  <clr-dg-column *ngFor="let col of headers">{{col}}</clr-dg-column>
+
+  <clr-dg-row *clrDgItems="let row of tableContent" [clrDgItem]="row">
+    <clr-dg-cell>
+      <button class="btn btn-outline btn-sm" style="margin: 0;" (click)="onViewEmail(row['email'])">View E-Mail</button>
+      <p class="p8" style="margin-top:5px;">{{row['status']}}</p>
+    </clr-dg-cell>
+    <clr-dg-cell *ngFor="let col of headers">
+      <div style="word-wrap:break-word">{{row[col]}}</div>
+    </clr-dg-cell>
+  </clr-dg-row>
+
+  <clr-dg-footer>{{selectedRows.length}} e-mails will be sent.</clr-dg-footer>
+</clr-datagrid>
+
+<clr-modal [(clrModalOpen)]="showEmailContentsModal">
+  <h3 class="modal-title">E-mail Contents</h3>
+  <div class="modal-body">
+    <form class="compact" style="padding-top: 0;">
+      <section class="form-block">
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_7">From</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_7" value="{{emailDetails['from']}}" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_1">To</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_1" value="{{emailDetails['to']}}" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_2">CC</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_2" value="{{emailDetails['cc']}}" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_3">Subject</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="text" id="aForm_3" value="{{emailDetails['subject']}}" size="45" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_5">Attachment</label>
+          </div>
+          <div class="col-xs-6">
+            <div *ngFor="let a of emailDetails['attachment']">
+              <clr-icon shape="attachment"></clr-icon>
+              <a href="{{a.url}}" target="_blank"> {{a.name}}</a>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-xs-2">
+            <label for="aForm_4">Content</label>
+          </div>
+          <div class="col-xs-10">
+            <div [innerHTML]="emailDetails.body" class="body-template-preview"></div>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <div class="row">
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary" (click)="sendEmail(emailDetails, true)">
+          <clr-icon shape="envelope"></clr-icon> SEND
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="sendEmailDetails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="sendEmailDetails.success">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">E-mail sent successfully.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="sendEmailDetails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send e-mail: {{sendEmailDetails.errorMessage}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="showTestEmailModal">
+  <h3 class="modal-title">Send Test E-mail</h3>
+  <div class="modal-body">
+    A test e-mail will be sent for the first row in the sheet to the following address instead of the actual sponsor.
+    <form class="compact" style="padding-top: 0;" #testEmailForm="ngForm" (ngSubmit)="sendTestEmail()">
+      <section class="form-block">
+        <div class="form-group row">
+          <div class="col-xs-1">
+            <label for="aForm_3">To</label>
+          </div>
+          <div class="col-xs-6">
+            <label for="aForm_3" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md"
+              [class.invalid]="toEmailInput.invalid && (toEmailInput.dirty || toEmailInput.touched)">
+              <input name="test_email_to" type="email" id="aForm_3" placeholder="eg.pigeons.are.idiots99@gmail.com"
+                required [(ngModel)]="testEmailDetails.to_address" size="30" #toEmailInput="ngModel" ngModel email>
+              <span class="tooltip-content">
+                Please check your e-mail address.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-xs-3">
+            <button type="submit" class="btn btn-primary" [disabled]="testEmailForm.form.invalid">
+              <clr-icon shape="envelope"></clr-icon> SEND
+            </button>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="testEmailDetails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="testEmailDetails.success">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Test e-mail sent successfully, please check your inbox.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="testEmailDetails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send test e-mail: {{testEmailDetails.errorMessage}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="showSendAllEmailsModal">
+  <h3 class="modal-title">Send All E-mails</h3>
+  <div class="modal-body">
+    {{selectedRows.length}} e-mails are ready to be sent.
+
+    <div class="row">
+      <div class="col-xs-4">
+        <button type="submit" class="btn btn-primary" (click)="sendSelectedEmails()">
+          <clr-icon shape="envelope"></clr-icon> SEND ALL E-MAILS
+        </button>
+      </div>
+
+
+      <div class="col-xs-12">
+        <div class="progress loop" *ngIf="sendAllEmails.processing"><progress></progress></div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-success" role="alert" *ngIf="sendAllEmails.done && !sendAllEmails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+              </div>
+              <span class="alert-text">All e-mails sent successfully.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="alert alert-danger" role="alert" *ngIf="sendAllEmails.done && sendAllEmails.error">
+          <div class="alert-items">
+            <div class="alert-item static">
+              <div class="alert-icon-wrapper">
+                <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+              </div>
+              <span class="alert-text">Failed to send some e-mails, view the report again for current status.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+
+<app-error-dialog #errorDialog></app-error-dialog>

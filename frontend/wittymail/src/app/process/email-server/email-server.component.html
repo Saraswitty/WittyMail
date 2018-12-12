@@ -1,0 +1,67 @@
+<h2 style="margin-top:0;">E-Mail > Server</h2>
+<p>
+  <i><b>WittyMail</b> sends e-mails using your usual email server so that recipients see it
+    as if it came directly from you.
+  </i>
+</p>
+
+<form #emailSettingsForm="ngForm" (ngSubmit)="validateInputsAndContinue()">
+  <section class="form-block">
+    <div class="form-group row">
+      <div class="col-xs-3">
+        <label for="aForm_3">
+          E-Mail Service
+        </label>
+      </div>
+      <div class="col-xs-4">
+        <div class="select">
+          <select name="email_service" [(ngModel)]="emailSettings.service">
+            <option value="GMail" selected>GMail</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <div class="col-xs-3">
+        <label for="aForm_3">
+          E-mail Address
+        </label>
+      </div>
+      <div class="col-xs-6">
+        <label for="aForm_3" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md"
+          [class.invalid]="emailUsernameInput.invalid && (emailUsernameInput.dirty || emailUsernameInput.touched)">
+          <input name="email_username" type="email" id="aForm_3" placeholder="eg.pigeons.are.idiots99@gmail.com"
+            required [(ngModel)]="emailSettings.username" size="30" #emailUsernameInput="ngModel" ngModel email>
+          <span class="tooltip-content">
+            Please check your e-mail address.
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <div class="col-xs-3">
+        <label for="formFields_3">
+          Password
+        </label>
+      </div>
+      <div class="col-xs-6">
+        <label for="formFields_3" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md"
+          [class.invalid]="emailPasswordInput.invalid && (emailPasswordInput.dirty || emailPasswordInput.touched)">
+          <input name="email_password" type="password" id="formFields_3" required [(ngModel)]="emailSettings.password"
+            size="30" #emailPasswordInput="ngModel">
+          <span class="tooltip-content">
+            Please enter your password.
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <button type="submit" class="btn btn-primary" [disabled]="emailSettingsForm.form.invalid">NEXT</button>
+    </div>
+  </section>
+</form>
+
+<app-error-dialog #errorDialog></app-error-dialog>
