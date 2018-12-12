@@ -217,7 +217,9 @@ def post_email_send():
     ccs.append(data['cc'])
 
     attachments = []
-    attachments = data['attachment']
+    at = data['attachment']
+    for a in at:
+        attachments.append(a["name"]) 
 
     e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
     if e[0] is not 0:
