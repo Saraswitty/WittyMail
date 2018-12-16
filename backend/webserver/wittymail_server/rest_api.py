@@ -194,43 +194,49 @@ def post_email():
 
 @flask_app.route("/api/burp/test", methods=['POST'])
 def post_email_test():
-    data = json.loads(request.data)
-    tos = []
-    tos.append(data['to'])
-    e = emailapi_broker.test_email(tos)
-    if e[0] is not 0:
-        return (jsonify({"err_msg": e[1]}),
-               HTTP_BAD_INPUT,
-               {'ContentType':'application/json'})
-
-    return (jsonify({}),
-              HTTP_OK,
-              {'ContentType':'application/json'})
+    try:
+        data = json.loads(request.data)
+        tos = []
+        tos.append(data['to'])
+        e = emailapi_broker.test_email(tos)
+        if e[0] is not 0:
+            return (jsonify({"err_msg": e[1]}),
+                   HTTP_BAD_INPUT,
+                   {'ContentType':'application/json'})
+    
+        return (jsonify({}),
+                  HTTP_OK,
+                  {'ContentType':'application/json'})
+    except:
+        log.exception("Failed to send test email")
 
 @flask_app.route("/api/burp/send", methods=['POST'])
 def post_email_send():
-    data = json.loads(request.data)
-
-    tos = []
-    tos.append(data['to'])
-
-    ccs = []
-    ccs.append(data['cc'])
-
-    attachments = []
-    at = data['attachment']
-    for a in at:
-        attachments.append(a["name"]) 
-
-    e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
-    if e[0] is not 0:
-        return (jsonify({"err_msg": e[1]}),
-               HTTP_BAD_INPUT,
-               {'ContentType':'application/json'})
-
-    return (jsonify({}),
-              HTTP_OK,
-              {'ContentType':'application/json'})
+    try:
+        data = json.loads(request.data)
+    
+        tos = []
+        tos.append(data['to'])
+    
+        ccs = []
+        ccs.append(data['cc'])
+    
+        attachments = []
+        at = data['attachment']
+        for a in at:
+            attachments.append(a["name"]) 
+    
+        e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
+        if e[0] is not 0:
+            return (jsonify({"err_msg": e[1]}),
+                   HTTP_BAD_INPUT,
+                   {'ContentType':'application/json'})
+    
+        return (jsonify({}),
+                  HTTP_OK,
+                  {'ContentType':'application/json'})
+    except:
+        log.exception("Failed to send email");
 
 @flask_app.route("/api/vomit", methods=['GET'])
 def get_vomit():

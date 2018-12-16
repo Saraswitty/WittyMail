@@ -64,48 +64,61 @@ def _test_values(frm, tos, subject, body, ccs, attachments):
   assert test_attachment in attachments[0] , "attachment do not match"
 
 def send_email(frm, tos, subject, body, ccs = None, attachments = None):
-  assert                   \
-  frm is not None and      \
-  tos is not None and      \
-  subject is not None and  \
-  body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
-                              % (frm, tos, subject, body))    
-
-  # _test_values(frm, tos, subject, body, ccs, attachments)
-  if not INITIALIZED:
-    log.error('send_email() called before set_login_details()')
-    return [-1, "Server or user details not yet set"]
-
-  log.debug('Email information: from=%s to=%s subject=%s body=%s cc=%s attachment=%s' 
-            % (frm, tos, subject[:50], body, ccs, attachments))
-
-  msg = MIMEMultipart() 
-  msg['From'] = frm
-  msg['To'] = ", ".join(tos)
-
-  if ccs is not None:
-    msg['Cc'] = ", ".join(ccs)
-  else:
-    log.debug('No cc mailer provided')
-
-  msg['Subject'] = subject
-  msg.attach(MIMEText(body, 'html'))  
-
-  if (attachments is not None):
-    for attachment in attachments:
-      if not os.path.isfile(attachment):
-        return [-1, 'Attachment not found'] 
-      a = open(attachment, "rb")
-      p = MIMEBase('application', 'octet-stream') 
-      p.set_payload((a).read()) 
-      encoders.encode_base64(p) 
-      p.add_header('Content-Disposition', "attachment; filename= %s" % os.path.basename(attachment)) 
-      msg.attach(p)
-
-  msg_str = msg.as_string()
-  s.sendmail(msg['From'], tos, msg_str) 
-  log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
-  return [0, 'Email sent successfully']
+    try:
+        assert                   \
+        frm is not None and      \
+        tos is not None and      \
+        subject is not None and  \
+        body is not None, log.error('Incorrect value provided from=%s to=%s subject=%s body=%s'  
+                                    % (frm, tos, subject, body))    
+        
+        # _test_values(frm, tos, subject, body, ccs, attachments)
+        if not INITIALIZED:
+          log.error('send_email() called before set_login_details()')
+          return [-1, "Server or user details not yet set"]
+        
+        log.debug('Email information: from=%s to=%s subject=%s body=%s cc=%s attachment=%s' 
+                  % (frm, tos, subject[:50], body, ccs, attachments))
+        
+        # Extra <p> tags show up as multiple line breaks in the resulting email, so replace them
+        # with single line breaks
+        body = body.replace('</p><p>', '<br />')
+        
+        log.debug("Cleaned body: %s", body)
+        
+        msg = MIMEMultipart() 
+        msg['From'] = frm
+        msg['To'] = ", ".join(tos)
+        
+        if ccs is not None:
+          msg['Cc'] = ", ".join(ccs)
+        else:
+          log.debug('No cc mailer provided')
+        
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))  
+        
+        if (attachments is not None):
+          for attachment in attachments:
+            if not os.path.isfile(attachment):
+              return [-1, 'Attachment not found'] 
+            try:
+                a = open(attachment, "rb")
+            except:
+                log.exception("Failed to open attachment: %s", attachment)
+                raise
+            p = MIMEBase('application', 'octet-stream') 
+            p.set_payload((a).read()) 
+            encoders.encode_base64(p) 
+            p.add_header('Content-Disposition', "attachment; filename= %s" % os.path.basename(attachment)) 
+            msg.attach(p)
+        
+        msg_str = msg.as_string()
+        s.sendmail(msg['From'], tos, msg_str) 
+        log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
+        return [0, 'Email sent successfully']
+    except:
+        log.exception("Failed to send test email")
   
 def teardown():
   if not INITIALIZED:

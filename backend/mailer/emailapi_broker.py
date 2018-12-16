@@ -194,8 +194,9 @@ def save_extended_fodder(to_column, cc_column, subject_template, body_template):
     EMAIL_FODDER_TO_INDEX = email_fodder_names.index(to_column)
     EMAIL_FODDER_CC_INDEX = email_fodder_names.index(cc_column)
 
-    if '@' not in email_fodder[0][EMAIL_FODDER_TO_INDEX] or '@' not in email_fodder[0][EMAIL_FODDER_CC_INDEX]:
-        return [-1, "Invalid to or cc provided"]
+    # 'cc' can be NULL, so skip checking for that
+    if '@' not in email_fodder[0][EMAIL_FODDER_TO_INDEX]:
+        return [-1, "Invalid to provided"]
 
     for r in email_fodder:
         gender = "his"
