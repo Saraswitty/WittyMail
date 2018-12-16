@@ -58,8 +58,10 @@ export class ReportSummaryComponent implements OnInit {
         let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent>data;
         this.headers = r.headers;
         this.tableContent = r.contents;
-        // Select all rows by default
-        this.selectedRows = this.tableContent;
+        // Select on rows that have "E-mail pending" as the status
+        // This skips rows that have 'Attachment missing' and any other status
+        this.selectedRows = this.tableContent.filter(
+          row => row.Status === "E-mail pending");
 
         this.log.info("Got %d headers and %d rows", this.headers.length, this.tableContent.length);
       },
@@ -86,6 +88,8 @@ export class ReportSummaryComponent implements OnInit {
       //attachment_url: selectedEmail['attachment']['url'],
       body: selectedEmail['body']
     }
+    this.sendEmailDetails.success = false;
+    this.sendEmailDetails.error = false;
     this.showEmailContentsModal = true;
   }
 
