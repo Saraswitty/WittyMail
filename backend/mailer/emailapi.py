@@ -90,8 +90,11 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
         msg['From'] = frm
         msg['To'] = ", ".join(tos)
         
-        if ccs is not None:
+        ccs_to_send = []
+        if ccs is not None and ccs[0] != 'None':
           msg['Cc'] = ", ".join(ccs)
+          for cc in ccs:
+            ccs_to_send.append(cc.strip())
         else:
           log.debug('No cc mailer provided')
         
@@ -114,7 +117,11 @@ def send_email(frm, tos, subject, body, ccs = None, attachments = None):
             msg.attach(p)
         
         msg_str = msg.as_string()
-        s.sendmail(msg['From'], tos, msg_str) 
+        log.debug("ccs_to_send: %s", ccs_to_send)
+        if ccs_to_send:
+          s.sendmail(msg['From'], tos + ccs_to_send, msg_str) 
+        else:
+          s.sendmail(msg['From'], tos, msg_str) 
         log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
         return [0, 'Email sent successfully']
     except:
