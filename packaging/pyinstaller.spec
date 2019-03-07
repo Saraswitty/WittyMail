@@ -27,7 +27,7 @@ os.mkdir("dist")
 print("## Building Angular app for production")
 cmd = 'cd "' + angular_base_dir + '" && yarn install && ng build --prod'
 print("\t%s" % cmd)
-r = 0 # os.system(cmd)
+r = os.system(cmd)
 if r:
     print("## Failed to build Angular app, aborting...")
     exit(1)
