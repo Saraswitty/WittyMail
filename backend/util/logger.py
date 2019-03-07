@@ -5,15 +5,22 @@
 Provides APIs that are wrappers over the Python 'logging' module
 '''
 
-import logging, sys, traceback
+import logging, os, sys, traceback
 
 _logger = None
 
 LOG_LEVEL_IN_FILE = logging.DEBUG
 LOG_LEVEL_ON_CONSOLE = logging.DEBUG
 
-import os
-LOG_FILE_PATH = os.path.join(os.path.abspath(os.getcwd()), 'wittymail_log.txt')
+# Support PyInstaller, export this as a module-level global variable for other modules to consume
+# Since all modules import the 'logger' module anyway, this is a good place to define it
+if getattr(sys, 'frozen', False):
+    WORKING_DIR = sys._MEIPASS # Path to the PyInstall temp dir
+    CURRENT_DIR = os.path.dirname(os.path.realpath(sys.executable)) # Path to the binary file
+else:
+    WORKING_DIR = '.'
+    CURRENT_DIR = os.getcwd()
+LOG_FILE_PATH = os.path.join(os.path.abspath(CURRENT_DIR), 'wittymail_log.txt')
 
 def init_logger():
     try:
