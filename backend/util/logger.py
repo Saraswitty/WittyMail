@@ -18,8 +18,8 @@ if getattr(sys, 'frozen', False):
     WORKING_DIR = sys._MEIPASS # Path to the PyInstall temp dir
     CURRENT_DIR = os.path.dirname(os.path.realpath(sys.executable)) # Path to the binary file
 else:
-    WORKING_DIR = '.'
-    CURRENT_DIR = os.getcwd()
+    WORKING_DIR = os.path.abspath(os.getcwd())
+    CURRENT_DIR = os.path.abspath(os.getcwd())
 LOG_FILE_PATH = os.path.join(os.path.abspath(CURRENT_DIR), 'wittymail_log.txt')
 
 def init_logger():

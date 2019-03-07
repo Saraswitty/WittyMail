@@ -16,7 +16,8 @@ def print_preamble():
 
     # This also has the app name
     version_string = version.__pretty_version__
-    runtime_path = os.path.abspath(os.getcwd()) + "(CWD)"
+    working_dir = logger.WORKING_DIR
+    runtime_path = logger.CURRENT_DIR
     log_file_path = logger.get_log_file_path()
 
     try:
@@ -36,6 +37,7 @@ OS: {}
 Python: {}
 System: {} on {}/{}
 Working directory: {}
+Runtime path: {}
 Commandline: {}
 =============================
 Log file: {}
@@ -44,6 +46,7 @@ Log file: {}
                platform.platform(),
                sys.version,
                getpass.getuser(), hostname, ip,
+               working_dir,
                runtime_path,
                ' '.join(sys.argv),
                log_file_path)
