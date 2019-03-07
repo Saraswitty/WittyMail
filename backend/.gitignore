@@ -3,3 +3,6 @@ ve/
 
 # WittyMail log file
 **/wittymail_log.txt
+
+# Flask static files
+webserver/static

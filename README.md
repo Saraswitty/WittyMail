@@ -1,6 +1,8 @@
 # WittyMail
 An automated personalized email composing solution that connects information from various sources to create a flexible workflow to send emails with attachments using SMTP from your own account.
 
+> Download [Windows EXE](https://github.com/Saraswitty/wittymail/releases) to run locally without any dependencies.
+
 ## The Big Picture
 Many non-profit organizations have started adopting tech for various common activities, such as engaging with sponsors via e-mails. These are not mass-marketing campaigns, but rather a medium to communicate information that each individual sponsor actually cares about, such as what their donations are being used for. These communications, by their nature, are personalized to the sponsor, the benefitiary or both and have a regular cadence that helps reinforce the relationship with the sponsor and encourage continued donations in the future.
 

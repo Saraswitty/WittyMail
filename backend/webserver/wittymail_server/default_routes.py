@@ -8,8 +8,11 @@ from wittymail_server import flask_app
 
 from flask import send_file, send_from_directory
 
-# Static files are in the parent directory
-base_path = '..'
+import util.logger as logger
+
+_logger = logger.get_logger(__name__)
+
+base_path = logger.WORKING_DIR
 
 @flask_app.route("/")
 def index():

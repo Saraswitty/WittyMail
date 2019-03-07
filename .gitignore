@@ -101,3 +101,6 @@ wittymail_ve/
 
 # VS Code
 .vscode/
+
+# WittyMail log file
+wittymail_log.txt

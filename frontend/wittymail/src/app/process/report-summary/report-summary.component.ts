@@ -18,7 +18,7 @@ export class ReportSummaryComponent implements OnInit {
   selectedRows = [];
   showEmailContentsModal: boolean = false;
 
-  emailDetails = {};
+  emailDetails:any = {};
   processedEmailsCount = 0;
 
   showTestEmailModal: boolean = false;
