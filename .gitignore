@@ -98,3 +98,6 @@ wittymail_ve/
 
 # mypy
 .mypy_cache/
+
+# VS Code
+.vscode/
