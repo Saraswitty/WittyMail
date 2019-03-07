@@ -10,7 +10,7 @@ import logging, os, sys, traceback
 _logger = None
 
 LOG_LEVEL_IN_FILE = logging.DEBUG
-LOG_LEVEL_ON_CONSOLE = logging.DEBUG
+LOG_LEVEL_ON_CONSOLE = logging.INFO
 
 # Support PyInstaller, export this as a module-level global variable for other modules to consume
 # Since all modules import the 'logger' module anyway, this is a good place to define it
