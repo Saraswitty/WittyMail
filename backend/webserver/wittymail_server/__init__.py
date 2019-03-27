@@ -62,6 +62,7 @@ try:
 
     flask_app.config['ATTACHMENTS_DIR'] = a
     flask_app.config['FODDER_DIR'] = f
+    flask_app.config['URL_DEFAULT_PREFIX_FOR_API'] = '/api/'
 
     # Import other Flask sub-modules containing URL handlers
     import wittymail_server.default_routes

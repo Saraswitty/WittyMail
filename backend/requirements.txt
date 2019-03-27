@@ -4,3 +4,4 @@ openpyxl
 requests
 PyPDF2
 pyinstaller
+flask-classy
