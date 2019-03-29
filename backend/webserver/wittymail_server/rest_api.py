@@ -7,8 +7,8 @@ sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
 import mailer.emailapi_broker as emailapi_broker
 from wittymail_server import flask_app
-from flask import jsonify, request, json
-from flask_classy import FlaskView
+from flask import jsonify, request, json, url_for
+from flask_classy import FlaskView, route
 import util.version as version
 import util.logger as logger
 from flask import send_file
@@ -28,14 +28,14 @@ class SheetView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @flask_app.route('/api/sheet/upload', methods=['POST'])
-    def upload_sheet(self):
+    @route('upload', methods=['POST'])
+    def some(self):
         """
         Upload a new Excel sheet as input
 
         :return:
         """
-        log.debug("Uploading sheet: ", request.files)
+        log.debug("Uploading sheet: %s", request.files)
         fodder_dir = flask_app.config['FODDER_DIR']
 
         f = request.files['fodder']
@@ -67,6 +67,7 @@ class SheetView(FlaskView):
 
         :return:
         """
+        log.info("URL: %s", url_for('SheetView:some'))
         e = emailapi_broker.get_email_fodder_names()
         if e[0] is not 0:
             return (jsonify({"err_msg": e[1]}),
@@ -100,7 +101,7 @@ class SheetView(FlaskView):
         for f, e in zip(fodder, extended_fodder):
             at = []
             for a in e[-2]:
-                at_dict = {"name": a, "url": os.path.join("/api/fodder/achar/", a)}
+                at_dict = {"name": a, "url": os.path.join("/attachment/", a)}
                 at.append(at_dict)
             email = { \
                 "from": emailapi_broker.email_from,
@@ -156,7 +157,7 @@ class SheetView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('/api/sheet/mapping', methods=['POST'])
+    @route('mapping', methods=['POST'])
     def mapping(self):
         """
         Specify the mapping of columns in the Excel sheet to targets (eg. attachment names)
@@ -176,7 +177,7 @@ class AttachmentView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @flask_app.route('/api/attachment/upload', methods=['POST'])
+    @route('upload', methods=['POST'])
     def upload_attachment(self):
         """
         The 3rd party Angular plugin ng6-file-upload makes one POST call per file instead of
@@ -203,7 +204,7 @@ class EmailView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @flask_app.route('/api/email/server', methods=['POST'])
+    @route('server', methods=['POST'])
     def server_details(self):
         """
         SMTP server URL and credentials
@@ -225,7 +226,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('/api/email/template_to_reality', methods=['POST'])
+    @route('template_to_reality', methods=['POST'])
     def template_to_reality(self):
         """
         Convert an email template (subject or body) by replacing column name placeholders with actual data
@@ -240,7 +241,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('/api/email/metadata_contents', methods=['POST'])
+    @route('metadata_contents', methods=['POST'])
     def metadata_contents(self):
         """
         Soecify email metadata (to, cc etc.) and content templates (subject, body)
@@ -265,7 +266,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('/api/email/send_test', methods=['POST'])
+    @route('send_test', methods=['POST'])
     def send_test(self):
         """
         Send a test email (metadata and actual content in payload)
@@ -288,7 +289,7 @@ class EmailView(FlaskView):
         except:
             log.exception("Failed to send test email")
 
-    @flask_app.route('/api/email/send', methods=['POST'])
+    @route('send', methods=['POST'])
     def send(self):
         """
         Send a single email (metadata and actual content in payload)

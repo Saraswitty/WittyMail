@@ -28,10 +28,10 @@ def route_static_files(path):
     '''
     return send_from_directory(os.path.join(base_path, "static"), path)
 
-@flask_app.route('/api/fodder/achar/<path:path>')
+@flask_app.route('/attachment/<path:path>')
 def route_attachment_files(path):
     return send_from_directory(flask_app.config['ATTACHMENTS_DIR'], path)
 
-@flask_app.route('/api/fodder/<path:path>')
+@flask_app.route('/sheet/<path:path>')
 def route_fodder_file(path):
     return send_from_directory(flask_app.config['FODDER_DIR'], path)

@@ -69,16 +69,33 @@ export class WittymailService {
 
   urls = {
     version: 'api/version',  // GET
-    fodder: 'api/fodder',    // POST, GET
-    regurgitate: 'api/fodder/regurgitate',    // POST
-    vomit: 'api/vomit', //POST
-    attachment: 'api/fodder/achar',  // POST
-    attachment_metadata: 'api/fodder/achar/mapping',  // POST
-    email: 'api/burp', // POST
-    email_server: 'api/burp/server', // POST
-    email_test: 'api/burp/test', // POST
-    email_send: 'api/burp/send', // POST
-    template_resolver: 'api/burp/template' // POST
+    sheet: {
+      upload: 'api/sheet/upload', // POST
+      get_file: 'api/sheet/file', // GET
+      get_contents: 'api/sheet/contents', //GET
+      get_headers: 'api/sheet/headers', // GET
+      set_mapping: 'api/sheet/mapping' // POST
+    },
+    attachment: {
+      upload: 'api/attachment/upload' // POST
+    },
+    email: {
+      set_server: 'api/email/server', // POST
+      convert_template_to_string: 'api/email/template_to_reality', // POST
+      set_metadata_and_contents: 'api/email/metadata_contents', // POST
+      send_test: 'api/email/send_test', // POST
+      send: 'api/email/send' // POST
+    }
+    // fodder: 'api/fodder',    // POST, GET
+    // regurgitate: 'api/fodder/regurgitate',    // POST
+    // vomit: 'api/vomit', //POST
+    // attachment: 'api/fodder/achar',  // POST
+    // attachment_metadata: 'api/fodder/achar/mapping',  // POST
+    // email: 'api/burp', // POST
+    // email_server: 'api/burp/server', // POST
+    // email_test: 'api/burp/test', // POST
+    // email_send: 'api/burp/send', // POST
+    // template_resolver: 'api/burp/template' // POST
   }
 
   constructor(private log: LoggerService, private http: HttpClient) {
@@ -129,26 +146,26 @@ export class WittymailService {
   }
 
   getFodderUploadUrl(): string {
-    return this.urls.fodder;
+    return this.urls.sheet.upload;
   }
 
   getFodderDownloadUrl(): string {
-    return this.urls.fodder;
+    return this.urls.sheet.get_file;
   }
 
   getAttachmentUploadUrl(): string {
-    return this.urls.attachment;
+    return this.urls.attachment.upload;
   }
 
   getColumnHeadersWithSampleRows(): Observable<ColumnHeadersWithRowContent> {
-    return this.http.get<ColumnHeadersWithRowContent>(this.urls.regurgitate)
+    return this.http.get<ColumnHeadersWithRowContent>(this.urls.sheet.get_headers)
       .pipe(
         catchError(this.handleError('getColumnHeadersWithSampleRows'))
       );
   }
 
   getVomit(): Observable<ColumnHeadersWithRowContent> {
-    return this.http.get<ColumnHeadersWithRowContent>(this.urls.vomit)
+    return this.http.get<ColumnHeadersWithRowContent>(this.urls.sheet.get_contents)
       .pipe(
         catchError(this.handleError('getVomit'))
       );
@@ -226,7 +243,7 @@ export class WittymailService {
 
   resolveTemplate(input: TemplateInput): Observable<TemplateOutput> {
     this.log.info("POSTing template: ", input);
-    return this.http.post<TemplateOutput>(this.urls.template_resolver, input)
+    return this.http.post<TemplateOutput>(this.urls.email.convert_template_to_string, input)
       .pipe(
         catchError(this.handleError('resolveTemplate'))
       );
@@ -234,7 +251,7 @@ export class WittymailService {
 
   postEmailMetadata(): Observable<string> {
     this.log.info("POSTing email metadata: ", this.emailMetadataInstance);
-    return this.http.post<string>(this.urls.email, this.emailMetadataInstance)
+    return this.http.post<string>(this.urls.email.set_metadata_and_contents, this.emailMetadataInstance)
       .pipe(
         catchError(this.handleError('postEmailMetadata'))
       );
@@ -242,7 +259,7 @@ export class WittymailService {
 
   postAttachmentMetadata(): Observable<string> {
     this.log.info("POSTing attachment metadata: ", this.attachmentMetadataInstance);
-    return this.http.post<string>(this.urls.attachment_metadata, this.attachmentMetadataInstance)
+    return this.http.post<string>(this.urls.sheet.set_mapping, this.attachmentMetadataInstance)
       .pipe(
         catchError(this.handleError('postAttachmentMetadata'))
       );
@@ -250,7 +267,7 @@ export class WittymailService {
 
   postEmailServerDetails(payload: EmailServerDetails): Observable<string> {
     this.log.info("POSTing email server details: ", payload);
-    return this.http.post<string>(this.urls.email_server, payload)
+    return this.http.post<string>(this.urls.email.set_server, payload)
       .pipe(
         catchError(this.handleError('postEmailServerDetails'))
       );
@@ -258,7 +275,7 @@ export class WittymailService {
 
   postTestEmail(payload: TestEmailDetails): Observable<string> {
     this.log.info("POSTing test email details: ", payload);
-    return this.http.post<string>(this.urls.email_test, payload)
+    return this.http.post<string>(this.urls.email.send_test, payload)
       .pipe(
         catchError(this.handleError('postTestEmail'))
       );
@@ -266,7 +283,7 @@ export class WittymailService {
 
   postSendEmail(payload: SendEmailContent): Observable<string> {
     this.log.info("POSTing email details: ", payload);
-    return this.http.post<string>(this.urls.email_send, payload)
+    return this.http.post<string>(this.urls.email.send, payload)
       .pipe(
         catchError(this.handleError('postSendEmail'))
       );
