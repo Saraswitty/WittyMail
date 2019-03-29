@@ -28,8 +28,8 @@ class SheetView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @flask_app.route('upload', methods=['POST'])
-    def upload(self):
+    @flask_app.route('/api/sheet/upload', methods=['POST'])
+    def upload_sheet(self):
         """
         Upload a new Excel sheet as input
 
@@ -50,7 +50,7 @@ class SheetView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    def get_file(self):
+    def file(self):
         """
         Get the Excel sheet (*.xlsx file) updated with 'status' and other columns
 
@@ -61,7 +61,7 @@ class SheetView(FlaskView):
 
         return send_file(fodder_file)
 
-    def get_contents(self):
+    def contents(self):
         """
         Get the contents of the sheet updated with 'status' and other columns
 
@@ -156,7 +156,7 @@ class SheetView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('mapping', methods=['POST'])
+    @flask_app.route('/api/sheet/mapping', methods=['POST'])
     def mapping(self):
         """
         Specify the mapping of columns in the Excel sheet to targets (eg. attachment names)
@@ -176,8 +176,8 @@ class AttachmentView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @flask_app.route('upload', methods=['POST'])
-    def upload(self):
+    @flask_app.route('/api/attachment/upload', methods=['POST'])
+    def upload_attachment(self):
         """
         The 3rd party Angular plugin ng6-file-upload makes one POST call per file instead of
         sending them all at once.
@@ -203,7 +203,7 @@ class EmailView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-
+    @flask_app.route('/api/email/server', methods=['POST'])
     def server_details(self):
         """
         SMTP server URL and credentials
@@ -225,7 +225,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('template_to_reality', methods=['POST'])
+    @flask_app.route('/api/email/template_to_reality', methods=['POST'])
     def template_to_reality(self):
         """
         Convert an email template (subject or body) by replacing column name placeholders with actual data
@@ -240,7 +240,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('metadata_contents', methods=['POST'])
+    @flask_app.route('/api/email/metadata_contents', methods=['POST'])
     def metadata_contents(self):
         """
         Soecify email metadata (to, cc etc.) and content templates (subject, body)
@@ -265,7 +265,7 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @flask_app.route('send_test', methods=['POST'])
+    @flask_app.route('/api/email/send_test', methods=['POST'])
     def send_test(self):
         """
         Send a test email (metadata and actual content in payload)
@@ -288,6 +288,7 @@ class EmailView(FlaskView):
         except:
             log.exception("Failed to send test email")
 
+    @flask_app.route('/api/email/send', methods=['POST'])
     def send(self):
         """
         Send a single email (metadata and actual content in payload)
@@ -323,6 +324,7 @@ class EmailView(FlaskView):
 
 SheetView.register(flask_app)
 AttachmentView.register(flask_app)
+EmailView.register(flask_app)
 
 @flask_app.route("/api/version", methods=['GET'])
 def get_version():
@@ -337,7 +339,7 @@ def get_version():
               {'ContentType':'application/json'})
     
 
-# The below APIs are never called by the GUI, who knows what they are for?
+# The below APIs are never called by the GUI, who knows what they are for? #############################################
 
 @flask_app.route("/api/fodder/ingredients", methods=['GET'])
 def get_fodder_ingredients():
