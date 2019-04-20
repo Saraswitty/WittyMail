@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-attachments',
@@ -38,9 +39,9 @@ export class AttachmentsComponent implements OnInit {
     }
   ]
   selectedAttachmentCandidate: any = null;
+  selectedPDFViewerHTML: SafeHtml = null;
 
-
-  constructor() { }
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
   }
@@ -53,6 +54,13 @@ export class AttachmentsComponent implements OnInit {
 
   onSelectCandidatePDF(candidate) {
     console.log(candidate);
+
+    let pdfurl = "https://pdfobject.com/pdf/sample-3pp.pdf";
+
+    this.selectedPDFViewerHTML = this.sanitizer.bypassSecurityTrustHtml(
+      "<object style='width: 100%;height: 100%' data='" + pdfurl + "' type='application/pdf' class='embed-responsive-item'>" +
+      "Object " + pdfurl + " failed" +
+      "</object>");
   }
 
 }
