@@ -20,3 +20,19 @@ table {
     width: 100%;
     height: 100%;
 }
+
+.step-container {
+    height: 70vh;
+}
+
+button {
+    margin: 5px;
+}
+
+.btn-icon {
+    margin-right: 5px;
+}
+
+.pdf-btn-group {
+    text-align: center;
+}

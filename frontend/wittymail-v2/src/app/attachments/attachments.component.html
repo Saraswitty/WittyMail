@@ -1,4 +1,4 @@
-<div style="height: 500px;">
+<div class="step-container">
   <div fxLayout="row" fxFill fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap>
     <div fxFlex="50" fxFill>
       <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1">
@@ -34,9 +34,20 @@
           </div>
         </div>
       </div>
-      <div fxFill fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap>
+      <div fxFill fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap
+        *ngIf="selectedAttachmentCandidate">
         <div fxFlex>
-          PDF Viewer for {{selectedAttachmentCandidate}}
+          <div class="pdf-btn-group">
+            <button mat-raised-button>
+              <i class="material-icons btn-icon">rotate_left</i>Rotate Left
+            </button>
+            <button mat-raised-button>
+              <i class="material-icons btn-icon">rotate_right</i>Rotate Right
+            </button>
+            <button mat-raised-button color="primary">
+              <i class="material-icons btn-icon">save</i>Save
+            </button>
+          </div>
           <br />
           <div *ngIf="selectedPDFViewerHTML" [innerHTML]="selectedPDFViewerHTML" class="embedded-pdf-viewer">
           </div>

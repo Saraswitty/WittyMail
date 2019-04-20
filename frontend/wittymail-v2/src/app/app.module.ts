@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { StepsSliderComponent } from './steps-slider/steps-slider.component';
 import { AttachmentsComponent } from './attachments/attachments.component';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { AttachmentsComponent } from './attachments/attachments.component';
     MatToolbarModule,
     MatStepperModule,
     MatTableModule,
-    MatRadioModule
+    MatRadioModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
