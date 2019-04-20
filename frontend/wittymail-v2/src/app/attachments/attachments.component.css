@@ -1,0 +1,17 @@
+table {
+    width: 100%;
+}
+
+.highlight-table-row {
+    background: #42A948; /* green */
+}
+
+.attachment-candidate-list {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.attachment-candidate-list-item {
+    margin: 5px;
+}
