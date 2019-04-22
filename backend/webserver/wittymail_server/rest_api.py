@@ -5,13 +5,13 @@ import os, sys
 
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
-import mailer.emailapi_broker as emailapi_broker
 from wittymail_server import flask_app
 from flask import jsonify, request, json, url_for
 from flask_classy import FlaskView, route
 import util.version as version
 import util.logger as logger
 from flask import send_file
+from sheet import sheet
 
 log = logger.get_logger(__name__)
 
@@ -26,10 +26,11 @@ class SheetView(FlaskView):
 
     /api/sheet/...
     """
+    s = sheet()
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
     @route('upload', methods=['POST'])
-    def some(self):
+    def upload(self):
         """
         Upload a new Excel sheet as input
 
@@ -170,7 +171,6 @@ class SheetView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-
 class AttachmentView(FlaskView):
     """
     APIs for attachments to be used with the Sheet (by mapping) and sent with emails
@@ -197,6 +197,19 @@ class AttachmentView(FlaskView):
         emailapi_broker.change_email_fodder_status(a.filename)
         return "Attachments saved successfully", HTTP_OK
 
+    @route('upload_for_row', methods=['POST'])
+    def upload_attachment_for_row(self):
+        """
+        """
+        a = request.files['attachment']
+        attachment_dir = flask_app.config['ATTACHMENTS_DIR']
+
+        a.save(os.path.join(attachment_dir, a.filename))
+        log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
+
+        data = json.loads(request.data)
+        emailapi_broker.change_email_fodder_status(a.filename, data['row'])
+        return "Attachments saved successfully", HTTP_OK
 
 class EmailView(FlaskView):
     """
