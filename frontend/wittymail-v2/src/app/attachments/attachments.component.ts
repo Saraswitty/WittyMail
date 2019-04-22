@@ -20,6 +20,66 @@ export class AttachmentsComponent implements OnInit {
       'Sr No.': "2",
       'Name of Child': "Vedika Shirgire",
       'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
+    },
+    {
+      'Sr No.': "2",
+      'Name of Child': "Vedika Shirgire",
+      'Class': "Nursery-kalewadi"
     }
   ];
   selectedRow: any = null;
