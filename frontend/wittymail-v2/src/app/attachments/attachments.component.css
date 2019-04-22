@@ -25,6 +25,10 @@ table {
     height: 100%;
 }
 
+.attachment-selector-container {
+    height: 100vh;
+}
+
 button {
     margin: 5px;
 }
@@ -35,4 +39,9 @@ button {
 
 .pdf-btn-group {
     text-align: center;
+}
+
+.summary-table-container {
+    height: 100vh;
+    overflow: auto;
 }

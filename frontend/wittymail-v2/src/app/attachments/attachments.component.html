@@ -1,82 +1,99 @@
 <div class="step-container">
   <mat-vertical-stepper [linear]="False" #stepper>
-    <mat-step editable="false" label="Upload Attachments">
+    <mat-step editable="true" label="Upload Attachments">
       <div gdGap="20px" gdColumns="repeat(2, [col] 30vw)" gdRows="repeat(2, [row] auto)">
         <div class="box" gdColumn="col" gdRow="row">
           Common Attachments
         </div>
         <div class="box" gdColumn="col 2" gdRow="row">
-            <input type="file" name="commonAttachments" ng2FileSelect [uploader]="uploader" multiple
-              placeholder="Input" />
+          <input type="file" name="commonAttachments" ng2FileSelect [uploader]="uploader" multiple
+            placeholder="Input" />
         </div>
         <div class="box" gdColumn="col" gdRow="row 2">
           Individual Attachments
         </div>
         <div class="box" gdColumn="col 2" gdRow="row 2">
-            <input type="file" name="individualAttachments" ng2FileSelect [uploader]="uploader" multiple
-              placeholder="Input" />
+          <input type="file" name="individualAttachments" ng2FileSelect [uploader]="uploader" multiple
+            placeholder="Input" />
         </div>
       </div>
     </mat-step>
-    
-    <mat-step editable="false" label="Customize Attachments">
 
+    <mat-step editable="true" label="Customize Attachments">
 
-      <div fxLayout="row" fxFill fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap>
-        <div fxFlex="50" fxFill>
-          <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1">
-            <div *ngFor="let header of headers">
-              <ng-container matColumnDef="{{header}}">
-                <th mat-header-cell *matHeaderCellDef> {{header}} </th>
-                <td mat-cell *matCellDef="let element"> {{element[header]}} </td>
-              </ng-container>
-            </div>
-            <tr mat-header-row *matHeaderRowDef="headers"></tr>
-            <tr mat-row *matRowDef="let row; columns: headers;" [ngClass]="{'highlight-table-row': selectedRow == row}"
-              (click)="onClickRow(row)"></tr>
-          </table>
-        </div>
-        <div fxFlex="50" fxFill>
-          <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap>
-            <div fxFlex>
-              <div *ngIf="!selectedRow">
-                <p>
-                  Select a row
-                </p>
+      <div class="attachment-selector-container">
+        <div fxLayout="row" fxFill fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center"
+          fxLayoutWrap>
+          <div fxFlex="50" style="overflow: auto" fxFill>
+            <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1">
+              <div *ngFor="let header of headers">
+                <ng-container matColumnDef="{{header}}">
+                  <th mat-header-cell *matHeaderCellDef> {{header}} </th>
+                  <td mat-cell *matCellDef="let element"> {{element[header]}} </td>
+                </ng-container>
               </div>
-              <div *ngIf="selectedRow">
-                Pick the correct attachment for <strong>{{selectedRow[attachmentSubjectHeaderName]}}</strong>:
-                <br>
-                <mat-radio-group class="attachment-candidate-list" [(ngModel)]="selectedAttachmentCandidate">
-                  <mat-radio-button class="attachment-candidate-list-item"
-                    *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate.id}}"
-                    (click)="onSelectCandidatePDF(candidate)">
-                    {{candidate.displayName}}
-                  </mat-radio-button>
-                </mat-radio-group>
+              <tr mat-header-row *matHeaderRowDef="headers"></tr>
+              <tr mat-row *matRowDef="let row; columns: headers;"
+                [ngClass]="{'highlight-table-row': selectedRow == row}" (click)="onClickRow(row)"></tr>
+            </table>
+          </div>
+          <div fxFlex="50" fxFill>
+            <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center" fxLayoutWrap>
+              <div fxFlex>
+                <div *ngIf="!selectedRow">
+                  <p>
+                    Select a row
+                  </p>
+                </div>
+                <div *ngIf="selectedRow">
+                  Pick the correct attachment for <strong>{{selectedRow[attachmentSubjectHeaderName]}}</strong>:
+                  <br>
+                  <mat-radio-group class="attachment-candidate-list" [(ngModel)]="selectedAttachmentCandidate">
+                    <mat-radio-button class="attachment-candidate-list-item"
+                      *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate.id}}"
+                      (click)="onSelectCandidatePDF(candidate)">
+                      {{candidate.displayName}}
+                    </mat-radio-button>
+                  </mat-radio-group>
+                </div>
+              </div>
+            </div>
+            <div fxFill fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center"
+              fxLayoutWrap *ngIf="selectedAttachmentCandidate">
+              <div fxFlex>
+                <div class="pdf-btn-group">
+                  <button mat-raised-button>
+                    <i class="material-icons btn-icon">rotate_left</i>Rotate Left
+                  </button>
+                  <button mat-raised-button>
+                    <i class="material-icons btn-icon">rotate_right</i>Rotate Right
+                  </button>
+                  <button mat-raised-button color="primary">
+                    <i class="material-icons btn-icon">save</i>Save
+                  </button>
+                </div>
+                <br />
+                <div *ngIf="selectedPDFViewerHTML" [innerHTML]="selectedPDFViewerHTML" class="embedded-pdf-viewer">
+                </div>
               </div>
             </div>
           </div>
-          <div fxFill fxLayout="row" fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center"
-            fxLayoutWrap *ngIf="selectedAttachmentCandidate">
-            <div fxFlex>
-              <div class="pdf-btn-group">
-                <button mat-raised-button>
-                  <i class="material-icons btn-icon">rotate_left</i>Rotate Left
-                </button>
-                <button mat-raised-button>
-                  <i class="material-icons btn-icon">rotate_right</i>Rotate Right
-                </button>
-                <button mat-raised-button color="primary">
-                  <i class="material-icons btn-icon">save</i>Save
-                </button>
-              </div>
-              <br />
-              <div *ngIf="selectedPDFViewerHTML" [innerHTML]="selectedPDFViewerHTML" class="embedded-pdf-viewer">
-              </div>
-            </div>
-          </div>
         </div>
+      </div>
+    </mat-step>
+
+    <mat-step editable="true" label="Summary">
+      <div class="summary-table-container">
+        <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1">
+          <div *ngFor="let header of headers">
+            <ng-container matColumnDef="{{header}}">
+              <th mat-header-cell *matHeaderCellDef> {{header}} </th>
+              <td mat-cell *matCellDef="let element"> {{element[header]}} </td>
+            </ng-container>
+          </div>
+          <tr mat-header-row *matHeaderRowDef="headers"></tr>
+          <tr mat-row *matRowDef="let row; columns: headers;"></tr>
+        </table>
       </div>
     </mat-step>
   </mat-vertical-stepper>
