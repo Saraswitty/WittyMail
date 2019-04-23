@@ -9,6 +9,8 @@ import {MatStepperModule} from '@angular/material/stepper';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatTableModule} from '@angular/material/table';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatIconModule} from '@angular/material';
+import {MatMenuModule} from '@angular/material/menu'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,6 +24,8 @@ import { EmailDesignComponent } from './email-design/email-design.component';
 import { SummaryComponent } from './summary/summary.component';
 import { AboutComponent } from './common/about/about.component';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
+import { LoggerService } from './util/logger.service';
+import { ConsoleLoggerService } from './util/console-logger.service';
 
 @NgModule({
   declarations: [
@@ -48,9 +52,13 @@ import { ErrorDialogComponent } from './common/error-dialog/error-dialog.compone
     MatRadioModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatIconModule,
+    MatMenuModule
   ],
-  providers: [],
+  providers: [
+    { provide: LoggerService, useClass: ConsoleLoggerService }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -3,6 +3,16 @@
     mail_outline
   </i>
   <span>WittyMail</span>
+
+  <span class="top-banner-spacer"></span>
+
+  <mat-menu #appMenu="matMenu">
+    <button mat-menu-item>About</button>
+  </mat-menu>
+
+  <button mat-icon-button [matMenuTriggerFor]="appMenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
 </mat-toolbar>
 <app-steps-slider></app-steps-slider>
 <router-outlet></router-outlet>
