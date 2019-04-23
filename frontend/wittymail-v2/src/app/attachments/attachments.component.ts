@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
+import { LoggerService } from '../util/logger.service';
 
 @Component({
   selector: 'app-attachments',
@@ -101,19 +102,19 @@ export class AttachmentsComponent implements OnInit {
   selectedAttachmentCandidate: any = null;
   selectedPDFViewerHTML: SafeHtml = null;
 
-  constructor(private sanitizer: DomSanitizer) { }
+  constructor(private sanitizer: DomSanitizer, private log: LoggerService) { }
 
   ngOnInit() {
   }
 
   onClickRow(row) {
-    console.log(row)
-    console.log(row[this.attachmentSubjectHeaderName])
+    this.log.info(row)
+    this.log.info(row[this.attachmentSubjectHeaderName])
     this.selectedRow = row;
   }
 
   onSelectCandidatePDF(candidate) {
-    console.log(candidate);
+    this.log.info(candidate);
 
     let pdfurl = "https://pdfobject.com/pdf/sample-3pp.pdf";
 

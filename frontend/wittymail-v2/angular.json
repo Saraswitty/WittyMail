@@ -132,5 +132,12 @@
       }
     }
   },
-  "defaultProject": "wittymail-v2"
+  "defaultProject": "wittymail-v2",
+  "schematics": {
+    "@schematics/angular": {
+      "component": {
+        "spec": false
+      }
+    }
+  }
 }
