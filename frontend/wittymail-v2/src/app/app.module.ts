@@ -11,6 +11,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatIconModule} from '@angular/material';
 import {MatMenuModule} from '@angular/material/menu'; 
+import {MatDialogModule} from '@angular/material/dialog'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -38,6 +39,7 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     AboutComponent,
     ErrorDialogComponent
   ],
+  entryComponents: [AboutComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -54,7 +56,8 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }
