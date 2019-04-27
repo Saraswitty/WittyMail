@@ -1,3 +1,37 @@
-<p>
-  email-design works!
-</p>
+<mat-vertical-stepper [linear]="False" #stepper>
+  <mat-step editable="true" label="Compose E-mail">
+    <div class="table-container">
+      <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1 sheet-contents-table">
+        <div *ngFor="let header of headers">
+          <ng-container matColumnDef="{{header}}">
+            <th mat-header-cell *matHeaderCellDef>
+              <button mat-button (click)="onClickColumn(header)">{{header}}</button>
+            </th>
+            <td mat-cell *matCellDef="let element"> {{element[header]}} </td>
+          </ng-container>
+        </div>
+        <tr mat-header-row *matHeaderRowDef="headers"></tr>
+        <tr mat-row *matRowDef="let row; columns: headers;"></tr>
+      </table>
+    </div>
+
+    <form>
+      Subject:
+      <mat-form-field class="full-width">
+        <input matInput placeholder="(template for unique subjects)" value="" name="subject"
+          [(ngModel)]="subjectTemplate" #subjectInput>
+        <mat-hint>{{subjectSample}}</mat-hint>
+      </mat-form-field>
+      <br />
+      Contents:
+      <mat-form-field>
+        <textarea matInput placeholder="Contents"></textarea>
+      </mat-form-field>
+    </form>
+
+  </mat-step>
+
+  <mat-step editable="true" label="E-mail Provider">
+
+  </mat-step>
+</mat-vertical-stepper>
