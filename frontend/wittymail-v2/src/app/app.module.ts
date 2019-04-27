@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModule } from 'ng2-file-upload';
+import { QuillModule } from 'ngx-quill';
 import { HttpClientModule } from '@angular/common/http';
 
 import {MatToolbarModule} from '@angular/material/toolbar'; 
@@ -50,6 +51,7 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     FlexLayoutModule, 
 
     FileUploadModule,
+    QuillModule,
     FormsModule,
     MatToolbarModule,
     MatStepperModule,

@@ -23,10 +23,9 @@
         <mat-hint>{{subjectSample}}</mat-hint>
       </mat-form-field>
       <br />
-      Contents:
-      <mat-form-field>
-        <textarea matInput placeholder="Contents"></textarea>
-      </mat-form-field>
+      <br />
+      
+      <quill-editor name="emailBodyTemplate" [(ngModel)]="bodyTemplate" [sanitize]="true" (onContentChanged)="onBodyTemplateChanged($event)"></quill-editor>
     </form>
 
   </mat-step>

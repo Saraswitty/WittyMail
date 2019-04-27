@@ -47,6 +47,9 @@ export class EmailDesignComponent implements OnInit {
   subjectTemplate: string = "";
   subjectSample: string = "This is the actual subject";
 
+  bodyTemplate: string = ""
+  bodySample: string = "";
+
   constructor(private log: LoggerService) { }
 
   ngOnInit() {
