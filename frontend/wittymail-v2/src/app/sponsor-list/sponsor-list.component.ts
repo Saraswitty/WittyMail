@@ -8,6 +8,15 @@ import { Component, OnInit } from '@angular/core';
 export class SponsorListComponent implements OnInit {
 
   headers = ['Sr No.', 'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference Mail ID']
+  columnSelectedAs = {
+    'Sr No.': '',
+    'Name of Child': 'Attachment Name',
+    'Class': '',
+    'Sponsor': '',
+    'Mail ID': 'E-mail Address (To)',
+    'Reference': '',
+    'Reference Mail ID': 'E-mail Address (CC)'
+  }
   sheetContents = [
     {
       'Sr No.': "1",

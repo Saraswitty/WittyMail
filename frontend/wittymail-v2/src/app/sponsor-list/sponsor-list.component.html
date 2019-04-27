@@ -29,7 +29,10 @@
   <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1 sheet-contents-table">
     <div *ngFor="let header of headers">
       <ng-container matColumnDef="{{header}}">
-        <th mat-header-cell *matHeaderCellDef> {{header}} </th>
+        <th mat-header-cell *matHeaderCellDef> 
+            <button mat-button>{{header}}</button>
+            <div class="column-selected-as">{{columnSelectedAs[header]}}</div>
+        </th>
         <td mat-cell *matCellDef="let element"> {{element[header]}} </td>
       </ng-container>
     </div>
