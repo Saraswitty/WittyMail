@@ -1,0 +1,11 @@
+.sheet-contents-table {
+    width: 100%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table td {
+    border: 1px solid grey; 
+}

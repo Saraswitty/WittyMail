@@ -13,6 +13,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {MatIconModule} from '@angular/material';
 import {MatMenuModule} from '@angular/material/menu'; 
 import {MatDialogModule} from '@angular/material/dialog'; 
+import {MatTabsModule} from '@angular/material/tabs';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -59,7 +60,8 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     MatInputModule,
     MatIconModule,
     MatMenuModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTabsModule
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }
