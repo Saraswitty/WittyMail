@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { LoggerService } from '../util/logger.service';
-import { MatInput } from '@angular/material';
+import { MatInput, MatStepper } from '@angular/material';
 
 @Component({
   selector: 'app-email-design',
@@ -9,6 +9,8 @@ import { MatInput } from '@angular/material';
 })
 export class EmailDesignComponent implements OnInit {
 
+  @Input('mainStepper') mainStepper: MatStepper;
+  
   @ViewChild("subjectInput")
   subjectInput: MatInput;
 

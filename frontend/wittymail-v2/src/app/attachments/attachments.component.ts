@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { LoggerService } from '../util/logger.service';
+import { MatStepper } from '@angular/material';
 
 @Component({
   selector: 'app-attachments',
@@ -9,6 +10,8 @@ import { LoggerService } from '../util/logger.service';
 })
 export class AttachmentsComponent implements OnInit {
 
+  @Input('mainStepper') mainStepper: MatStepper;
+  
   headers = ['Sr No.', 'Name of Child', 'Class']
   attachmentSubjectHeaderName = 'Name of Child'
   sheetContents = [
