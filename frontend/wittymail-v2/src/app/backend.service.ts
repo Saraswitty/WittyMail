@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LoggerService } from './util/logger.service';
 import { HttpErrorResponse, HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Observable } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -62,7 +61,7 @@ export interface TemplateOutput {
 @Injectable({
   providedIn: 'root'
 })
-export class WittymailService {
+export class BackendService {
 
   emailMetadataInstance: EmailMetadata;
   attachmentMetadataInstance: AttachmentMetadata;
@@ -118,7 +117,7 @@ export class WittymailService {
       console.log("REST API failed, response: " + error);
     }
 
-    return new ErrorObservable();
+    return throwError(error);
   }
 
   private handleError(operation = 'operation') {
