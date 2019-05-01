@@ -129,6 +129,16 @@ class FileUtils:
         log.debug('template_to_str() final str = %s' % st)
         return st
 
+def save_to_excel(excel_data, out_file):
+    wb=openpyxl.Workbook()
+    ws_write = wb.active
+
+    for row in excel_data:
+       ws_write.append(row)
+
+    wb.save(filename=out_file)
+    return os.path.join(os.getcwd(), out_file)
+
 if __name__ == "__main__":
     f = FileUtils()
     #print(f.find_n_files_by_fuzzymatch(os.path.join("C:\\", "Users", "naira11", "Documents", "wittymail_data", 'allpdf'), 'aarahya jadav', ignore_phrases = ['Nursery', 'Kothrud']))

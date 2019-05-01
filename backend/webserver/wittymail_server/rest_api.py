@@ -26,7 +26,6 @@ class SheetView(FlaskView):
 
     /api/sheet/...
     """
-    s = Sheet(None)
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
     @route('upload', methods=['POST'])
@@ -37,15 +36,16 @@ class SheetView(FlaskView):
         :return:
         """
         log.debug("Uploading sheet: %s", request.files)
-        fodder_dir = flask_app.config['FODDER_DIR']
+        excel_dir = flask_app.config['EXCEL_DIR']
 
         f = request.files['sponsor-sheet']
-        fodder_file = os.path.join(fodder_dir, f.filename)
-        f.save(fodder_file)
-        log.info('Sheet file saved as: %s', fodder_file)
+        excel_file = os.path.join(excel_dir, f.filename)
+        f.save(excel_file)
+        log.info('Sheet file saved as: %s', excel_file)
 
         # Parse the Excel sheet and store the contents in-memory
-        emailapi_broker.save_fodder_from_file(fodder_file)
+        sheet = Sheet.getInstance(excel_file)
+        sheet.dump_to_memory()
 
         return (jsonify({}),
                 HTTP_OK,
@@ -57,7 +57,8 @@ class SheetView(FlaskView):
 
         :return:
         """
-        fodder_file = emailapi_broker.save_fodder_to_file()
+        sheet = Sheet.getInstance()
+        fodder_file = sheet.save_to_file()
         log.info("Send sheet back to frontend: %s", fodder_file)
 
         return send_file(fodder_file)
@@ -127,34 +128,9 @@ class SheetView(FlaskView):
 
         :return:
         """
-        e = emailapi_broker.get_email_fodder_names()
-        if e[0] is not 0:
-            return (jsonify({"err_msg": e[1]}),
-                    HTTP_BAD_INPUT,
-                    {'ContentType': 'application/json'})
-
-        fodder_names = e[1]
-        fodder = emailapi_broker.get_email_fodder()
-
-        if len(fodder_names) == 0 or len(fodder) == 0:
-            return (jsonify({"err_msg": "Data sheet is empty or not provided"}),
-                    HTTP_BAD_INPUT,
-                    {'ContentType': 'application/json'})
-
-        cnt = 0
-        fodder_list = []
-        for f in fodder:
-            if cnt == 2:
-                break
-            fodder_list.append(dict(zip(fodder_names, f)))
-            cnt += 1
-
-        if cnt == 0:
-            return (jsonify({'error_message': "Data sheet is empty or data sheet is not provided"}),
-                    HTTP_BAD_INPUT,
-                    {'ContentType': 'application/json'})
-
-        return (jsonify({'headers': fodder_names, 'contents': fodder_list}),
+        sheet = Sheet.getInstance()
+        headers, data = sheet.get_headers_with_sample_rows(row_count = 3)
+        return (jsonify({'headers': headers, 'contents': data}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
@@ -176,6 +152,13 @@ class AttachmentView(FlaskView):
     APIs for attachments to be used with the Sheet (by mapping) and sent with emails
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
+
+    @route('get_candidates', methods=['GET'])
+    def get_candidates(self):
+        data = json.loads(request.data)
+        row = data['row']
+        # get candidate from 
+
 
     @route('upload', methods=['POST'])
     def upload_attachment(self):
@@ -208,14 +191,16 @@ class AttachmentView(FlaskView):
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
 
         data = json.loads(request.data)
-        emailapi_broker.change_email_fodder_status(a.filename, data['row'])
-        return "Attachments saved successfully", HTTP_OK
+        s = Sheet.getInstance()
+        s.set_attachment(data['attachment_name'])
+        return "Attachments set successfully", HTTP_OK
 
 class EmailView(FlaskView):
     """
     APIs for email server, contents and actions
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
+    email_provider = EmailProvider()
 
     @route('server', methods=['POST'])
     def server_details(self):
@@ -227,6 +212,9 @@ class EmailView(FlaskView):
         data = json.loads(request.data)
 
         assert len(data['username']) > 0 and len(data['password']) > 0, "username or password not provided"
+
+        _smtp_provider = email_provider.choose_email_provider("SMTP")
+        smtp_provider
 
         e = emailapi_broker.set_login_details(data['username'], data['password'])
 

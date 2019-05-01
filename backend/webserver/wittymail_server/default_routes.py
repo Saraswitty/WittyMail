@@ -34,4 +34,4 @@ def route_attachment_files(path):
 
 @flask_app.route('/sheet/<path:path>')
 def route_fodder_file(path):
-    return send_from_directory(flask_app.config['FODDER_DIR'], path)
+    return send_from_directory(flask_app.config['EXCEL_DIR'], path)

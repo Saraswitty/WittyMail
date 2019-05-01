@@ -9,7 +9,7 @@ class ColumnMapping:
         self.to = map_info['email_to']
         self.to = map_info['email_cc']
         self.to = map_info['email_status']
-        self.frozen_attachment = map_info['email_email_frozen_attachment']
+        self.frozen_attachment = map_info['email_frozen_attachment']
     
     def __del__(self):
         self.to = None
