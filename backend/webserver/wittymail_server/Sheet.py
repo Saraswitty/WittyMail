@@ -1,5 +1,5 @@
 from util.FileUtils import FileUtils
-from mailer.ColumnMapping import ColumnMapping
+from wittymail_server.ColumnMapping import ColumnMapping
 
 class Sheet:
    __instance = None

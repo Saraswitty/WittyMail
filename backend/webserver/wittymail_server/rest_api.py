@@ -11,7 +11,7 @@ from flask_classy import FlaskView, route
 import util.version as version
 import util.logger as logger
 from flask import send_file
-from sheet import sheet
+from wittymail_server.Sheet import Sheet
 
 log = logger.get_logger(__name__)
 
@@ -26,7 +26,7 @@ class SheetView(FlaskView):
 
     /api/sheet/...
     """
-    s = sheet()
+    s = Sheet(None)
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
     @route('upload', methods=['POST'])
