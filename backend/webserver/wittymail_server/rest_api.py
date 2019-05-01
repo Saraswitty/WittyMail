@@ -12,6 +12,7 @@ import util.version as version
 import util.logger as logger
 from flask import send_file
 from wittymail_server.Sheet import Sheet
+from util.FileUtils import FileUtils
 
 log = logger.get_logger(__name__)
 
@@ -19,6 +20,7 @@ HTTP_OK         = 200
 HTTP_CREATED    = 201
 HTTP_NOT_FOUND  = 404
 HTTP_BAD_INPUT  = 400
+HTTP_SERVER_ERROR = 500
 
 class SheetView(FlaskView):
     """
@@ -224,7 +226,21 @@ class AttachmentView(FlaskView):
 
         data = json.loads(request.data)
         emailapi_broker.change_email_fodder_status(a.filename, data['row'])
-        return "Attachments saved successfully", HTTP_OK
+        return ("Attachments saved successfully", HTTP_OK, {'ContentType': 'text/plain'})
+
+    @route('rotate', methods=['POST'])
+    def rotate(self):
+        data = json.loads(request.data)
+        filepath = os.path.join(flask_app.config['ATTACHMENTS_DIR'], data['filename'])
+        
+        try:
+            util = FileUtils()
+            util.pdf_rotate(filepath, data['direction'])
+        except Exception as e:
+            log.exception("Failed to rotate: %s", data)
+            return (str(e), HTTP_SERVER_ERROR, {'ContentType': 'text/plain'})
+        
+        return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
 
 class EmailView(FlaskView):
     """

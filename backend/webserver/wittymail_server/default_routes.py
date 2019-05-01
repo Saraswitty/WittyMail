@@ -28,7 +28,7 @@ def route_static_files(path):
     '''
     return send_from_directory(os.path.join(base_path, "static"), path)
 
-@flask_app.route('/attachment/<path:path>')
+@flask_app.route('/api/attachment/file/<path:path>')
 def route_attachment_files(path):
     return send_from_directory(flask_app.config['ATTACHMENTS_DIR'], path)
 

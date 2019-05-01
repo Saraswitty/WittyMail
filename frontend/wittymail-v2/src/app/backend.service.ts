@@ -31,6 +31,11 @@ export interface AttachmentMetadata {
   attachment_column: string;
 }
 
+export interface AttachmentRotation {
+  filename: string;
+  direction: string;
+}
+
 export interface EmailServerDetails {
   service: string;
   username: string;
@@ -76,7 +81,9 @@ export class BackendService {
       set_mapping: 'api/sheet/mapping' // POST
     },
     attachment: {
-      upload: 'api/attachment/upload' // POST
+      upload: 'api/attachment/upload', // POST
+      rotate: 'api/attachment/rotate', // POST
+      get_file: 'api/attachment/file/', // GET with filename appended to URL
     },
     email: {
       set_server: 'api/email/server', // POST
@@ -238,6 +245,13 @@ export class BackendService {
     this.attachmentMetadataInstance.attachment_column = attachment_column;
 
     this.log.info("attachmentMetadataInstance: ", this.attachmentMetadataInstance);
+  }
+
+  rotateAttachment(rotation: AttachmentRotation) {
+    return this.http.post<TemplateOutput>(this.urls.attachment.rotate, rotation)
+      .pipe(
+        catchError(this.handleError('rotateAttachment'))
+      );
   }
 
   resolveTemplate(input: TemplateInput): Observable<TemplateOutput> {
