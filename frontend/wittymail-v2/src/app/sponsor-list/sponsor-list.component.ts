@@ -40,12 +40,12 @@ export class SponsorListComponent implements OnInit {
     };
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      this.log.info('Sponsor sheet uploaded: ', item.file.name, status);
       if (status === 200) {
+        this.log.info('Sponsor sheet uploaded: ', item.file.name, status);
         this.stepper.next();
         this.displayColumnMappingUi();
       } else {
-        this.errorDialog.showError("Failed to upload the sheet to the backend");
+        this.errorDialog.showError("Failed to upload sponsor list '" + item.file.name + "': " + status + " " + response);
       }
     };
   }

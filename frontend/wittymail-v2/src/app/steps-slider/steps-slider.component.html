@@ -4,11 +4,11 @@
   </mat-step>
 
   <mat-step label="Attachments">
-    <app-attachments></app-attachments>
+    <app-attachments [mainStepper]="stepper"></app-attachments>
   </mat-step>
 
   <mat-step label="E-Mail Design">
-    <app-email-design></app-email-design>
+    <app-email-design [mainStepper]="stepper"></app-email-design>
   </mat-step>
 
   <mat-step label="Summary">

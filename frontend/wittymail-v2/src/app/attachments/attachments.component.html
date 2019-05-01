@@ -6,17 +6,18 @@
           Common Attachments
         </div>
         <div class="box" gdColumn="col 2" gdRow="row">
-          <input type="file" name="commonAttachments" ng2FileSelect [uploader]="uploader" multiple
+          <input type="file" name="commonAttachments" ng2FileSelect [uploader]="commonAttachmentUploader" multiple
             placeholder="Input" />
         </div>
         <div class="box" gdColumn="col" gdRow="row 2">
           Individual Attachments
         </div>
         <div class="box" gdColumn="col 2" gdRow="row 2">
-          <input type="file" name="individualAttachments" ng2FileSelect [uploader]="uploader" multiple
+          <input type="file" name="individualAttachments" ng2FileSelect [uploader]="individualAttachmentUploader" multiple
             placeholder="Input" />
         </div>
       </div>
+      <button mat-stroked-button matStepperNext>Done Uploading</button>
     </mat-step>
 
     <mat-step editable="true" label="Customize Attachments">
@@ -50,9 +51,9 @@
                   <br>
                   <mat-radio-group class="attachment-candidate-list" [(ngModel)]="selectedAttachmentCandidate">
                     <mat-radio-button class="attachment-candidate-list-item"
-                      *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate.id}}"
+                      *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate.pdfName}}"
                       (click)="onSelectCandidatePDF(candidate)">
-                      {{candidate.displayName}}
+                      {{candidate.pdfName}}
                     </mat-radio-button>
                   </mat-radio-group>
                 </div>
@@ -62,10 +63,10 @@
               fxLayoutWrap *ngIf="selectedAttachmentCandidate">
               <div fxFlex>
                 <div class="pdf-btn-group">
-                  <button mat-raised-button>
+                  <button mat-raised-button (click)="onClickRotate('ANTICLOCKWISE')">
                     <i class="material-icons btn-icon">rotate_left</i>Rotate Left
                   </button>
-                  <button mat-raised-button>
+                  <button mat-raised-button (click)="onClickRotate('CLOCKWISE')">
                     <i class="material-icons btn-icon">rotate_right</i>Rotate Right
                   </button>
                   <button mat-raised-button color="primary">
@@ -98,3 +99,5 @@
     </mat-step>
   </mat-vertical-stepper>
 </div>
+
+<app-error-dialog #errorDialog></app-error-dialog>

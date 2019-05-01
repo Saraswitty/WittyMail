@@ -12,6 +12,7 @@ import util.version as version
 import util.logger as logger
 from flask import send_file
 from wittymail_server.Sheet import Sheet
+from util.FileUtils import FileUtils
 
 log = logger.get_logger(__name__)
 
@@ -19,6 +20,7 @@ HTTP_OK         = 200
 HTTP_CREATED    = 201
 HTTP_NOT_FOUND  = 404
 HTTP_BAD_INPUT  = 400
+HTTP_SERVER_ERROR = 500
 
 class SheetView(FlaskView):
     """
@@ -169,15 +171,30 @@ class AttachmentView(FlaskView):
         To workaround this stupidity, this API is idempotent and will just keep saving
         all files in the same dir
         """
-        a = request.files['attachment']
-        attachment_dir = flask_app.config['ATTACHMENTS_DIR']
+        if 'attachment' in request.files:
+            a = request.files['attachment']
+            attachment_save_path = os.path.join(flask_app.config['ATTACHMENTS_DIR'], a.filename)
 
-        a.save(os.path.join(attachment_dir, a.filename))
-        log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
+            a.save(attachment_save_path)
+            log.info('Attachment file saved at: %s', attachment_save_path)
 
-        emailapi_broker.save_attachment_dir(attachment_dir)
-        # TODO Call change_email_fodder_status() from save_attachment_dir()
-        emailapi_broker.change_email_fodder_status(a.filename)
+            #emailapi_broker.save_attachment_dir(attachment_dir)
+            # TODO Call change_email_fodder_status() from save_attachment_dir()
+            #emailapi_broker.change_email_fodder_status(a.filename)
+
+        elif 'common_attachment' in request.files:
+            a = request.files['common_attachment']
+            attachment_save_path = os.path.join(flask_app.config['COMMON_ATTACHMENTS_DIR'], a.filename)
+
+            a.save(attachment_save_path)
+            log.info('Attachment file saved at: %s', attachment_save_path)
+
+        else:
+            log.error('No file found in payload: %s', request.files)
+            return (jsonify({'error': 'Request payload must have either files.attachment or files.common_attachment'}),
+                    HTTP_BAD_INPUT,
+                    {'ContentType': 'application/json'})
+
         return "Attachments saved successfully", HTTP_OK
 
     @route('upload_for_row', methods=['POST'])
@@ -191,9 +208,25 @@ class AttachmentView(FlaskView):
         log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
 
         data = json.loads(request.data)
+
         s = Sheet.getInstance()
         s.set_attachment(data['attachment_name'])
         return "Attachments set successfully", HTTP_OK
+
+
+    @route('rotate', methods=['POST'])
+    def rotate(self):
+        data = json.loads(request.data)
+        filepath = os.path.join(flask_app.config['ATTACHMENTS_DIR'], data['filename'])
+        
+        try:
+            util = FileUtils()
+            util.pdf_rotate(filepath, data['direction'])
+        except Exception as e:
+            log.exception("Failed to rotate: %s", data)
+            return (str(e), HTTP_SERVER_ERROR, {'ContentType': 'text/plain'})
+        
+        return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
 
 class EmailView(FlaskView):
     """

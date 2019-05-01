@@ -14,8 +14,17 @@ log = logger.get_logger(__name__)
 Used to denote the direction of the rotation of pdf
 '''
 class Direction(Enum):
-    CLOCKWISE = 0
-    ANTICLOCKWISE = 1
+    CLOCKWISE = 270 # Degrees to rotate
+    ANTICLOCKWISE = 90
+
+    @classmethod
+    def convert_from_string(cls, direction_str):
+        mapping = {
+            'CLOCKWISE': Direction.CLOCKWISE,
+            'ANTICLOCKWISE': Direction.ANTICLOCKWISE
+        }
+
+        return mapping[direction_str]
 
 '''
 All file related helper operations
@@ -28,11 +37,14 @@ class FileUtils:
     Rotate a pdf based on the direction provided
     '''
     def pdf_rotate(self, filepath, direction):
-        if direction == Direction.CLOCKWISE:
-            rotation_degree = 270
-        else:
-            rotation_degree = 90
+        """
+        Rotate all pages in the PDF and replace file on disk
 
+        :param filepath: Full path to PDF file
+        :param direction: Direction enum value
+        """
+        log.info("Rotating file '%s' by %s", filepath, direction)
+        direction = Direction.convert_from_string(direction)
         output_file = filepath + '.tmp'
 
         with open(filepath, 'rb') as f:
@@ -41,7 +53,7 @@ class FileUtils:
 
             for pagenum in range(pdf_reader.numPages):
                 page = pdf_reader.getPage(pagenum)
-                page.rotateCounterClockwise(rotation_degree)
+                page.rotateCounterClockwise(direction.value)
                 pdf_writer.addPage(page)
 
             log.info("Writing PDF: %s", output_file)
