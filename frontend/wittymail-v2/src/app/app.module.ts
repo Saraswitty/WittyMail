@@ -15,6 +15,7 @@ import {MatIconModule} from '@angular/material';
 import {MatMenuModule} from '@angular/material/menu'; 
 import {MatDialogModule} from '@angular/material/dialog'; 
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -63,7 +64,8 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     MatIconModule,
     MatMenuModule,
     MatDialogModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSnackBarModule
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }

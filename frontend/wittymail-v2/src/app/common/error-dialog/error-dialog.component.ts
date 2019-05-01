@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { LoggerService } from 'src/app/util/logger.service';
 
 @Component({
   selector: 'app-error-dialog',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ErrorDialogComponent implements OnInit {
 
-  constructor() { }
+  constructor(private snackBar: MatSnackBar, private log: LoggerService) { }
 
   ngOnInit() {
+  }
+
+  showError(message: string) {
+    this.log.error(message);
+    this.snackBar.open(message, 'OK', {});
   }
 
 }
