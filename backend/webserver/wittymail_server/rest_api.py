@@ -186,15 +186,30 @@ class AttachmentView(FlaskView):
         To workaround this stupidity, this API is idempotent and will just keep saving
         all files in the same dir
         """
-        a = request.files['attachment']
-        attachment_dir = flask_app.config['ATTACHMENTS_DIR']
+        if 'attachment' in request.files:
+            a = request.files['attachment']
+            attachment_save_path = os.path.join(flask_app.config['ATTACHMENTS_DIR'], a.filename)
 
-        a.save(os.path.join(attachment_dir, a.filename))
-        log.info('Attachment file saved as = %s' % (attachment_dir + a.filename))
+            a.save(attachment_save_path)
+            log.info('Attachment file saved at: %s', attachment_save_path)
 
-        emailapi_broker.save_attachment_dir(attachment_dir)
-        # TODO Call change_email_fodder_status() from save_attachment_dir()
-        emailapi_broker.change_email_fodder_status(a.filename)
+            #emailapi_broker.save_attachment_dir(attachment_dir)
+            # TODO Call change_email_fodder_status() from save_attachment_dir()
+            #emailapi_broker.change_email_fodder_status(a.filename)
+
+        elif 'common_attachment' in request.files:
+            a = request.files['common_attachment']
+            attachment_save_path = os.path.join(flask_app.config['COMMON_ATTACHMENTS_DIR'], a.filename)
+
+            a.save(attachment_save_path)
+            log.info('Attachment file saved at: %s', attachment_save_path)
+
+        else:
+            log.error('No file found in payload: %s', request.files)
+            return (jsonify({'error': 'Request payload must have either files.attachment or files.common_attachment'}),
+                    HTTP_BAD_INPUT,
+                    {'ContentType': 'application/json'})
+
         return "Attachments saved successfully", HTTP_OK
 
     @route('upload_for_row', methods=['POST'])

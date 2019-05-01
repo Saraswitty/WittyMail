@@ -58,9 +58,12 @@ try:
     CORS(flask_app)
 
     a = get_attachments_dir()
+    common_attachments_dir = os.path.join(a,'common')
+    os.makedirs(common_attachments_dir)
     f = get_fodder_dir()
 
     flask_app.config['ATTACHMENTS_DIR'] = a
+    flask_app.config['COMMON_ATTACHMENTS_DIR'] = common_attachments_dir
     flask_app.config['FODDER_DIR'] = f
     flask_app.config['URL_DEFAULT_PREFIX_FOR_API'] = '/api'
 

@@ -1,7 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { LoggerService } from '../util/logger.service';
 import { MatStepper } from '@angular/material';
+import { FileUploader } from 'ng2-file-upload';
+import { BackendService } from '../backend.service';
+import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-attachments',
@@ -11,6 +14,10 @@ import { MatStepper } from '@angular/material';
 export class AttachmentsComponent implements OnInit {
 
   @Input('mainStepper') mainStepper: MatStepper;
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+  
+  public commonAttachmentUploader: FileUploader;
+  public individualAttachmentUploader: FileUploader;
   
   headers = ['Sr No.', 'Name of Child', 'Class']
   attachmentSubjectHeaderName = 'Name of Child'
@@ -105,9 +112,28 @@ export class AttachmentsComponent implements OnInit {
   selectedAttachmentCandidate: any = null;
   selectedPDFViewerHTML: SafeHtml = null;
 
-  constructor(private sanitizer: DomSanitizer, private log: LoggerService) { }
+  constructor(private sanitizer: DomSanitizer, private log: LoggerService,
+    private backend: BackendService) { }
 
   ngOnInit() {
+    this.commonAttachmentUploader = new FileUploader({ url: this.backend.getAttachmentUploadUrl(), itemAlias: 'common_attachment' });
+    this.individualAttachmentUploader = new FileUploader({ url: this.backend.getAttachmentUploadUrl(), itemAlias: 'attachment' });
+    let uploaders = [this.commonAttachmentUploader, this.individualAttachmentUploader];
+    
+    uploaders.forEach(uploader => {
+      uploader.onAfterAddingFile = (file) => {
+        file.withCredentials = false;
+        uploader.uploadAll();
+      };
+
+      uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+        if (status == 200) {
+          this.log.info("Attachment uploaded: ", item.file.name, status);
+        } else {
+          this.errorDialog.showError("Failed to upload attachment '" + item.file.name + "': " + status + " " + response);
+        }
+      };
+    });
   }
 
   onClickRow(row) {
