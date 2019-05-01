@@ -1,4 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FileUploader } from 'ng2-file-upload';
+import { BackendService } from '../backend.service';
+import { LoggerService } from '../util/logger.service';
+import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
+import { MatStepper } from '@angular/material';
 
 @Component({
   selector: 'app-sponsor-list',
@@ -6,6 +11,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./sponsor-list.component.css']
 })
 export class SponsorListComponent implements OnInit {
+
+  @ViewChild('stepper') stepper: MatStepper;
+  @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
+  public uploader: FileUploader;
 
   headers = ['Sr No.', 'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference Mail ID']
   columnSelectedAs = {
@@ -47,9 +56,24 @@ export class SponsorListComponent implements OnInit {
     },
   ];
 
-  constructor() { }
+  constructor(private backend: BackendService, private log: LoggerService) { }
 
   ngOnInit() {
+    this.uploader = new FileUploader({ url: this.backend.getFodderUploadUrl(), itemAlias: 'sponsor-sheet' });
+    this.uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+      this.uploader.uploadAll();
+    };
+
+    this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+      this.log.info('Sponsor sheet uploaded: ', item.file.name, status);
+      if (status === 200) {
+        this.stepper.next();
+        //this.displayColumnMappingUi();
+      } else {
+        this.errorDialog.showError("Failed to upload the sheet to the backend");
+      }
+    };
   }
 
 }

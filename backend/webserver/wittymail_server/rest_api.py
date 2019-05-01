@@ -29,7 +29,7 @@ class SheetView(FlaskView):
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
     @route('upload', methods=['POST'])
-    def some(self):
+    def upload(self):
         """
         Upload a new Excel sheet as input
 
@@ -38,7 +38,7 @@ class SheetView(FlaskView):
         log.debug("Uploading sheet: %s", request.files)
         fodder_dir = flask_app.config['FODDER_DIR']
 
-        f = request.files['fodder']
+        f = request.files['sponsor-sheet']
         fodder_file = os.path.join(fodder_dir, f.filename)
         f.save(fodder_file)
         log.info('Sheet file saved as: %s', fodder_file)

@@ -5,7 +5,7 @@
         Sponsor List
       </div>
       <div class="box" gdColumn="col 2" gdRow="row">
-        <input type="file" name="sheet" ng2FileSelect [uploader]="uploader" placeholder="Input" />
+        <input type="file" name="sponsor-sheet" ng2FileSelect [uploader]="uploader" placeholder="Input" />
       </div>
     </div>
   </mat-step>
@@ -41,3 +41,5 @@
       (click)="onClickRow(row)"></tr>
   </table>
 </div>
+
+<app-error-dialog #errorDialog></app-error-dialog>
