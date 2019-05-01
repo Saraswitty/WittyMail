@@ -1,6 +1,6 @@
 <mat-horizontal-stepper [linear]="True" #stepper>
   <mat-step editable="false" label="Sponsor List">
-    <app-sponsor-list></app-sponsor-list>
+    <app-sponsor-list [mainStepper]="stepper"></app-sponsor-list>
   </mat-step>
 
   <mat-step label="Attachments">

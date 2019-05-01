@@ -2,6 +2,10 @@
     width: 100%;
 }
 
+.table-container {
+    overflow: auto;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
