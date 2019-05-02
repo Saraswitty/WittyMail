@@ -10,7 +10,6 @@ import { LoggerService } from '../util/logger.service';
 })
 export class StepsSliderComponent implements OnInit {
 
-  @ViewChild("stepper") stepper: MatStepper;
   @ViewChild("stepEmailDesign") stepEmailDesign: EmailDesignComponent;
 
   constructor(private log: LoggerService) { }
@@ -22,10 +21,10 @@ export class StepsSliderComponent implements OnInit {
    * Watch the main stepper for step changes and call the populate() API on the 
    * component for the page which is about to be shown next
    */
-  populateNextStepPage() {
-    this.log.info("Main stepper changed: ", this.stepper.selectedIndex);
+  populateNextStepPage(stepper: MatStepper) {
+    this.log.info("Main stepper changed: ", stepper.selectedIndex);
 
-    if (this.stepper.selectedIndex + 1 == 2) {
+    if (stepper.selectedIndex == 2) {
       this.stepEmailDesign.populateTable();
     }
   }
