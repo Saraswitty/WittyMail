@@ -1,8 +1,13 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { LoggerService } from '../util/logger.service';
 import { MatInput, MatStepper } from '@angular/material';
-import { BackendService, ColumnHeadersWithRowContent } from '../backend.service';
+import { BackendService, ColumnHeadersWithRowContent, TemplateInput, TemplateOutput } from '../backend.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
+
+enum LastFocusedInput {
+  SUBJECT,
+  BODY
+}
 
 @Component({
   selector: 'app-email-design',
@@ -27,6 +32,9 @@ export class EmailDesignComponent implements OnInit {
 
   bodyTemplate: string = ""
   bodySample: string = "";
+
+  /* Which element was last focussed? */
+  lastFocused: LastFocusedInput = LastFocusedInput.SUBJECT;
 
   constructor(private log: LoggerService, private backend: BackendService) { }
 
@@ -57,7 +65,63 @@ export class EmailDesignComponent implements OnInit {
 
   onClickColumn(columnName) {
     this.log.info("Selected column: %s", columnName);
-    this.subjectTemplate += " {" + columnName + "} ";
+    
+    /* Trigger template-to-reality conversion for the last focused field */
+    if (this.lastFocused == LastFocusedInput.SUBJECT) {
+      this.subjectTemplate += " {" + columnName + "} ";
+      this.onSubjectTemplateChanged(this.subjectTemplate);
+    } else if (this.lastFocused == LastFocusedInput.BODY) {
+      this.bodyTemplate += " {" + columnName + "} ";
+      this.onBodyTemplateChanged(this.subjectTemplate);
+    }
+  }
+
+  onSubjectTemplateChanged(value: string) {
+    this.lastFocused = LastFocusedInput.SUBJECT;
+
+    // Optimization: Don't bother the backend if there is no template to be substituted yet
+    if (value.indexOf("{") == -1) {
+      this.subjectSample = value;
+      return;
+    }
+
+    let v: TemplateInput = {
+      template: value
+    }
+    this.backend.resolveTemplate(v).subscribe(
+      data => {
+        this.log.info("Template resolved to: ", data);
+        let r: TemplateOutput = <TemplateOutput>data;
+        this.subjectSample = r.reality;
+      },
+      error => {
+        this.errorDialog.showError("Your subject template is weird, try making it more realistic");
+      }
+    );
+  }
+
+  onBodyTemplateChanged(event: any) {
+    this.lastFocused = LastFocusedInput.BODY;
+
+    // Optimization: Don't bother the backend if there is no template to be substituted yet
+    if (this.bodyTemplate.indexOf("{") == -1) {
+      this.bodySample = this.bodyTemplate;
+      return;
+    }
+
+    let v: TemplateInput = {
+      template: this.bodyTemplate
+    }
+    this.backend.resolveTemplate(v).subscribe(
+      data => {
+        this.log.info("Template resolved to: ", data);
+        let r: TemplateOutput = <TemplateOutput>data;
+        this.bodySample = r.reality;
+      },
+      error => {
+        this.errorDialog.showError("Your body template is weird, try making it more realistic");
+      }
+    );
   }
 
 }

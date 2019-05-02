@@ -269,10 +269,11 @@ class EmailView(FlaskView):
         :return:
         """
         data = json.loads(request.data)
-        fodder = emailapi_broker.get_email_fodder()
-        result_str = emailapi_broker.template_to_str(data['template'], fodder[0])
+        # fodder = emailapi_broker.get_email_fodder()
+        # result_str = emailapi_broker.template_to_str(data['template'], fodder[0])
 
-        return (jsonify({'reality': result_str}),
+        # TODO: For now, just short-circuit input to reality
+        return (jsonify({'reality': data['template']}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
