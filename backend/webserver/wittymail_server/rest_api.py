@@ -13,6 +13,7 @@ import util.logger as logger
 from flask import send_file
 from wittymail_server.Sheet import Sheet
 from util.FileUtils import FileUtils
+from mailer.EmailProvider import EmailProvider
 
 log = logger.get_logger(__name__)
 

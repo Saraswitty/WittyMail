@@ -41,13 +41,7 @@ class Sheet:
       f = FileUtils()
       self.headers, self.data = f.read_excel_to_memory(self.filepath)
       self.data_width = len(self.data[0])
-      id_index = Sheet.data_width + Sheet.extended_headers.index("ID")
-
-      i = 0
-      for d in self.data:
-         d[id_index] = i
-         i += 1
-
+ 
    def save_to_file(self):
       f = FileUtils()
       return f.save_to_excel(self.headers + self.data)
