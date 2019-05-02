@@ -1,15 +1,12 @@
 from util.FileUtils import FileUtils
 from wittymail_server.ColumnMapping import ColumnMapping
-import pdb
 
 class Sheet:
    __instance = None
    filepath = None
    headers = []
    data = []
-   data_width = []
-   extended_headers = []
-
+   extended_headers = ["status", "frozen_attachments"]
    c = ColumnMapping()
 
    @staticmethod
@@ -33,20 +30,22 @@ class Sheet:
       Sheet.filepath = None
       Sheet.__instance = None
    
+   def get_column_mappings(self, column_names):
+      return self.c.get_column_mappings(column_names)
+
+   def get_column_value(self, row, column_name):
+      return row[self.c.get_column_mappings(column_name)]      
+
+
    def set_attachment(self, attachment_name):
-      id_index = Sheet.data_width + Sheet.extended_headers.index("Attachment Name")
-      Sheet.data[id_index] = attachment_name
+      frozen_attachments = self.c.get_column_mappings(["frozen_attachments"])
+      self.data[frozen_attachments] = attachment_name
 
    def dump_to_memory(self):
       f = FileUtils()
       self.headers, self.data = f.read_excel_to_memory(self.filepath)
-      self.data_width = len(self.data[0])
-      id_index = Sheet.data_width + Sheet.extended_headers.index("ID")
-
-      i = 0
-      for d in self.data:
-         d[id_index] = i
-         i += 1
+      data_width = len(self.data[0])
+      self.c.set_column_delta(data_width)
 
    def save_to_file(self):
       f = FileUtils()
@@ -59,11 +58,14 @@ class Sheet:
       return self.headers, data
    
    def get_all_content(self):
-      return self.headers + self.data
+      return self.headers, self.data
+
+   def get_extended_headers(self):
+      return self.extended_headers
 
    def template_to_str(self, st, l):
       f = FileUtils()
       return f.template_to_str(st, l)
 
-   def set_column_mapping(self, map_info):
-      Sheet.c = ColumnMapping(map_info)
+   def set_column_mappings(self, map_info):
+      self.c.set_column_mappings(map_info)

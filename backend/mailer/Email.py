@@ -14,6 +14,7 @@ log = logger.get_logger(__name__)
 class Email():
   subject_template = None
   body_template = None
+  frm = None
 
   def __init__(self, to, cc, subject, body, status = None):
     assert to is not None and                   \
@@ -25,6 +26,9 @@ class Email():
     self.body = body
     self.status = status
     self.attachment = None
+
+  def get_email_from(self):
+    return self.frm
 
   def __del__(self):
     self.to = None
