@@ -14,6 +14,7 @@ from flask import send_file
 from wittymail_server.Sheet import Sheet
 from util.FileUtils import FileUtils
 from mailer.Email import Email
+from mailer.EmailProvider import EmailProvider
 
 log = logger.get_logger(__name__)
 
@@ -124,6 +125,7 @@ class SheetView(FlaskView):
         data = json.loads(request.data)
         sheet = Sheet.getInstance()
         sheet.set_column_mappings(data)
+
         return (jsonify({}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})

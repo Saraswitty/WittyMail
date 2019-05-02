@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { FileUploader } from 'ng2-file-upload';
-import { BackendService, ColumnHeadersWithRowContent } from '../backend.service';
+import { BackendService, ColumnHeadersWithRowContent, ColumnMappings } from '../backend.service';
 import { LoggerService } from '../util/logger.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 import { MatStepper } from '@angular/material';
@@ -94,9 +94,11 @@ export class SponsorListComponent implements OnInit {
    * Save the selected column mapping to the backend and move to the next page
    */
   saveColumnMappingAndContinue() {
-    let to_column: string = "";
-    let cc_column: string = "";
-    let attachment_column: string = "";
+    let mapping: ColumnMappings = {
+      to_column: "",
+      cc_column: "",
+      attachment_column: ""
+    }
 
     /* The map-stepper API returns a QueryList which, unlike an array, is not
      * directly accesible by index, so convert it to a normal array first
@@ -109,20 +111,29 @@ export class SponsorListComponent implements OnInit {
      */
     for (let key in this.columnSelectedAs) {
       if (this.columnSelectedAs[key] == mappingSteps[0].label) {
-        to_column = key;
+        mapping.to_column = key;
       }
       if (this.columnSelectedAs[key] == mappingSteps[1].label) {
-        cc_column = key;
+        mapping.cc_column = key;
       }
       if (this.columnSelectedAs[key] == mappingSteps[2].label) {
-        attachment_column = key;
+        mapping.attachment_column = key;
       }
     }
-    this.log.info("Selected columns:\nto: %s\ncc: %s\nattachment: %s",
-    to_column, cc_column, attachment_column);
-    this.backend.saveEmailToCCColumns(to_column, cc_column);
-    this.backend.saveAttachmentMetadata(attachment_column);
+    this.log.info("Selected columns: ", mapping);
 
-    this.mainStepper.next();
+    // TODO: Do we need this after refactoring?
+    this.backend.saveEmailToCCColumns(mapping.to_column, mapping.cc_column);
+    this.backend.saveAttachmentMetadata(mapping.attachment_column);
+
+    this.backend.postColumnMapping(mapping).subscribe(
+      data => {
+        this.log.info("Column mapping posted, moving on...")
+        this.mainStepper.next();
+      },
+      error => {
+        this.errorDialog.showError("Failed to select columns: " + error);
+      }
+    );
   }
 }

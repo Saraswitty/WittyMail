@@ -1,4 +1,4 @@
-<mat-horizontal-stepper [linear]="True" #stepper>
+<mat-horizontal-stepper [linear]="True" (selectionChange)="populateNextStepPage($event)" #stepper>
   <mat-step editable="false" label="Sponsor List">
     <app-sponsor-list [mainStepper]="stepper"></app-sponsor-list>
   </mat-step>
@@ -8,7 +8,7 @@
   </mat-step>
 
   <mat-step label="E-Mail Design">
-    <app-email-design [mainStepper]="stepper"></app-email-design>
+    <app-email-design [mainStepper]="stepper" #stepEmailDesign></app-email-design>
   </mat-step>
 
   <mat-step label="Summary">
