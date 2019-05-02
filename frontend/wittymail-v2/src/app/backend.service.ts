@@ -227,6 +227,13 @@ export class BackendService {
     // return res;
   }
 
+  postColumnMapping(mapping: ColumnMappings) {
+    return this.http.post<TemplateOutput>(this.urls.sheet.set_mapping, mapping)
+      .pipe(
+        catchError(this.handleError('postColumnMapping'))
+      );
+  }
+
   saveEmailToCCColumns(to_column: string, cc_column: string) {
     this.emailMetadataInstance.to_column = to_column;
     this.emailMetadataInstance.cc_column = cc_column;

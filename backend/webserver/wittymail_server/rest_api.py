@@ -145,7 +145,7 @@ class SheetView(FlaskView):
         :return:
         """
         data = json.loads(request.data)
-        emailapi_broker.save_attachment_column(data['attachment_column'])
+        # emailapi_broker.save_attachment_column(data['attachment_column'])
         return (jsonify({}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
