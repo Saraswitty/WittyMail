@@ -245,6 +245,10 @@ class EmailView(FlaskView):
         """
         data = json.loads(request.data)
 
+        return (jsonify({'error_message': ""}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
+
         assert len(data['username']) > 0 and len(data['password']) > 0, "username or password not provided"
 
         _smtp_provider = email_provider.choose_email_provider("SMTP")

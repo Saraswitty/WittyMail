@@ -39,7 +39,22 @@
   </mat-step>
 
   <mat-step editable="true" label="E-mail Provider">
-
+    <p>  
+    Please login to Gmail and <a href="https://myaccount.google.com/lesssecureapps" target="_blank">allow access to send e-mails</a>.
+    </p>
+    <form>
+      <mat-form-field class="email-settings-input-field">
+        <input matInput placeholder="E-mail address" value="" name="email"
+          [(ngModel)]="emailSettings.username">
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="email-settings-input-field">
+          <input matInput type="password" placeholder="Password" value="" name="password"
+          [(ngModel)]="emailSettings.password">
+      </mat-form-field>
+      <br/>
+          <button mat-stroked-button (click)="onSubmitEmailServer()">Next</button>
+    </form>
   </mat-step>
 </mat-vertical-stepper>
 

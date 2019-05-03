@@ -12,3 +12,7 @@
     border-style: solid;
     padding: 0.5rem;
 }
+
+.email-settings-input-field {
+    width: 50vw;
+}
