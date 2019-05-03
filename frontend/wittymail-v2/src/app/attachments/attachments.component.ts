@@ -4,7 +4,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { LoggerService } from '../util/logger.service';
 import { MatStepper } from '@angular/material';
 import { FileUploader } from 'ng2-file-upload';
-import { BackendService, AttachmentRotation, ColumnHeadersWithRowContent } from '../backend.service';
+import { BackendService, AttachmentRotation, ColumnHeadersWithRowContent, CandidateAttachmentSelection, CandidateAttachments } from '../backend.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 
 @Component({
@@ -31,19 +31,10 @@ export class AttachmentsComponent implements OnInit {
   sheetContents = [];
 
   selectedRow: any = null;
+  selectedRowSubject: string = "";
   selectedPDF: any;
 
-  attachmentCandidatesForSelectedRow = [
-    {
-      'pdfName': "Aradhya Karche.pdf"
-    },
-    {
-      'pdfName': "Aaradhya Karche.pdf"
-    },
-    {
-      'pdfName': "Aradhya Kachre.pdf"
-    }
-  ]
+  attachmentCandidatesForSelectedRow: string[] = [];
   selectedAttachmentCandidate: any = null;
   selectedPDFViewerHTML: SafeHtml = null;
 
@@ -109,6 +100,37 @@ export class AttachmentsComponent implements OnInit {
   onClickRow(row) {
     this.log.info(row)
     this.selectedRow = row;
+
+    this.backend.getCandidateAttachments(row).subscribe(
+      data => {
+        this.log.info("Got attachment candidates: ", data);
+        let d: CandidateAttachments = <CandidateAttachments> data;
+        this.attachmentCandidatesForSelectedRow = d.pdfNames;
+        this.selectedRowSubject = d.subject;
+      },
+      error => {
+        this.errorDialog.showError("Could not fetch any candidates for this row: " + error);
+        this.attachmentCandidatesForSelectedRow = [];
+      }
+    );
+  }
+
+  onSelectAttachmentCandidate() {
+    let payload: CandidateAttachmentSelection = {
+      pdfName: this.selectedAttachmentCandidate,
+      selected_row: this.selectedRow
+    };
+
+    this.log.info("Selecting candidate: ", payload);
+
+    this.backend.selectAttachmentCandidate(payload).subscribe(
+      data => {
+        this.selectedRow = null;
+      },
+      error => {
+        this.errorDialog.showError("Failed to select this candidate: " + error);
+      }
+    );
   }
 
   _setPDFViewerHTML(url) {

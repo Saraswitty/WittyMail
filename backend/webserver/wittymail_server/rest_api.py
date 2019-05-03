@@ -234,6 +234,21 @@ class AttachmentView(FlaskView):
             return (str(e), HTTP_SERVER_ERROR, {'ContentType': 'text/plain'})
         
         return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
+    
+    def candidate(self):
+        row = request.args.get("selected_row")
+
+        log.info("Fetching candidates for: %s", row)
+        return (jsonify({'subject': 'John Doe', 'pdfNames': ['John Doe.pdf']}),
+                HTTP_OK, {'ContentType': 'application/json'})
+        
+    @route('candidate/select', methods=['POST'])
+    def select_candidate(self):
+        data = json.loads(request.data)
+
+        log.info("Selecting candidate: %s", data)
+        return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
+
 
 class EmailView(FlaskView):
     """

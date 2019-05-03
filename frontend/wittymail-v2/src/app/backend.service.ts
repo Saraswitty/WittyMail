@@ -64,6 +64,20 @@ export interface TemplateOutput {
   reality: string;
 }
 
+export interface CandidateAttachmentsInput {
+  selected_row: any;
+}
+
+export interface CandidateAttachments {
+  subject: string;
+  pdfNames: string[];
+}
+
+export interface CandidateAttachmentSelection {
+  selected_row: any;
+  pdfName: string;  
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -85,6 +99,8 @@ export class BackendService {
       upload: 'api/attachment/upload', // POST
       rotate: 'api/attachment/rotate', // POST
       get_file: 'api/attachment/file/', // GET with filename appended to URL
+      candidate: 'api/attachment/candidate', // GET with selected_row
+      candidate_select: 'api/attachment/candidate/select', // POST with selected_row and attachment name
     },
     email: {
       set_server: 'api/email/server', // POST
@@ -209,6 +225,20 @@ export class BackendService {
     return this.http.post<TemplateOutput>(this.urls.attachment.rotate, rotation)
       .pipe(
         catchError(this.handleError('rotateAttachment'))
+      );
+  }
+
+  getCandidateAttachments(selected_row: CandidateAttachmentsInput): Observable<CandidateAttachments> {
+    return this.http.get<CandidateAttachments>(this.urls.attachment.candidate)
+      .pipe(
+        catchError(this.handleError('getCandidateAttachments'))
+      );
+  }
+
+  selectAttachmentCandidate(selected: CandidateAttachmentSelection) {
+    return this.http.post<CandidateAttachmentSelection>(this.urls.attachment.candidate_select, selected)
+      .pipe(
+        catchError(this.handleError('selectAttachmentCandidate'))
       );
   }
 
