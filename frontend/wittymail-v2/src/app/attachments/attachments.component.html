@@ -1,5 +1,5 @@
 <div class="step-container">
-  <mat-vertical-stepper [linear]="False" #stepper>
+  <mat-vertical-stepper [linear]="False" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step editable="true" label="Upload Attachments">
       <div gdGap="20px" gdColumns="repeat(2, [col] 30vw)" gdRows="repeat(2, [row] auto)">
         <div class="box" gdColumn="col" gdRow="row">

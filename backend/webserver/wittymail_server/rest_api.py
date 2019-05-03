@@ -72,7 +72,13 @@ class SheetView(FlaskView):
 
         :return:
         """
-        log.info("URL: %s", url_for('SheetView:some'))
+        # TODO: Using implementation in /headers temporarily
+        sheet = Sheet.getInstance()
+        headers, data = sheet.get_headers_with_sample_rows(row_count = 3)
+        return (jsonify({'headers': headers, 'extended_headers': [], 'contents': data}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
+
         e = emailapi_broker.get_email_fodder_names()
         if e[0] is not 0:
             return (jsonify({"err_msg": e[1]}),
