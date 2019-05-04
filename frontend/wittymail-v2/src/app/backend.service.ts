@@ -11,6 +11,7 @@ export interface VersionInfo {
 
 export interface ColumnHeadersWithRowContent {
   headers: string[];
+  extended_headers: string[];
   contents: any[];
 }
 
@@ -63,6 +64,20 @@ export interface TemplateOutput {
   reality: string;
 }
 
+export interface CandidateAttachmentsInput {
+  selected_row: any;
+}
+
+export interface CandidateAttachments {
+  subject: string;
+  pdfNames: string[];
+}
+
+export interface CandidateAttachmentSelection {
+  selected_row: any;
+  pdfName: string;  
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -84,6 +99,8 @@ export class BackendService {
       upload: 'api/attachment/upload', // POST
       rotate: 'api/attachment/rotate', // POST
       get_file: 'api/attachment/file/', // GET with filename appended to URL
+      candidate: 'api/attachment/candidate', // GET with selected_row
+      candidate_select: 'api/attachment/candidate/select', // POST with selected_row and attachment name
     },
     email: {
       set_server: 'api/email/server', // POST
@@ -170,61 +187,11 @@ export class BackendService {
       );
   }
 
-  getVomit(): Observable<ColumnHeadersWithRowContent> {
+  getSheetContents(): Observable<ColumnHeadersWithRowContent> {
     return this.http.get<ColumnHeadersWithRowContent>(this.urls.sheet.get_contents)
       .pipe(
-        catchError(this.handleError('getVomit'))
+        catchError(this.handleError('getSheetContents'))
       );
-
-    // let res: ColumnHeadersWithRowContent = {
-    //   headers: [
-    //     'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference mail ID'
-    //   ],
-    //   contents: [
-    //     {
-    //       'Name of Child': 'Aradhya Karche',
-    //       'Class': 'Nursery- kalewadi',
-    //       'Sponsor': 'Kalubai pratishthan',
-    //       'Mail ID': 'Sanjaysandhu8090@gmail.com',
-    //       'Reference': 'Ravi',
-    //       'Reference mail ID': 'amboreravi@gmail.com',
-    //       'status': 'Pending',
-    //       'email': {
-    //         'from': 'wittymail@acme.com',
-    //         'to': 'Sanjaysandhu8090@gmail.com',
-    //         'cc': 'amboreravi@gmail.com',
-    //         'attachment': {
-    //           'name': 'Aradhya Karche.pdf',
-    //           'url': 'api/attachment/Aradhya%20Karche.pdf'
-    //         },
-    //         'subject': 'First term progress report for Aradhya Karche',
-    //         'body': 'Dear Kalubai pratishthan,'
-    //       }
-    //     },
-    //     {
-    //       'Name of Child': 'Vedika Shirgire',
-    //       'Class': 'Nursery- kalewadi',
-    //       'Sponsor': 'Apurva kumar',
-    //       'Mail ID': 'apurv07vit@gmail.com',
-    //       'Reference': 'Anish',
-    //       'Reference mail ID': 'anishgarg07@gmail.com',
-    //       'status': 'Pending',
-    //       'email': {
-    //         'from': 'wittymail@acme.com',
-    //         'to': 'apurv07vit@gmail.com',
-    //         'cc': 'anishgarg07@gmail.com',
-    //         'attachment': {
-    //           'name': 'Vedika Shirgire.pdf',
-    //           'url': 'api/attachment/Vedika%20Shirgire.pdf'
-    //         },
-    //         'subject': 'First term progress report for Vedika Shirgire',
-    //         'body': 'Dear Apurva kumar,'
-    //       }
-    //     }
-    //   ]
-    // };
-
-    // return res;
   }
 
   postColumnMapping(mapping: ColumnMappings) {
@@ -258,6 +225,20 @@ export class BackendService {
     return this.http.post<TemplateOutput>(this.urls.attachment.rotate, rotation)
       .pipe(
         catchError(this.handleError('rotateAttachment'))
+      );
+  }
+
+  getCandidateAttachments(selected_row: CandidateAttachmentsInput): Observable<CandidateAttachments> {
+    return this.http.get<CandidateAttachments>(this.urls.attachment.candidate)
+      .pipe(
+        catchError(this.handleError('getCandidateAttachments'))
+      );
+  }
+
+  selectAttachmentCandidate(selected: CandidateAttachmentSelection) {
+    return this.http.post<CandidateAttachmentSelection>(this.urls.attachment.candidate_select, selected)
+      .pipe(
+        catchError(this.handleError('selectAttachmentCandidate'))
       );
   }
 

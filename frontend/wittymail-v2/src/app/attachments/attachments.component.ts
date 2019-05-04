@@ -4,7 +4,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { LoggerService } from '../util/logger.service';
 import { MatStepper } from '@angular/material';
 import { FileUploader } from 'ng2-file-upload';
-import { BackendService, AttachmentRotation } from '../backend.service';
+import { BackendService, AttachmentRotation, ColumnHeadersWithRowContent, CandidateAttachmentSelection, CandidateAttachments } from '../backend.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 
 @Component({
@@ -15,100 +15,26 @@ import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.compon
 export class AttachmentsComponent implements OnInit {
 
   @Input('mainStepper') mainStepper: MatStepper;
+  @Input('stepper') stepper: MatStepper;
   @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
   
   public commonAttachmentUploader: FileUploader;
   public individualAttachmentUploader: FileUploader;
 
-  selectedPDF: any;
-  
-  headers = ['Sr No.', 'Name of Child', 'Class']
-  attachmentSubjectHeaderName = 'Name of Child'
-  sheetContents = [
-    {
-      'Sr No.': "1",
-      'Name of Child': "Aradhya Karche",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    },
-    {
-      'Sr No.': "2",
-      'Name of Child': "Vedika Shirgire",
-      'Class': "Nursery-kalewadi"
-    }
-  ];
-  selectedRow: any = null;
+  /** List of strings, each being the heading text for a column */
+  headers = [];
 
-  attachmentCandidatesForSelectedRow = [
-    {
-      'pdfName': "Aradhya Karche.pdf"
-    },
-    {
-      'pdfName': "Aaradhya Karche.pdf"
-    },
-    {
-      'pdfName': "Aradhya Kachre.pdf"
-    }
-  ]
+  /** Dict of columnHeaderName -> selectedMapping */
+  columnSelectedAs = {};
+
+  /** Data displayed in the table */
+  sheetContents = [];
+
+  selectedRow: any = null;
+  selectedRowSubject: string = "";
+  selectedPDF: any;
+
+  attachmentCandidatesForSelectedRow: string[] = [];
   selectedAttachmentCandidate: any = null;
   selectedPDFViewerHTML: SafeHtml = null;
 
@@ -136,10 +62,75 @@ export class AttachmentsComponent implements OnInit {
     });
   }
 
+  /**
+   * Populate the table that displays the column headers and a few sample rows
+   * 
+   * This is called by the main stepper when this step becomes visible, because
+   * the data fetching depends on previous steps.
+   */
+  populateTable() {
+    this.backend.getSheetContents().subscribe(
+      data => {
+        let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
+
+        /* Only show the first 4 columns as we have just half the page width for the table */
+        this.headers = r.headers.slice(0, 3);
+
+        /* Append the 'frozen_attachment' column */
+        this.headers.concat(r.extended_headers);
+        this.sheetContents = r.contents;
+    
+        this.log.info("Using %d headers and %d rows", this.headers.length, this.sheetContents.length);
+      },
+      error => {
+        this.errorDialog.showError("Failed to get contents of the Excel sheet: " + error);
+      }
+    );
+  }
+
+  onStepChange(stepper: MatStepper) {
+    this.log.info("Attachments page now showing step: ", stepper.selectedIndex);
+
+    /* On the second step, populate the table with sheet contents */
+    if (stepper.selectedIndex == 1) {
+      this.populateTable();
+    }
+  }
+
   onClickRow(row) {
     this.log.info(row)
-    this.log.info(row[this.attachmentSubjectHeaderName])
     this.selectedRow = row;
+
+    this.backend.getCandidateAttachments(row).subscribe(
+      data => {
+        this.log.info("Got attachment candidates: ", data);
+        let d: CandidateAttachments = <CandidateAttachments> data;
+        this.attachmentCandidatesForSelectedRow = d.pdfNames;
+        this.selectedRowSubject = d.subject;
+      },
+      error => {
+        this.errorDialog.showError("Could not fetch any candidates for this row: " + error);
+        this.attachmentCandidatesForSelectedRow = [];
+      }
+    );
+  }
+
+  onSelectAttachmentCandidate() {
+    let payload: CandidateAttachmentSelection = {
+      pdfName: this.selectedAttachmentCandidate,
+      selected_row: this.selectedRow
+    };
+
+    this.log.info("Selecting candidate: ", payload);
+
+    this.backend.selectAttachmentCandidate(payload).subscribe(
+      data => {
+        this.selectedRow = null;
+      },
+      error => {
+        this.errorDialog.showError("Failed to select this candidate: " + error);
+      }
+    );
   }
 
   _setPDFViewerHTML(url) {

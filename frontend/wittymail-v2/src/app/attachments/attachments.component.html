@@ -1,5 +1,5 @@
 <div class="step-container">
-  <mat-vertical-stepper [linear]="False" #stepper>
+  <mat-vertical-stepper [linear]="False" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step editable="true" label="Upload Attachments">
       <div gdGap="20px" gdColumns="repeat(2, [col] 30vw)" gdRows="repeat(2, [row] auto)">
         <div class="box" gdColumn="col" gdRow="row">
@@ -47,13 +47,13 @@
                   </p>
                 </div>
                 <div *ngIf="selectedRow">
-                  Pick the correct attachment for <strong>{{selectedRow[attachmentSubjectHeaderName]}}</strong>:
+                  Pick the correct attachment for <strong>{{selectedRowSubject}}</strong>:
                   <br>
                   <mat-radio-group class="attachment-candidate-list" [(ngModel)]="selectedAttachmentCandidate">
                     <mat-radio-button class="attachment-candidate-list-item"
-                      *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate.pdfName}}"
+                      *ngFor="let candidate of attachmentCandidatesForSelectedRow" value="{{candidate}}"
                       (click)="onSelectCandidatePDF(candidate)">
-                      {{candidate.pdfName}}
+                      {{candidate}}
                     </mat-radio-button>
                   </mat-radio-group>
                 </div>
@@ -69,7 +69,7 @@
                   <button mat-raised-button (click)="onClickRotate('CLOCKWISE')">
                     <i class="material-icons btn-icon">rotate_right</i>Rotate Right
                   </button>
-                  <button mat-raised-button color="primary">
+                  <button mat-raised-button color="primary" (click)="onSelectAttachmentCandidate()">
                     <i class="material-icons btn-icon">save</i>Save
                   </button>
                 </div>

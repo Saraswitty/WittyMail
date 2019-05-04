@@ -19,19 +19,42 @@
       Subject:
       <mat-form-field class="full-width">
         <input matInput placeholder="(template for unique subjects)" value="" name="subject"
-          [(ngModel)]="subjectTemplate" #subjectInput>
+          [(ngModel)]="subjectTemplate" (input)="onSubjectTemplateChanged($event.target.value)" #subjectInput>
         <mat-hint>{{subjectSample}}</mat-hint>
       </mat-form-field>
+    </form>
       <br />
       <br />
       
-      <quill-editor name="emailBodyTemplate" [(ngModel)]="bodyTemplate" [sanitize]="true" (onContentChanged)="onBodyTemplateChanged($event)"></quill-editor>
-    </form>
+      <div fxLayout="row" fxFill fxLayout.xs="column" fxLayoutGap="10px" fxLayoutAlign.xs="center center"
+          fxLayoutWrap>
+          <div fxFlex="50" fxFill>
+            <quill-editor name="emailBodyTemplate" [(ngModel)]="bodyTemplate" [sanitize]="true" (onContentChanged)="onBodyTemplateChanged($event)"></quill-editor>
+          </div>
+          <div fxFlex="50" fxFill class="email-body-preview" [innerHTML]="bodySample">
+          </div>
+      </div>
 
+    
   </mat-step>
 
   <mat-step editable="true" label="E-mail Provider">
-
+    <p>  
+    Please login to Gmail and <a href="https://myaccount.google.com/lesssecureapps" target="_blank">allow access to send e-mails</a>.
+    </p>
+    <form>
+      <mat-form-field class="email-settings-input-field">
+        <input matInput placeholder="E-mail address" value="" name="email"
+          [(ngModel)]="emailSettings.username">
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="email-settings-input-field">
+          <input matInput type="password" placeholder="Password" value="" name="password"
+          [(ngModel)]="emailSettings.password">
+      </mat-form-field>
+      <br/>
+          <button mat-stroked-button (click)="onSubmitEmailServer()">Next</button>
+    </form>
   </mat-step>
 </mat-vertical-stepper>
 

@@ -5,3 +5,14 @@
 .table-container {
     overflow: auto;
 }
+
+.email-body-preview {
+    border-width: 1px;
+    border-color:  grey;
+    border-style: solid;
+    padding: 0.5rem;
+}
+
+.email-settings-input-field {
+    width: 50vw;
+}
