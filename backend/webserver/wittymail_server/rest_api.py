@@ -79,7 +79,7 @@ class SheetView(FlaskView):
         sheet = Sheet.getInstance()
         headers, data = sheet.get_all_content()
 
-        index, frozen_attachments_index, email_to_index, email_cc_index  = sheet.get_column_mappings(["index", "frozen_attachments", "to_column", "cc_column"])
+        index, frozen_attachments_index, email_to_index, email_cc_index  = sheet.get_column_mappings_index(["index", "frozen_attachments", "to_column", "cc_column"])
 
         output_list = []
         for d in data:
@@ -168,10 +168,6 @@ class AttachmentView(FlaskView):
         log.info("Find attachment candidate for row: %s", row)
         # row = ['1', 'Aradhya Karche', 'Nursery- kalewadi', 'Kalubai pratishthan', 'Sanjaysandhu8090@gmail.com', 'Ravi', 'amboreravi@gmail.com', '9822809079']
         sheet = Sheet.getInstance()
-        
-        return (jsonify({'pdfNames': ['Aradhya Karche.pdf'], 'subject': 'Aradhya Karche'}),
-                HTTP_OK,
-                {'ContentType': 'application/json'})
         
         attachment_value = sheet.get_column_value(row, ['attachment_column'])
         log.info("Find attachment candidate for: %s", attachment_value)

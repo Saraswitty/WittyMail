@@ -32,19 +32,22 @@ class Sheet:
       Sheet.filepath = None
       Sheet.__instance = None
    
-   def get_column_mappings(self, column_names):
-      return self.c.get_column_mappings(column_names)
+   def get_column_mappings_index(self, column_names):
+      return self.c.get_column_mappings_index(column_names)
 
+   def get_column_mappings_name(self, column_names):
+      return self.c.get_column_mappings_name(column_names)
+   
    def get_column_value(self, row, column_name):
-      index = self.c.get_column_mappings(column_name)
+      index = self.c.get_column_mappings_name(column_name)
       return row[index[0]]    
 
    def get_header_index_from_name(self, header_name):
       return self.headers.index(header_name)
 
    def set_attachment(self, attachment_name):
-      frozen_attachments = self.c.get_column_mappings(["frozen_attachments"])
-      self.data[frozen_attachments] = attachment_name
+      attachment_index = self.c.get_column_mappings_index(["frozen_attachments"])
+      self.data[attachment_index] = attachment_name
 
    def set_extended_dafault_data(self):
       self.data = self.c.set_default_values(self.data)
@@ -91,11 +94,10 @@ class Sheet:
 
    def set_column_mappings(self, map_info):
       for key in map_info:
-         map_info[key] = self.headers.index(map_info[key])
+         map_info[key] = [map_info[key], self.headers.index(map_info[key])]
       self.c.set_column_mappings(map_info)
    
    def set_column_value(self, row, column, value):
       index = self.c.get_index_from_row(row)
-      column = self.c.get_column_mappings([column])
-      
-      self.data[index][column[0]] = value
+      column_index = self.c.get_column_mappings_index([column])
+      self.data[index][column_index[0]] = value

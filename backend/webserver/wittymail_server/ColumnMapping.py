@@ -9,9 +9,9 @@ class ColumnMapping:
 
     def set_column_mappings(self, map_info):
         self.mapping = map_info
-        self.mapping['status'] = self.column_delta
-        self.mapping['frozen_attachments'] = self.column_delta + 1
-        self.mapping['index'] = self.column_delta + 2
+        self.mapping['status'] = ['status', self.column_delta]
+        self.mapping['frozen_attachments'] = ['frozen_attachments', self.column_delta + 1]
+        self.mapping['index'] = ['index', self.column_delta + 2]
 
     def get_index_from_row(self, row):
         return row['index']
@@ -25,11 +25,20 @@ class ColumnMapping:
     def set_column_mapping(self, map_info):
         self.mapping.append(map_info)
 
-    def get_column_mappings(self, column_names):
+    def get_column_mappings_index(self, column_names):
         column_maps = []
         for c in column_names:
             if c in self.mapping.keys():
-                column_maps.append(self.mapping[c])
+                column_maps.append(self.mapping[c][1])
+            else:
+                column_maps.append(None)
+        return tuple(column_maps)        
+
+    def get_column_mappings_name(self, column_names):
+        column_maps = []
+        for c in column_names:
+            if c in self.mapping.keys():
+                column_maps.append(self.mapping[c][0])
             else:
                 column_maps.append(None)
         return tuple(column_maps)
