@@ -109,9 +109,11 @@ class FileUtils:
 
         for filename in os.listdir(directory):
             if filename.endswith(filetype):
-                for phrase in ignore_phrases:
-                    filename_tmp = filename.lower().replace(phrase.lower(), '')
-                ratio = fuzz.ratio(filename_tmp.lower(), fuzzystring.lower())
+                filename_tmp = filename.lower()
+                if ignore_phrases:
+                    for phrase in ignore_phrases:
+                        filename_tmp = filename_tmp.replace(phrase.lower(), '')
+                ratio = fuzz.ratio(filename_tmp, fuzzystring.lower())
                 candidates[filename] = ratio
         sorted_candidates = sorted(candidates.items(), key=operator.itemgetter(1), reverse=True)
         return [i[0] for i in sorted_candidates][:n]
@@ -136,7 +138,7 @@ class FileUtils:
 
         # Iterate over each index and replace '#i' with l[i] in the input string
         for i in range(len(index)):
-            st = st.replace(substitute[i], l[index[i] - 1])
+            st = st.replace(substitute[i], l[index[i]])
 
         log.debug('template_to_str() final str = %s' % st)
         return st

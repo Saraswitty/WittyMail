@@ -15,20 +15,22 @@ class Email():
   subject_template = None
   body_template = None
   frm = None
+  common_attachment_dir = None
 
-  def __init__(self, to, cc, subject, body, status = None):
-    assert to is not None and                   \
-        cc is not None,                         \
-        log.error('Incorrect value provided to=%s cc=%s' % (to, cc))
-    self.to = to
-    self.cc = cc
+  def __init__(self, tos, ccs, attachments, subject, body, status = None):
+    assert tos is not None, log.error('Incorrect value provided to=%s cc=%s' % (tos, ccs))
+    self.tos = tos
+    self.ccs = ccs
+    self.attachments = attachments
     self.subject = subject
     self.body = body
     self.status = status
-    self.attachment = None
 
   def get_email_from(self):
-    return self.frm
+    return Email.frm
+
+  def set_email_common_attachment_dir(self, attachment_dir):
+    Email.common_attachment_dir = attachment_dir
 
   def __del__(self):
     self.to = None

@@ -2,9 +2,12 @@
 # coding=utf-8
 
 import os, sys
+import re
+import pdb
 
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
+from flask import send_from_directory
 from wittymail_server import flask_app
 from flask import jsonify, request, json, url_for
 from flask_classy import FlaskView, route
@@ -73,30 +76,34 @@ class SheetView(FlaskView):
 
         :return:
         """
-        log.info("URL: %s", url_for('SheetView:some'))
         sheet = Sheet.getInstance()
         headers, data = sheet.get_all_content()
 
-        frozen_attachment_index, email_to_index, email_cc_index, email_subject_index, email_body_index  = sheet.get_column_mappings(["frozen_attachment", "email_to", "email_cc", "email_subject", "email_body"])
+        index, frozen_attachments_index, email_to_index, email_cc_index, email_subject_index, email_body_index  = sheet.get_column_mappings(["index", "frozen_attachments", "to_column", "cc_column", "email_subject", "email_body"])
 
-        # Create fodder_list in email_broker
         output_list = []
         for d in data:
             attachments = []
-            for attachment in d[frozen_attachment_index]:
-                at_dict = {"name": attachment, "url": os.path.join("/attachment/", attachment)}
+            if frozen_attachments_index and d[frozen_attachments_index]:
+                at_dict = {"name": d[frozen_attachments_index], "url": os.path.join("/attachment/file/", d[frozen_attachments_index])}
                 attachments.append(at_dict)
-            email = { \
-                "from": Email.get_email_from(),
-                "to": d[email_to_index],
-                "cc": d[email_cc_index],
-                "attachment": attachments,
-                "subject": d[email_subject_index],
-                "body": d[email_body_index],
-            }
+            
+            email = {}
+            email["from"] = Email.frm
+            if email_to_index:
+                email["to"] = d[email_to_index] 
+            if email_cc_index:
+                email["cc"] = d[email_cc_index] 
+            if len(attachments) != 0:
+                email["attachment"] = attachments
+            if email_subject_index:
+                    email["subject"] = d[email_subject_index]
+            if email_body_index:
+                    email["body"] = d[email_body_index]
 
             tmp = dict(zip(headers, d))
             tmp["email"] = email
+            tmp["index"] = d[index]
             output_list.append(tmp)
 
         return (jsonify({'headers': headers, 'contents': output_list}),
@@ -122,10 +129,26 @@ class SheetView(FlaskView):
 
         :return:
         """
+        request.data
         data = json.loads(request.data)
         sheet = Sheet.getInstance()
         sheet.set_column_mappings(data)
 
+        return (jsonify({}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
+
+    @route('metadata_contents', methods=['POST'])
+    def metadata_contents(self):
+        """
+        Specify email metadata (to, cc etc.) and content templates (subject, body)
+
+        :return:
+        """
+        data = json.loads(request.data)
+ 
+        sheet = Sheet.getInstance()
+        sheet.set_column_mappings(data)
         return (jsonify({}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
@@ -136,18 +159,30 @@ class AttachmentView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @route('get_candidates', methods=['GET'])
+    @route('candidate', methods=['GET'])
     def get_candidates(self):
-        data = json.loads(request.data)
-        row = data['row']
+        row = request.args.get("selected_row")
+
+        row = ['1', 'Aradhya Karche', 'Nursery- kalewadi', 'Kalubai pratishthan', 'Sanjaysandhu8090@gmail.com', 'Ravi', 'amboreravi@gmail.com', '9822809079']
         sheet = Sheet.getInstance()
-        attachment_value = sheet.get_column_value(row, ['attachment'])
-        candidates = FileUtils.find_n_files_by_fuzzymatch(flask_app.config['ATTACHMENTS_DIR'], attachment_value)
-        candidate_list = [{'pdfname': c} for c in candidates]
-        return (jsonify({'candidates': candidate_list}),
+        attachment_value = sheet.get_column_value(row, ['attachment_column'])
+        f = FileUtils()
+        candidates = f.find_n_files_by_fuzzymatch(flask_app.config['ATTACHMENTS_DIR'], attachment_value)
+
+        return (jsonify({'pdfNames': candidates, 'subject': attachment_value}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
-        
+
+    @route('candidate/select', methods=['POST'])
+    def select_candidate(self):
+        data = json.loads(request.data)
+
+        row = data['selected_row']
+        selected_candidate = data['pdfName']
+
+        sheet = Sheet.getInstance()
+        sheet.set_column_value(row, 'frozen_attachments', selected_candidate)
+        return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
 
     @route('upload', methods=['POST'])
     def upload_attachment(self):
@@ -164,10 +199,6 @@ class AttachmentView(FlaskView):
 
             a.save(attachment_save_path)
             log.info('Attachment file saved at: %s', attachment_save_path)
-
-            #emailapi_broker.save_attachment_dir(attachment_dir)
-            # TODO Call change_email_fodder_status() from save_attachment_dir()
-            #emailapi_broker.change_email_fodder_status(a.filename)
 
         elif 'common_attachment' in request.files:
             a = request.files['common_attachment']
@@ -204,7 +235,8 @@ class AttachmentView(FlaskView):
     @route('rotate', methods=['POST'])
     def rotate(self):
         data = json.loads(request.data)
-        filepath = os.path.join(flask_app.config['ATTACHMENTS_DIR'], data['filename'])
+        filename = 'PICT-3.pdf' #data['filename']
+        filepath = os.path.join(flask_app.config['ATTACHMENTS_DIR'], filename)
         
         try:
             util = FileUtils()
@@ -220,6 +252,7 @@ class EmailView(FlaskView):
     APIs for email server, contents and actions
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
+    email_provider_type = None 
 
     @route('server', methods=['POST'])
     def server_details(self):
@@ -232,50 +265,11 @@ class EmailView(FlaskView):
 
         assert len(data['username']) > 0 and len(data['password']) > 0, "username or password not provided"
 
-        smtp_provider_class = email_provider.choose_email_provider("SMTP")
-        self.smtp_provider = smtp_provider_class(data['username'], "smtp.gmail.com", 587, data['username'], data['password'])
+        email_provider = EmailProvider()
+        email_provider_type_class = email_provider.choose_email_provider("SMTP")
+        self.email_provider_type = email_provider_type_class("smtp.gmail.com", 587, data['username'], data['password'])
 
         return (jsonify({'error_message': ""}),
-                HTTP_OK,
-                {'ContentType': 'application/json'})
-
-    @route('template_to_reality', methods=['POST'])
-    def template_to_reality(self):
-        """
-        Convert an email template (subject or body) by replacing column name placeholders with actual data
-
-        :return:
-        """
-        data = json.loads(request.data)
-        fodder = emailapi_broker.get_email_fodder()
-        result_str = emailapi_broker.template_to_str(data['template'], fodder[0])
-
-        return (jsonify({'reality': result_str}),
-                HTTP_OK,
-                {'ContentType': 'application/json'})
-
-    @route('metadata_contents', methods=['POST'])
-    def metadata_contents(self):
-        """
-        Specify email metadata (to, cc etc.) and content templates (subject, body)
-
-        :return:
-        """
-        data = json.loads(request.data)
-        if data['to_column'] == None or data['cc_column'] == None or data['subject_template'] == None or data[
-            'body_template'] == None:
-            return (jsonify({'error_message': "to, cc, subject or body not provided"}),
-                    HTTP_BAD_INPUT,
-                    {'ContentType': 'application/json'})
-
-        e = emailapi_broker.save_extended_fodder(data['to_column'], data['cc_column'], data['subject_template'],
-                                                 data['body_template'])
-        if e[0] is not 0:
-            return (jsonify({"err_msg": e[1]}),
-                    HTTP_BAD_INPUT,
-                    {'ContentType': 'application/json'})
-
-        return (jsonify({}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
@@ -286,21 +280,7 @@ class EmailView(FlaskView):
 
         :return:
         """
-        try:
-            data = json.loads(request.data)
-            tos = []
-            tos.append(data['to'])
-            e = emailapi_broker.test_email(tos)
-            if e[0] is not 0:
-                return (jsonify({"err_msg": e[1]}),
-                        HTTP_BAD_INPUT,
-                        {'ContentType': 'application/json'})
-
-            return (jsonify({}),
-                    HTTP_OK,
-                    {'ContentType': 'application/json'})
-        except:
-            log.exception("Failed to send test email")
+        pass
 
     @route('send', methods=['POST'])
     def send(self):
@@ -323,9 +303,11 @@ class EmailView(FlaskView):
             for a in at:
                 attachments.append(a["name"])
 
-            e = emailapi_broker.send_email(data['from'], tos, data['subject'], data['body'], ccs, attachments)
-            if e[0] is not 0:
-                return (jsonify({"err_msg": e[1]}),
+            e = Email(tos, ccs, attachments, data['subject'], data['body'], flask_app.config['COMMON_ATTACHMENTS_DIR'])
+            self.email_provider_type()
+            err = email_provider_type.send_email(e)
+            if err[0] != 0:
+                return (jsonify({"err_msg": err[1]}),
                         HTTP_BAD_INPUT,
                         {'ContentType': 'application/json'})
 
@@ -334,6 +316,28 @@ class EmailView(FlaskView):
                     {'ContentType': 'application/json'})
         except:
             log.exception("Failed to send email")
+
+    @route('template_to_reality', methods=['POST'])
+    def template_to_reality(self):
+        """
+        Convert an email template (subject or body) by replacing column name placeholders with actual data
+
+        :return:
+        """
+        template = json.loads(request.data)['template']
+        header_names = re.findall("{.*?}", template)
+
+        sheet = Sheet.getInstance()
+        for header_name in header_names:
+            header_name = header_name[1:-1]
+            header_index = sheet.get_header_index_from_name(header_name)
+            template = template.replace('{' + header_name + '}', '#' + str(header_index))
+            
+        result_str = sheet.template_to_str(template)
+
+        return (jsonify({'reality': result_str}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
 
 
 SheetView.register(flask_app)

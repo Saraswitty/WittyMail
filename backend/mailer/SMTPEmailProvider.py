@@ -9,16 +9,17 @@ from email import encoders
 import os
 import util.logger as logger
 from mailer.EmailProvider import EmailProvider
+from os import listdir 
+from os.path import isfile
 
 log = logger.get_logger(__name__)
 
 class SMTPEmailProvider(EmailProvider):
-    def __init__(self, frm, server, port, username, password):
+    def __init__(self, server, port, username, password):
         EmailProvider.__init__(self)
         assert server is not None and port is not None and username is not None and password is not None,\
             log.error('server, port number, username or password is None')
 
-        self.frm = frm
         self.server = server
         self.port = port
         self.username = username
@@ -68,8 +69,12 @@ class SMTPEmailProvider(EmailProvider):
             msg['Subject'] = e.subject
             msg.attach(MIMEText(e.body, 'html'))  
             
-            if (e.attachment is not None):
-                for attachment in e.attachment:
+            common_attachments = [f for f in listdir(e.common_attachment_dir) if isfile(join(e.common_attachment_dir, f))]
+            
+            attachments = e.attachments + common_attachments
+
+            if (attachments is not None):
+                for attachment in attachments:
                     if not os.path.isfile(attachment):
                         return [-1, 'Attachment not found'] 
                     try:
