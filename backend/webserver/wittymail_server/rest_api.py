@@ -285,7 +285,34 @@ class EmailView(FlaskView):
 
         :return:
         """
-        pass
+        try:
+            data = json.loads(request.data)
+
+            tos = []
+            tos.append(Email.frm)
+
+            ccs = []
+            ccs.append(Email.frm)
+
+            attachments = []
+            at = data['attachment']
+            for a in at:
+                attachments.append(a["name"])
+
+            e = Email(tos, ccs, attachments, data['subject'], data['body'], flask_app.config['COMMON_ATTACHMENTS_DIR'])
+            self.email_provider_type()
+            err = email_provider_type.send_email(e)
+            if err[0] != 0:
+                return (jsonify({"err_msg": err[1]}),
+                        HTTP_BAD_INPUT,
+                        {'ContentType': 'application/json'})
+
+            return (jsonify({}),
+                    HTTP_OK,
+                    {'ContentType': 'application/json'})
+        except:
+            log.exception("Failed to send email")
+        
 
     @route('send', methods=['POST'])
     def send(self):
