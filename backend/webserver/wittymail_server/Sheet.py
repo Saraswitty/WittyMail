@@ -1,6 +1,8 @@
 from util.FileUtils import FileUtils
 from wittymail_server.ColumnMapping import ColumnMapping
 import pdb
+import re
+
 class Sheet:
    __instance = None
    filepath = None
@@ -69,6 +71,17 @@ class Sheet:
 
    def get_extended_headers(self):
       return self.extended_headers
+
+   def _template_to_str(self, template, list_ = None):
+      header_names = re.findall("{.*?}", template)
+
+      # TODO Modify template_to_str to support header name instead of header_index
+      for header_name in header_names:
+         header_name = header_name[1:-1]
+         header_index = self.get_header_index_from_name(header_name)
+         template = template.replace('{' + header_name + '}', '#' + str(header_index))
+
+      return self.template_to_str(template, list_)
 
    def template_to_str(self, st, list_ = None):
       f = FileUtils()

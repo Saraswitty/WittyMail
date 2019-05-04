@@ -79,7 +79,7 @@ class SheetView(FlaskView):
         sheet = Sheet.getInstance()
         headers, data = sheet.get_all_content()
 
-        index, frozen_attachments_index, email_to_index, email_cc_index, email_subject_index, email_body_index  = sheet.get_column_mappings(["index", "frozen_attachments", "to_column", "cc_column", "email_subject", "email_body"])
+        index, frozen_attachments_index, email_to_index, email_cc_index  = sheet.get_column_mappings(["index", "frozen_attachments", "to_column", "cc_column"])
 
         output_list = []
         for d in data:
@@ -96,10 +96,12 @@ class SheetView(FlaskView):
                 email["cc"] = d[email_cc_index] 
             if len(attachments) != 0:
                 email["attachment"] = attachments
-            if email_subject_index:
-                    email["subject"] = d[email_subject_index]
-            if email_body_index:
-                    email["body"] = d[email_body_index]
+            if Email.subject_template:
+                    sheet = Sheet.getInstance()
+                    email["subject"] = sheet._template_to_str(Email.subject_template, d)
+            if Email.body_template:
+                    sheet = Sheet.getInstance()
+                    email["body"] = sheet._template_to_str(Email.subject_template, d)
 
             tmp = dict(zip(headers, d))
             tmp["email"] = email
@@ -141,14 +143,15 @@ class SheetView(FlaskView):
     @route('metadata_contents', methods=['POST'])
     def metadata_contents(self):
         """
-        Specify email metadata (to, cc etc.) and content templates (subject, body)
+        Specify email metadata content templates (subject, body)
 
         :return:
         """
         data = json.loads(request.data)
  
-        sheet = Sheet.getInstance()
-        sheet.set_column_mappings(data)
+        Email.subject_template = data['subject_template']
+        Email.body_template = data['body_template']
+
         return (jsonify({}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
@@ -265,6 +268,8 @@ class EmailView(FlaskView):
 
         assert len(data['username']) > 0 and len(data['password']) > 0, "username or password not provided"
 
+        Email.frm = data['username']
+
         email_provider = EmailProvider()
         email_provider_type_class = email_provider.choose_email_provider("SMTP")
         self.email_provider_type = email_provider_type_class("smtp.gmail.com", 587, data['username'], data['password'])
@@ -325,15 +330,9 @@ class EmailView(FlaskView):
         :return:
         """
         template = json.loads(request.data)['template']
-        header_names = re.findall("{.*?}", template)
 
         sheet = Sheet.getInstance()
-        for header_name in header_names:
-            header_name = header_name[1:-1]
-            header_index = sheet.get_header_index_from_name(header_name)
-            template = template.replace('{' + header_name + '}', '#' + str(header_index))
-            
-        result_str = sheet.template_to_str(template)
+        result_str = sheet._template_to_str(template)
 
         return (jsonify({'reality': result_str}),
                 HTTP_OK,

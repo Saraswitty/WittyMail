@@ -29,6 +29,9 @@ class Email():
   def get_email_from(self):
     return Email.frm
 
+  def set_email_frm(self, frm):
+    Email.frm = frm
+
   def set_email_common_attachment_dir(self, attachment_dir):
     Email.common_attachment_dir = attachment_dir
 
