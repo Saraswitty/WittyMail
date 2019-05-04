@@ -4,7 +4,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { LoggerService } from '../util/logger.service';
 import { MatStepper } from '@angular/material';
 import { FileUploader } from 'ng2-file-upload';
-import { BackendService, AttachmentRotation, ColumnHeadersWithRowContent, CandidateAttachmentSelection, CandidateAttachments } from '../backend.service';
+import { BackendService, AttachmentRotation, ColumnHeadersWithRowContent, CandidateAttachmentSelection, CandidateAttachments, CandidateAttachmentsInput } from '../backend.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 
 @Component({
@@ -101,7 +101,11 @@ export class AttachmentsComponent implements OnInit {
     this.log.info(row)
     this.selectedRow = row;
 
-    this.backend.getCandidateAttachments(row).subscribe(
+    let payload: CandidateAttachmentsInput = {
+      selected_row: JSON.stringify(row) 
+    }
+
+    this.backend.getCandidateAttachments(payload).subscribe(
       data => {
         this.log.info("Got attachment candidates: ", data);
         let d: CandidateAttachments = <CandidateAttachments> data;
@@ -149,14 +153,14 @@ export class AttachmentsComponent implements OnInit {
   }
 
   onSelectCandidatePDF(candidate) {
-    this.log.info("Showing PDF for: ", candidate.pdfName);
+    this.log.info("Showing PDF for: ", candidate);
     this.selectedPDF = candidate;
-    this._setPDFViewerHTML(this.backend.urls.attachment.get_file + candidate.pdfName);
+    this._setPDFViewerHTML(this.backend.urls.attachment.get_file + candidate);
   }
 
   onClickRotate(direction: string) {
     let rotation: AttachmentRotation = {
-      filename: this.selectedPDF.pdfName,
+      filename: this.selectedPDF,
       direction: direction
     };
 

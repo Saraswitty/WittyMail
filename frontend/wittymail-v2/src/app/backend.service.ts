@@ -229,7 +229,8 @@ export class BackendService {
   }
 
   getCandidateAttachments(selected_row: CandidateAttachmentsInput): Observable<CandidateAttachments> {
-    return this.http.get<CandidateAttachments>(this.urls.attachment.candidate)
+    return this.http.get<CandidateAttachments>(this.urls.attachment.candidate, 
+      {params: {'selected_row': selected_row.selected_row}})
       .pipe(
         catchError(this.handleError('getCandidateAttachments'))
       );

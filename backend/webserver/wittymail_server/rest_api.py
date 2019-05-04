@@ -162,13 +162,19 @@ class AttachmentView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
 
-    @route('candidate', methods=['GET'])
-    def get_candidates(self):
+    def candidate(self):
         row = request.args.get("selected_row")
-
-        row = ['1', 'Aradhya Karche', 'Nursery- kalewadi', 'Kalubai pratishthan', 'Sanjaysandhu8090@gmail.com', 'Ravi', 'amboreravi@gmail.com', '9822809079']
+        row = json.loads(row)
+        log.info("Find attachment candidate for row: %s", row)
+        # row = ['1', 'Aradhya Karche', 'Nursery- kalewadi', 'Kalubai pratishthan', 'Sanjaysandhu8090@gmail.com', 'Ravi', 'amboreravi@gmail.com', '9822809079']
         sheet = Sheet.getInstance()
+        
+        return (jsonify({'pdfNames': ['Aradhya Karche.pdf'], 'subject': 'Aradhya Karche'}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
+        
         attachment_value = sheet.get_column_value(row, ['attachment_column'])
+        log.info("Find attachment candidate for: %s", attachment_value)
         f = FileUtils()
         candidates = f.find_n_files_by_fuzzymatch(flask_app.config['ATTACHMENTS_DIR'], attachment_value)
 
@@ -238,7 +244,7 @@ class AttachmentView(FlaskView):
     @route('rotate', methods=['POST'])
     def rotate(self):
         data = json.loads(request.data)
-        filename = 'PICT-3.pdf' #data['filename']
+        filename = data['filename']
         filepath = os.path.join(flask_app.config['ATTACHMENTS_DIR'], filename)
         
         try:
