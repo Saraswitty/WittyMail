@@ -101,7 +101,7 @@ class SheetView(FlaskView):
                     email["subject"] = sheet._template_to_str(Email.subject_template, d)
             if Email.body_template:
                     sheet = Sheet.getInstance()
-                    email["body"] = sheet._template_to_str(Email.subject_template, d)
+                    email["body"] = sheet._template_to_str(Email.body_template, d)
 
             tmp = dict(zip(headers, d))
             tmp["email"] = email
@@ -275,7 +275,8 @@ class EmailView(FlaskView):
         email_provider = EmailProvider()
         email_provider_type_class = email_provider.choose_email_provider("SMTP")
         self.email_provider_type = email_provider_type_class("smtp.gmail.com", 587, data['username'], data['password'])
-
+        self.email_provider_type.login()
+        
         return (jsonify({'error_message': ""}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
