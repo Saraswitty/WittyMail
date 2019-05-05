@@ -11,6 +11,9 @@
     border-color:  grey;
     border-style: solid;
     padding: 0.5rem;
+    height: 100%;
+    overflow: auto;
+
 }
 
 .email-settings-input-field {

@@ -140,22 +140,6 @@ class SheetView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @route('metadata_contents', methods=['POST'])
-    def metadata_contents(self):
-        """
-        Specify email metadata content templates (subject, body)
-
-        :return:
-        """
-        data = json.loads(request.data)
- 
-        Email.subject_template = data['subject_template']
-        Email.body_template = data['body_template']
-
-        return (jsonify({}),
-                HTTP_OK,
-                {'ContentType': 'application/json'})
-
 class AttachmentView(FlaskView):
     """
     APIs for attachments to be used with the Sheet (by mapping) and sent with emails
@@ -258,6 +242,22 @@ class EmailView(FlaskView):
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
     email_provider_type = None 
+
+    @route('metadata_contents', methods=['POST'])
+    def metadata_contents(self):
+        """
+        Specify email metadata content templates (subject, body)
+
+        :return:
+        """
+        data = json.loads(request.data)
+        log.info("Got email metadata: %s", data)
+        Email.subject_template = data['subject_template']
+        Email.body_template = data['body_template']
+
+        return (jsonify({}),
+                HTTP_OK,
+                {'ContentType': 'application/json'})
 
     @route('server', methods=['POST'])
     def server_details(self):

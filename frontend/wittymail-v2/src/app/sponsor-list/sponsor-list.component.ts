@@ -123,7 +123,6 @@ export class SponsorListComponent implements OnInit {
     this.log.info("Selected columns: ", mapping);
 
     // TODO: Do we need this after refactoring?
-    this.backend.saveEmailToCCColumns(mapping.to_column, mapping.cc_column);
     this.backend.saveAttachmentMetadata(mapping.attachment_column);
 
     this.backend.postColumnMapping(mapping).subscribe(

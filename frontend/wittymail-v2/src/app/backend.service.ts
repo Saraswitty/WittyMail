@@ -22,8 +22,6 @@ export interface ColumnMappings {
 }
 
 export interface EmailMetadata {
-  to_column: string;
-  cc_column: string;
   subject_template: string;
   body_template: string;
 }
@@ -201,13 +199,6 @@ export class BackendService {
       );
   }
 
-  saveEmailToCCColumns(to_column: string, cc_column: string) {
-    this.emailMetadataInstance.to_column = to_column;
-    this.emailMetadataInstance.cc_column = cc_column;
-
-    this.log.info("emailMetadataInstance: ", this.emailMetadataInstance);
-  }
-
   saveEmailSubjectBodyTemplate(subject_template: string, body_template: string) {
     this.emailMetadataInstance.subject_template = subject_template;
     this.emailMetadataInstance.body_template = body_template;
@@ -251,9 +242,8 @@ export class BackendService {
       );
   }
 
-  postEmailMetadata(): Observable<string> {
-    this.log.info("POSTing email metadata: ", this.emailMetadataInstance);
-    return this.http.post<string>(this.urls.email.set_metadata_and_contents, this.emailMetadataInstance)
+  postEmailMetadata(templates: EmailMetadata): Observable<string> {
+    return this.http.post<string>(this.urls.email.set_metadata_and_contents, templates)
       .pipe(
         catchError(this.handleError('postEmailMetadata'))
       );

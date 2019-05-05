@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { LoggerService } from '../util/logger.service';
 import { MatInput, MatStepper } from '@angular/material';
-import { BackendService, ColumnHeadersWithRowContent, TemplateInput, TemplateOutput, EmailServerDetails } from '../backend.service';
+import { BackendService, ColumnHeadersWithRowContent, TemplateInput, TemplateOutput, EmailServerDetails, EmailMetadata } from '../backend.service';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 
 enum LastFocusedInput {
@@ -130,10 +130,27 @@ export class EmailDesignComponent implements OnInit {
     );
   }
 
+  onSubmitEmailTemplates() {
+    let payload: EmailMetadata = {
+      body_template: this.bodyTemplate,
+      subject_template: this.subjectTemplate
+    }
+    this.log.info("Posting email templates: ", payload);
+    this.backend.postEmailMetadata(payload).subscribe(
+      data => {
+        this.log.info("Email metadata posted, moving on...");
+        this.stepper.next();
+      },
+      error => {
+        this.errorDialog.showError(error.error_message);
+      }
+    );
+  }
+
   onSubmitEmailServer() {
     this.backend.postEmailServerDetails(this.emailSettings).subscribe(
       data => {
-        this.log.info("Email server detailes posted, moving on...");
+        this.log.info("Email server details posted, moving on...");
         this.mainStepper.next();
       },
       error => {
