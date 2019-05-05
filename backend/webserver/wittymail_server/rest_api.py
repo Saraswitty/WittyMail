@@ -156,7 +156,18 @@ class AttachmentView(FlaskView):
         attachment_value = sheet.get_column_value(row, ['attachment_column'])
         log.info("Find attachment candidate for: %s", attachment_value)
         f = FileUtils()
-        candidates = f.find_n_files_by_fuzzymatch(flask_app.config['ATTACHMENTS_DIR'], attachment_value)
+
+        phrases = [
+            'nursery',
+            'kothrud',
+            'balaji',
+            'nagar',
+            'junior',
+            'kg',
+            'jr',
+            'kg',            
+        ]
+        candidates = f.find_n_files_by_fuzzymatch(flask_app.config['ATTACHMENTS_DIR'], attachment_value, ignore_phrases = phrases)
 
         return (jsonify({'pdfNames': candidates, 'subject': attachment_value}),
                 HTTP_OK,
@@ -241,7 +252,7 @@ class EmailView(FlaskView):
     APIs for email server, contents and actions
     """
     route_prefix = flask_app.config['URL_DEFAULT_PREFIX_FOR_API']
-    email_provider_type = None 
+    email_provider_type = None
 
     @route('metadata_contents', methods=['POST'])
     def metadata_contents(self):
@@ -274,8 +285,8 @@ class EmailView(FlaskView):
 
         email_provider = EmailProvider()
         email_provider_type_class = email_provider.choose_email_provider("SMTP")
-        self.email_provider_type = email_provider_type_class("smtp.gmail.com", 587, data['username'], data['password'])
-        self.email_provider_type.login()
+        EmailView.email_provider_type = email_provider_type_class("smtp.gmail.com", 587, data['username'], data['password'])
+        EmailView.email_provider_type.login()
         
         return (jsonify({'error_message': ""}),
                 HTTP_OK,
@@ -289,7 +300,7 @@ class EmailView(FlaskView):
         :return:
         """
         try:
-            data = json.loads(request.data)
+            data = json.loads(request.data)['email']
 
             tos = []
             tos.append(Email.frm)
@@ -302,9 +313,9 @@ class EmailView(FlaskView):
             for a in at:
                 attachments.append(a["name"])
 
-            e = Email(tos, ccs, attachments, data['subject'], data['body'], flask_app.config['COMMON_ATTACHMENTS_DIR'])
-            self.email_provider_type()
-            err = email_provider_type.send_email(e)
+            Email.common_attachment_dir = flask_app.config['COMMON_ATTACHMENTS_DIR']
+            e = Email(tos, ccs, attachments, data['subject'], data['body'])
+            err = self.email_provider_type.send_email(e)
             if err[0] != 0:
                 return (jsonify({"err_msg": err[1]}),
                         HTTP_BAD_INPUT,
@@ -316,7 +327,6 @@ class EmailView(FlaskView):
         except:
             log.exception("Failed to send email")
         
-
     @route('send', methods=['POST'])
     def send(self):
         """
@@ -339,8 +349,7 @@ class EmailView(FlaskView):
                 attachments.append(a["name"])
 
             e = Email(tos, ccs, attachments, data['subject'], data['body'], flask_app.config['COMMON_ATTACHMENTS_DIR'])
-            self.email_provider_type()
-            err = email_provider_type.send_email(e)
+            err = self.email_provider_type.send_email(e)
             if err[0] != 0:
                 return (jsonify({"err_msg": err[1]}),
                         HTTP_BAD_INPUT,

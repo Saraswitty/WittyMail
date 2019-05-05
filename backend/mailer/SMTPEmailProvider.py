@@ -11,6 +11,7 @@ import util.logger as logger
 from mailer.EmailProvider import EmailProvider
 from os import listdir 
 from os.path import isfile
+import pdb
 
 log = logger.get_logger(__name__)
 
@@ -55,13 +56,13 @@ class SMTPEmailProvider(EmailProvider):
             log.debug("Cleaned body: %s", body)
             
             msg = MIMEMultipart() 
-            msg['From'] = self.frm
-            msg['To'] = ", ".join(e.to)
+            msg['From'] = e.frm
+            msg['To'] = ", ".join(e.tos)
             
             ccs_to_send = []
-            if e.cc is not None and e.cc[0] != 'None':
-                msg['Cc'] = ", ".join(e.cc)
-                for cc in e.cc:
+            if e.ccs is not None and e.ccs[0] != 'None':
+                msg['Cc'] = ", ".join(e.ccs)
+                for cc in e.ccs:
                     ccs_to_send.append(cc.strip())
             else:
                 log.debug('No cc mailer provided')
@@ -69,9 +70,13 @@ class SMTPEmailProvider(EmailProvider):
             msg['Subject'] = e.subject
             msg.attach(MIMEText(e.body, 'html'))  
             
-            common_attachments = [f for f in listdir(e.common_attachment_dir) if isfile(join(e.common_attachment_dir, f))]
-            
-            attachments = e.attachments + common_attachments
+            common_attachments = listdir(e.common_attachment_dir)
+            common_attachments = [os.path.join(e.common_attachment_dir, ca) for ca in common_attachments]
+        
+            attachments_dir = os.path.dirname(e.common_attachment_dir)
+            attachments = [os.path.join(attachments_dir, a) for a in e.attachments]
+
+            attachments = attachments + common_attachments
 
             if (attachments is not None):
                 for attachment in attachments:
@@ -91,10 +96,11 @@ class SMTPEmailProvider(EmailProvider):
             msg_str = msg.as_string()
             log.debug("ccs_to_send: %s", ccs_to_send)
             if ccs_to_send:
-                self.s.sendmail(msg['From'], e.to + ccs_to_send, msg_str) 
+                self.s.sendmail(msg['From'], e.tos + ccs_to_send, msg_str) 
             else:
-                self.s.sendmail(msg['From'], e.to, msg_str) 
+                self.s.sendmail(msg['From'], e.tos, msg_str) 
                 log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
             return [0, 'Email sent successfully']
         except:
             log.exception("Failed to send test email")
+            return [-1, 'Error']
