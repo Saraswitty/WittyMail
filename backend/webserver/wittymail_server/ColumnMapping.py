@@ -14,11 +14,11 @@ class ColumnMapping:
         self.mapping['index'] = ['index', self.column_delta + 2]
 
     def get_index_from_row(self, row):
-        return row['index']
+        return int(row['index'])
 
     def set_default_values(self, data):
         for i in range(0, len(data)):
-            data[i].extend([None, None])
+            data[i].extend(['Attachment Pending', 'None'])
             data[i].append(i)
         return data
 

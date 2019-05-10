@@ -2,13 +2,14 @@ from util.FileUtils import FileUtils
 from wittymail_server.ColumnMapping import ColumnMapping
 import pdb
 import re
+from util.FileUtils import FileUtils
 
 class Sheet:
    __instance = None
    filepath = None
    headers = []
    data = []
-   extended_headers = ["status", "frozen_attachments"]
+   extended_headers = ["status", "frozen_attachments", "index"]
    c = ColumnMapping()
 
    @staticmethod
@@ -25,7 +26,6 @@ class Sheet:
       else:
          Sheet.__instance = self
          Sheet.filepath = filepath
-         Sheet.extended_headers = ["ID", "Attachment Name", "Status"]
 
    def __del__(self):
       Sheet.rows = []
@@ -42,6 +42,17 @@ class Sheet:
       index = self.c.get_column_mappings_name(column_name)
       return row[index[0]]    
 
+   def get_count_of_column_value_from_data(self, row, column_name):
+      index = self.c.get_index_from_row(row)
+      column_index = self.c.get_column_mappings_index([column_name])[0]
+      f = FileUtils()
+      return len(f.sanitize_names_str(self.data[index][column_index]))
+
+   def get_column_value_from_data(self, row, column_name):
+      index = self.c.get_index_from_row(row)
+      column_index = self.c.get_column_mappings_index([column_name])[0]
+      return self.data[index][column_index]
+
    def get_header_index_from_name(self, header_name):
       return self.headers.index(header_name)
 
@@ -56,12 +67,25 @@ class Sheet:
       f = FileUtils()
       self.headers, self.data = f.read_excel_to_memory(self.filepath)
       data_width = len(self.data[0])
-      self.c.set_column_delta(data_width)
-      self.set_extended_dafault_data()
 
-   def save_to_file(self):
+      if ('status' in self.headers):
+         data_width -= 3
+      else:
+         self.set_extended_dafault_data()
+
+      self.c.set_column_delta(data_width)
+
+   def add_extended_headers(self, headers_):
+      if ('status' not in self.headers):
+         headers_.extend(self.extended_headers)
+      return headers_
+
+   def save_to_file(self, outfile = 'outfile.xlsx'):
       f = FileUtils()
-      return f.save_to_excel(self.headers + self.data)
+      extended_headers = self.add_extended_headers(self.headers)
+      data = [extended_headers]
+      data.extend(self.data)
+      return f.save_to_excel(data, outfile)
 
    def get_headers_with_sample_rows(self, row_count = 5):
       data = []
@@ -99,5 +123,5 @@ class Sheet:
    
    def set_column_value(self, row, column, value):
       index = self.c.get_index_from_row(row)
-      column_index = self.c.get_column_mappings_index([column])
-      self.data[index][column_index[0]] = value
+      column_index = self.c.get_column_mappings_index([column])[0]
+      self.data[index][column_index] = value
