@@ -1,3 +1,33 @@
-<p>
-  summary works!
-</p>
+<button mat-stroked-button color="primary" (click)="onSendSelectedEmails()">Send selected emails</button>
+<div class="table-container">
+  <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1 sheet-contents-table">
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+    </ng-container>
+    <div *ngFor="let header of headers">
+      <ng-container matColumnDef="{{header}}">
+        <th mat-header-cell *matHeaderCellDef class="wrap"> 
+            {{header}}
+        </th>
+        <td mat-cell *matCellDef="let element" class="wrap"> 
+          {{element[header]}} 
+        </td>
+      </ng-container>
+    </div>
+    <tr mat-header-row *matHeaderRowDef="displayedHeaders"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedHeaders;" (click)="selection.toggle(row)"></tr>
+  </table>
+</div>
+
+<app-error-dialog #errorDialog></app-error-dialog>
