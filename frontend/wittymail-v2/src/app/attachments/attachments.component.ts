@@ -130,6 +130,7 @@ export class AttachmentsComponent implements OnInit {
     this.backend.selectAttachmentCandidate(payload).subscribe(
       data => {
         this.selectedRow = null;
+        this.selectedAttachmentCandidate = null;
       },
       error => {
         this.errorDialog.showError("Failed to select this candidate: " + error);
