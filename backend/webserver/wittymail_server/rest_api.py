@@ -4,7 +4,7 @@
 import os, sys
 import re
 import pdb
-
+import copy
 sys.path.append(os.path.abspath(os.path.join(os.curdir, '..', '..')))
 
 from flask import send_from_directory
@@ -70,7 +70,11 @@ class SheetView(FlaskView):
 
         return send_file(excel_file)
 
-    def _convert_header_data_list_to_dict(self, headers, extended_headers, data):
+    def _convert_header_data_list_to_dict(self, headers_, extended_headers_, data_):
+            headers = copy.deepcopy(headers_)
+            extended_headers  = copy.deepcopy(extended_headers_)
+            data = copy.deepcopy(data_)
+
             dict_ = dict(zip(headers, data))
             extended_headers.reverse()
             data.reverse()
