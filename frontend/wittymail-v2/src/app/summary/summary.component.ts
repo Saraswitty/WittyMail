@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { LoggerService } from '../util/logger.service';
 import { BackendService, ColumnHeadersWithRowContent } from '../backend.service';
-import { MatStepper, MatDialog } from '@angular/material';
+import { MatStepper, MatDialog, MatTableDataSource, MatSort } from '@angular/material';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { SingleEmailDialogComponent } from './single-email-dialog/single-email-dialog.component';
@@ -14,14 +14,16 @@ import { SingleEmailDialogComponent } from './single-email-dialog/single-email-d
 export class SummaryComponent implements OnInit {
 
   @Input('mainStepper') mainStepper: MatStepper;
+  @ViewChild(MatSort) sortedTable: MatSort;
   @ViewChild('errorDialog') errorDialog: ErrorDialogComponent;
 
   /** List of strings, each being the heading text for a column */
   headers = [];
-  displayedHeaders = ['select'];
+  defaultDisplayedHeaders = ['select', 'view-email']
+  displayedHeaders = [];
 
   /** Data displayed in the table */
-  sheetContents = [];
+  sheetContents = null;
 
   selection = new SelectionModel<any>(true, []);
 
@@ -42,13 +44,16 @@ export class SummaryComponent implements OnInit {
       data => {
         let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
 
-        this.headers = this.headers.concat(r.headers);
-        this.headers = this.headers.concat(r.extended_headers);
+        this.headers = r.headers;
+        if (r.extended_headers && r.extended_headers.length) {
+          this.headers = this.headers.concat(r.extended_headers);
+        }
+        this.displayedHeaders = this.defaultDisplayedHeaders;
         this.displayedHeaders = this.displayedHeaders.concat(this.headers);
-        this.displayedHeaders = this.displayedHeaders.concat(["view-email"]);
-        this.sheetContents = r.contents;
+        this.sheetContents = new MatTableDataSource(r.contents);
+        this.sheetContents.sort = this.sortedTable;
     
-        this.log.info("Using %s headers and %d rows", this.headers, this.sheetContents.length);
+        this.log.info("Using %d headers and %d rows", this.headers.length, this.sheetContents.length);
       },
       error => {
         this.errorDialog.showError("Failed to get contents of the Excel sheet: " + error);

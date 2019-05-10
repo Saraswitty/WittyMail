@@ -12,6 +12,12 @@ table {
     margin: 15px 0;
 }
 
+.attachment-cadidates-list-container {
+    height: 30%;
+    overflow: auto;
+    margin-bottom: 0.3rem;
+}
+
 .attachment-candidate-list-item {
     margin: 5px;
 }
@@ -44,4 +50,8 @@ button {
 .summary-table-container {
     height: 100vh;
     overflow: auto;
+}
+
+.next-button {
+    text-align: right;
 }

@@ -130,6 +130,7 @@ export class AttachmentsComponent implements OnInit {
     this.backend.selectAttachmentCandidate(payload).subscribe(
       data => {
         this.selectedRow = null;
+        this.selectedAttachmentCandidate = null;
       },
       error => {
         this.errorDialog.showError("Failed to select this candidate: " + error);
@@ -175,6 +176,11 @@ export class AttachmentsComponent implements OnInit {
         this.errorDialog.showError("Failed to rotate PDF: " + error);
       }
     );
+  }
+
+  onClickNext() {
+    this.log.info("Done selecting attachment PDFs, moving on...");
+    this.mainStepper.next();
   }
 
 }

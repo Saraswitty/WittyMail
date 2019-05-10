@@ -11,7 +11,7 @@ import {MatStepperModule} from '@angular/material/stepper';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatTableModule} from '@angular/material/table';
 import {MatRadioModule} from '@angular/material/radio';
-import {MatIconModule, MatCheckboxModule} from '@angular/material';
+import {MatIconModule, MatCheckboxModule, MatSortModule} from '@angular/material';
 import {MatMenuModule} from '@angular/material/menu'; 
 import {MatDialogModule} from '@angular/material/dialog'; 
 import {MatTabsModule} from '@angular/material/tabs';
@@ -68,7 +68,8 @@ import { SingleEmailDialogComponent } from './summary/single-email-dialog/single
     MatDialogModule,
     MatTabsModule,
     MatSnackBarModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSortModule
   ],
   providers: [
     { provide: LoggerService, useClass: ConsoleLoggerService }
