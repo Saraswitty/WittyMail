@@ -8,6 +8,10 @@
     width: 100%;
 }
 
+.top-action-button {
+    margin: 0.3rem;
+}
+
 .wrap{
     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
     white-space: -webkit-pre-wrap; /*Chrome & Safari */ 

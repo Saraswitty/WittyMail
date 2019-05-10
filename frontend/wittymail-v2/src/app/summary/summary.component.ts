@@ -27,10 +27,21 @@ export class SummaryComponent implements OnInit {
 
   selection = new SelectionModel<any>(true, []);
 
+  downloadSheetUrl: string = '';
+
   constructor(private log: LoggerService, private backend: BackendService,
     public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.downloadSheetUrl = this.backend.getSheetDownloadUrl();
+    /* Cache buster, because the sheet will have the same name */
+    this.downloadSheetUrl += "?" + Math.random();
+  }
+
+  onClickDownloadSheet() {
+    this.downloadSheetUrl = this.backend.getSheetDownloadUrl();
+    /* Cache buster, because the sheet will have the same name */
+    this.downloadSheetUrl += "?" + Math.random();
   }
 
   /**
@@ -44,9 +55,10 @@ export class SummaryComponent implements OnInit {
       data => {
         let r: ColumnHeadersWithRowContent = <ColumnHeadersWithRowContent> data;
 
-        this.headers = r.headers;
         if (r.extended_headers && r.extended_headers.length) {
-          // this.headers = this.headers.concat(r.extended_headers);
+          this.headers = r.extended_headers.concat(r.headers);
+        } else {
+          this.headers = r.headers;
         }
         this.displayedHeaders = this.defaultDisplayedHeaders;
         this.displayedHeaders = this.displayedHeaders.concat(this.headers);

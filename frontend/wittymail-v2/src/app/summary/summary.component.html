@@ -1,4 +1,5 @@
-<button mat-stroked-button color="primary" (click)="onSendSelectedEmails()">Send selected emails</button>
+<button mat-stroked-button color="primary" (click)="onSendSelectedEmails()" class="top-action-button">Send selected emails</button>
+<a href="{{downloadSheetUrl}}"><button mat-stroked-button class="top-action-button" (click)="onClickDownloadSheet()">Download Sheet</button></a>
 <div class="table-container">
   <table mat-table [dataSource]="sheetContents" matSort class="mat-elevation-z1 sheet-contents-table">
     <!-- Selection box -->

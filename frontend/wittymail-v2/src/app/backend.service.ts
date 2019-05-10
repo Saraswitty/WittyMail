@@ -170,7 +170,7 @@ export class BackendService {
     return this.urls.sheet.upload;
   }
 
-  getFodderDownloadUrl(): string {
+  getSheetDownloadUrl(): string {
     return this.urls.sheet.get_file;
   }
 
