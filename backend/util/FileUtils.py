@@ -106,7 +106,7 @@ class FileUtils:
                "**** There are no entries in the excel sheet! ****"
         return [excel_headers, excel_rows]
 
-    def _find_n_files_by_fuzzymatch(self, directory, fuzzystring, filetype = 'pdf', n = 5, ignore_phrases = None):
+    def _find_n_files_by_fuzzymatch(self, directory, fuzzystring, filetype = 'pdf', n = 3, ignore_phrases = None):
         candidates = {}
 
         for filename in os.listdir(directory):
@@ -120,19 +120,17 @@ class FileUtils:
         sorted_candidates = sorted(candidates.items(), key=operator.itemgetter(1), reverse=True)
         return [i[0] for i in sorted_candidates][:n]
 
-    def find_n_files_by_fuzzymatch(self, directory, fuzzystring, filetype = 'pdf', n = 5, ignore_phrases = None):
+    def find_n_files_by_fuzzymatch(self, directory, fuzzystring, filetype = 'pdf', n = 3, ignore_phrases = None):
         fuzzystring_set = self.sanitize_names_str(fuzzystring)
         fuzzymatch_res = []
         for f in fuzzystring_set:
             fuzzymatch_res.append(self._find_n_files_by_fuzzymatch(directory, f, filetype, n, ignore_phrases))
 
-        fetch_count_from_each_res = math.ceil(n / len(fuzzystring_set))
-
         res = []
         for f in fuzzymatch_res:
-            res.extend(f[:fetch_count_from_each_res])
+            res.extend(f)
 
-        return res[:n]
+        return res
 
     '''
     #no in st will be replaced by l[no]
@@ -182,9 +180,9 @@ def add_next_class_to_excel(input_excel, output_excel):
     return f.save_to_excel(data, output_excel)
 
 if __name__ == "__main__":
-    #f = FileUtils()
-    #print(f.find_n_files_by_fuzzymatch(os.path.join("C:\\", "Users", "naira11", "Documents", "wittymail_data", 'allpdf'), 'aarahya jadav', ignore_phrases = ['Nursery', 'Kothrud']))
+    f = FileUtils()
+    print(f.find_n_files_by_fuzzymatch(os.path.join("C:\\", "Users", "naira11", "Documents", "wittymail_data", 'allpdf'), 'aarahya jadav,ayush kurund,aarohiBhagat,aahil sayyed', ignore_phrases = ['Nursery', 'Kothrud']))
     #f.pdf_rotate(os.path.join("C:\\", "Users","naira11", 'Test.pdf'), Direction.CLOCKWISE)
     #f.pdf_rotate(Direction.ANTICLOCKWISE)
-    print(add_next_class_to_excel(os.path.join("C:\\", "Users", "naira11", "Desktop", "SnehMail", "Clean_sheet.xlsx"), 'test1.xlsx'))
+    #print(add_next_class_to_excel(os.path.join("C:\\", "Users", "naira11", "Desktop", "SnehMail", "Clean_sheet.xlsx"), 'test1.xlsx'))
     next

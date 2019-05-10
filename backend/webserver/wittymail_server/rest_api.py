@@ -70,14 +70,23 @@ class SheetView(FlaskView):
 
         return send_file(excel_file)
 
+    def _convert_header_data_list_to_dict(self, headers, extended_headers, data):
+            dict_ = dict(zip(headers, data))
+            extended_headers.reverse()
+            data.reverse()
+            dict2_ = dict(zip(extended_headers, data))
+            dict_.update(dict2_)
+            return dict_
+
     def contents(self):
         """
         Get the contents of the sheet updated with 'status' and other columns
 
         :return:
         """
+        f = FileUtils()
         sheet = Sheet.getInstance()
-        headers, data = sheet.get_all_content()
+        headers, extended_headers, data = sheet.get_all_content()
 
         index, frozen_attachments_index, email_to_index, email_cc_index  = sheet.get_column_mappings_index(["index", "frozen_attachments", "to_column", "cc_column"])
 
@@ -85,8 +94,10 @@ class SheetView(FlaskView):
         for d in data:
             attachments = []
             if frozen_attachments_index and d[frozen_attachments_index]:
-                at_dict = {"name": d[frozen_attachments_index], "url": os.path.join("/attachment/file/", d[frozen_attachments_index])}
-                attachments.append(at_dict)
+                attachment_list = f.sanitize_names_str(d[frozen_attachments_index])
+                for a in attachment_list:
+                    at_dict = {"name": a, "url": os.path.join("/attachment/file/", a)}
+                    attachments.append(at_dict)
             
             email = {}
             email["from"] = Email.frm
@@ -103,12 +114,13 @@ class SheetView(FlaskView):
                     sheet = Sheet.getInstance()
                     email["body"] = sheet._template_to_str(Email.body_template, d)
 
-            tmp = dict(zip(headers, d))
+            tmp = self._convert_header_data_list_to_dict(headers, extended_headers, d)
+
             tmp["email"] = email
             tmp["index"] = d[index]
             output_list.append(tmp)
 
-        return (jsonify({'headers': headers, 'contents': output_list}),
+        return (jsonify({'headers': headers, 'extended_headers': extended_headers, 'contents': output_list}),
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
