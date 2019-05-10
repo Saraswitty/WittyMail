@@ -51,3 +51,7 @@ button {
     height: 100vh;
     overflow: auto;
 }
+
+.next-button {
+    text-align: right;
+}

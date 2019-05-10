@@ -178,4 +178,9 @@ export class AttachmentsComponent implements OnInit {
     );
   }
 
+  onClickNext() {
+    this.log.info("Done selecting attachment PDFs, moving on...");
+    this.mainStepper.next();
+  }
+
 }
