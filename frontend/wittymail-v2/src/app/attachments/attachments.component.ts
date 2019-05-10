@@ -63,7 +63,7 @@ export class AttachmentsComponent implements OnInit {
   }
 
   /**
-   * Populate the table that displays the column headers and a few sample rows
+   * Populate the table that displays the contents of the sheet
    * 
    * This is called by the main stepper when this step becomes visible, because
    * the data fetching depends on previous steps.
