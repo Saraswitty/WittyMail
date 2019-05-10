@@ -1,9 +1,10 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { LoggerService } from '../util/logger.service';
 import { BackendService, ColumnHeadersWithRowContent } from '../backend.service';
-import { MatStepper } from '@angular/material';
+import { MatStepper, MatDialog } from '@angular/material';
 import { ErrorDialogComponent } from '../common/error-dialog/error-dialog.component';
 import { SelectionModel } from '@angular/cdk/collections';
+import { SingleEmailDialogComponent } from './single-email-dialog/single-email-dialog.component';
 
 @Component({
   selector: 'app-summary',
@@ -24,7 +25,8 @@ export class SummaryComponent implements OnInit {
 
   selection = new SelectionModel<any>(true, []);
 
-  constructor(private log: LoggerService, private backend: BackendService) { }
+  constructor(private log: LoggerService, private backend: BackendService,
+    public dialog: MatDialog) { }
 
   ngOnInit() {
   }
@@ -43,6 +45,7 @@ export class SummaryComponent implements OnInit {
         this.headers = this.headers.concat(r.headers);
         this.headers = this.headers.concat(r.extended_headers);
         this.displayedHeaders = this.displayedHeaders.concat(this.headers);
+        this.displayedHeaders = this.displayedHeaders.concat(["view-email"]);
         this.sheetContents = r.contents;
     
         this.log.info("Using %s headers and %d rows", this.headers, this.sheetContents.length);
@@ -68,5 +71,17 @@ export class SummaryComponent implements OnInit {
 
   onSendSelectedEmails() {
     this.log.info("Selected rows: ", this.selection.selected);
+  }
+
+  onViewSingleEmail(row: any) {
+    this.log.info("View single e-mail for: ", row);
+
+    const dialogRef = this.dialog.open(SingleEmailDialogComponent, {
+      data: row.email
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.log.info('The dialog was closed');
+    });
   }
 }

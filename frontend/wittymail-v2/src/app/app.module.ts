@@ -31,6 +31,7 @@ import { AboutComponent } from './common/about/about.component';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 import { LoggerService } from './util/logger.service';
 import { ConsoleLoggerService } from './util/console-logger.service';
+import { SingleEmailDialogComponent } from './summary/single-email-dialog/single-email-dialog.component';
 
 @NgModule({
   declarations: [
@@ -41,9 +42,10 @@ import { ConsoleLoggerService } from './util/console-logger.service';
     EmailDesignComponent,
     SummaryComponent,
     AboutComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    SingleEmailDialogComponent
   ],
-  entryComponents: [AboutComponent],
+  entryComponents: [AboutComponent, SingleEmailDialogComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

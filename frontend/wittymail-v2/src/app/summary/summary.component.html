@@ -1,6 +1,7 @@
 <button mat-stroked-button color="primary" (click)="onSendSelectedEmails()">Send selected emails</button>
 <div class="table-container">
   <table mat-table [dataSource]="sheetContents" class="mat-elevation-z1 sheet-contents-table">
+    <!-- Selection box -->
     <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <mat-checkbox (change)="$event ? masterToggle() : null"
@@ -15,6 +16,20 @@
           </mat-checkbox>
         </td>
     </ng-container>
+
+    <!-- View Email button -->
+    <ng-container matColumnDef="view-email">
+        <th mat-header-cell *matHeaderCellDef>
+          E-mail
+        </th>
+        <td mat-cell *matCellDef="let row">
+            <button mat-stroked-button color="accent" (click)="onViewSingleEmail(row)">
+              View E-mail
+            </button>
+        </td>
+    </ng-container>
+
+    <!-- All other headers -->
     <div *ngFor="let header of headers">
       <ng-container matColumnDef="{{header}}">
         <th mat-header-cell *matHeaderCellDef class="wrap"> 
@@ -26,7 +41,7 @@
       </ng-container>
     </div>
     <tr mat-header-row *matHeaderRowDef="displayedHeaders"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedHeaders;" (click)="selection.toggle(row)"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedHeaders;"></tr>
   </table>
 </div>
 
