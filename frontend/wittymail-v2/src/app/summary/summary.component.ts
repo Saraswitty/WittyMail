@@ -46,7 +46,7 @@ export class SummaryComponent implements OnInit {
 
         this.headers = r.headers;
         if (r.extended_headers && r.extended_headers.length) {
-          this.headers = this.headers.concat(r.extended_headers);
+          // this.headers = this.headers.concat(r.extended_headers);
         }
         this.displayedHeaders = this.defaultDisplayedHeaders;
         this.displayedHeaders = this.displayedHeaders.concat(this.headers);
@@ -76,6 +76,18 @@ export class SummaryComponent implements OnInit {
 
   onSendSelectedEmails() {
     this.log.info("Selected rows: ", this.selection.selected);
+
+    this.selection.selected.forEach(row => {
+      this.log.info("Sending Email for: ", row);
+      this.backend.postSendEmail(row.email).subscribe(
+      data => {
+        this.log.info("Email sent successfully");
+      },
+      error => {
+        this.errorDialog.showError("Failed to send email: " + error);
+      }  
+    );
+    });
   }
 
   onViewSingleEmail(row: any) {
