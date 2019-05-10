@@ -130,7 +130,7 @@ class FileUtils:
         for f in fuzzymatch_res:
             res.extend(f)
 
-        return res
+        return list(set(res))
 
     '''
     #no in st will be replaced by l[no]

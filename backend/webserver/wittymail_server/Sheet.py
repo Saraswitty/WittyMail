@@ -3,6 +3,7 @@ from wittymail_server.ColumnMapping import ColumnMapping
 import pdb
 import re
 from util.FileUtils import FileUtils
+import copy
 
 class Sheet:
    __instance = None
@@ -81,7 +82,7 @@ class Sheet:
       self.c.set_column_delta(data_width)
 
    def add_extended_headers(self):
-      headers_ = self.headers
+      headers_ = copy.deepcopy(self.headers)
       headers_.extend(self.extended_headers)
       return headers_
 

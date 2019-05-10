@@ -99,11 +99,13 @@ class SheetView(FlaskView):
             attachments = []
             if frozen_attachments_index and d[frozen_attachments_index]:
                 attachment_list = f.sanitize_names_str(d[frozen_attachments_index])
+                attachment_list = list(set(attachment_list))
                 for a in attachment_list:
                     at_dict = {"name": a, "url": os.path.join("/attachment/file/", a)}
                     attachments.append(at_dict)
             
             email = {}
+            email["index"] = d[index]
             email["from"] = Email.frm
             if email_to_index:
                 email["to"] = d[email_to_index] 
@@ -121,7 +123,7 @@ class SheetView(FlaskView):
             tmp = self._convert_header_data_list_to_dict(headers, extended_headers, d)
 
             tmp["email"] = email
-            tmp["index"] = d[index]
+
             output_list.append(tmp)
 
         return (jsonify({'headers': headers, 'extended_headers': extended_headers, 'contents': output_list}),
@@ -320,13 +322,10 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    def _send_email(self, row, test_email = True):
+    def _send_email(self, data, test_email = True):
         sheet = Sheet.getInstance()
 
         try:
-            assert(row['status'] == 'Email Pending')
-            data = row['email']
-
             tos = []
             if (test_email):
                 tos.append(Email.frm)
@@ -358,7 +357,7 @@ class EmailView(FlaskView):
                         HTTP_BAD_INPUT,
                         {'ContentType': 'application/json'})
 
-            sheet.set_column_value(row, 'status', 'sent')
+            sheet.set_column_value(data, 'status', 'Email Sent')
             return (jsonify({}),
                     HTTP_OK,
                     {'ContentType': 'application/json'})
