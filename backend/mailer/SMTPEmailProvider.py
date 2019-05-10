@@ -102,5 +102,6 @@ class SMTPEmailProvider(EmailProvider):
                 log.info('Email sent by %s to %s' % (msg['From'], msg['To']))
             return [0, 'Email sent successfully']
         except:
+            self.login()
             log.exception("Failed to send test email")
             return [-1, 'Error']

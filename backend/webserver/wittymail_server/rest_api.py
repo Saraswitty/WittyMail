@@ -150,7 +150,6 @@ class AttachmentView(FlaskView):
         row = request.args.get("selected_row")
         row = json.loads(row)
         log.info("Find attachment candidate for row: %s", row)
-        # row = ['1', 'Aradhya Karche', 'Nursery- kalewadi', 'Kalubai pratishthan', 'Sanjaysandhu8090@gmail.com', 'Ravi', 'amboreravi@gmail.com', '9822809079']
         sheet = Sheet.getInstance()
         
         attachment_value = sheet.get_column_value(row, ['attachment_column'])
@@ -181,7 +180,20 @@ class AttachmentView(FlaskView):
         selected_candidate = data['pdfName']
 
         sheet = Sheet.getInstance()
-        sheet.set_column_value(row, 'frozen_attachments', selected_candidate)
+        current_frozen_attachments = sheet.get_column_value_from_data(row, 'frozen_attachments')
+        if current_frozen_attachments != 'None':
+            new_frozen_attachments = current_frozen_attachments + ',' + selected_candidate
+        else:
+            new_frozen_attachments = selected_candidate
+
+        sheet.set_column_value(row, 'frozen_attachments', new_frozen_attachments)
+
+        required_attachment_count = sheet.get_count_of_column_value_from_data(row, 'attachment_column')
+        current_attachment_count = sheet.get_count_of_column_value_from_data(row, 'frozen_attachments')
+
+        if current_attachment_count == required_attachment_count:
+            sheet.set_column_value(row, 'status', 'Email Pending')
+
         return (jsonify({}), HTTP_OK, {'ContentType': 'application/json'})
 
     @route('upload', methods=['POST'])
@@ -292,21 +304,24 @@ class EmailView(FlaskView):
                 HTTP_OK,
                 {'ContentType': 'application/json'})
 
-    @route('send_test', methods=['POST'])
-    def send_test(self):
-        """
-        Send a test email (metadata and actual content in payload)
+    def _send_email(self, row, test_email = True):
+        sheet = Sheet.getInstance()
 
-        :return:
-        """
         try:
-            data = json.loads(request.data)['email']
+            assert(row['status'] == 'Email Pending')
+            data = row['email']
 
             tos = []
-            tos.append(Email.frm)
+            if (test_email):
+                tos.append(Email.frm)
+            else:
+                tos.append(data['to'])
 
             ccs = []
-            ccs.append(Email.frm)
+            if (test_email):
+                ccs.append(Email.frm)
+            else:
+                ccs.append(data['cc'])
 
             attachments = []
             at = data['attachment']
@@ -315,18 +330,37 @@ class EmailView(FlaskView):
 
             Email.common_attachment_dir = flask_app.config['COMMON_ATTACHMENTS_DIR']
             e = Email(tos, ccs, attachments, data['subject'], data['body'])
-            err = self.email_provider_type.send_email(e)
+            for i in range(0,3):
+                try:
+                    err = self.email_provider_type.send_email(e)
+                except:
+                    continue
+                break
+
             if err[0] != 0:
                 return (jsonify({"err_msg": err[1]}),
                         HTTP_BAD_INPUT,
                         {'ContentType': 'application/json'})
 
+            sheet.set_column_value(row, 'status', 'sent')
             return (jsonify({}),
                     HTTP_OK,
                     {'ContentType': 'application/json'})
         except:
             log.exception("Failed to send email")
-        
+
+
+    @route('send_test', methods=['POST'])
+    def send_test(self):
+        """
+        Send a test email (metadata and actual content in payload)
+
+        :return:
+        """
+        row = json.loads(request.data)
+
+        return self._send_email(row)
+
     @route('send', methods=['POST'])
     def send(self):
         """
@@ -334,32 +368,10 @@ class EmailView(FlaskView):
 
         :return:
         """
-        try:
-            data = json.loads(request.data)
+        row = json.loads(request.data)
 
-            tos = []
-            tos.append(data['to'])
-
-            ccs = []
-            ccs.append(data['cc'])
-
-            attachments = []
-            at = data['attachment']
-            for a in at:
-                attachments.append(a["name"])
-
-            e = Email(tos, ccs, attachments, data['subject'], data['body'], flask_app.config['COMMON_ATTACHMENTS_DIR'])
-            err = self.email_provider_type.send_email(e)
-            if err[0] != 0:
-                return (jsonify({"err_msg": err[1]}),
-                        HTTP_BAD_INPUT,
-                        {'ContentType': 'application/json'})
-
-            return (jsonify({}),
-                    HTTP_OK,
-                    {'ContentType': 'application/json'})
-        except:
-            log.exception("Failed to send email")
+        return self._send_email(row, test_email = False)
+        
 
     @route('template_to_reality', methods=['POST'])
     def template_to_reality(self):
