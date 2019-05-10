@@ -54,7 +54,11 @@ class Sheet:
       return self.data[index][column_index]
 
    def get_header_index_from_name(self, header_name):
-      return self.headers.index(header_name)
+      if header_name in self.headers:
+         return self.headers.index(header_name)
+      if header_name in self.extended_headers:
+         return self.extended_headers.index(header_name)
+      return None
 
    def set_attachment(self, attachment_name):
       attachment_index = self.c.get_column_mappings_index(["frozen_attachments"])
@@ -70,19 +74,20 @@ class Sheet:
 
       if ('status' in self.headers):
          data_width -= 3
+         self.headers = self.headers[:-3]
       else:
          self.set_extended_dafault_data()
 
       self.c.set_column_delta(data_width)
 
-   def add_extended_headers(self, headers_):
-      if ('status' not in self.headers):
-         headers_.extend(self.extended_headers)
+   def add_extended_headers(self):
+      headers_ = self.headers
+      headers_.extend(self.extended_headers)
       return headers_
 
    def save_to_file(self, outfile = 'outfile.xlsx'):
       f = FileUtils()
-      extended_headers = self.add_extended_headers(self.headers)
+      extended_headers = self.add_extended_headers()
       data = [extended_headers]
       data.extend(self.data)
       return f.save_to_excel(data, outfile)
@@ -94,7 +99,7 @@ class Sheet:
       return self.headers, data
    
    def get_all_content(self):
-      return self.headers, self.data
+      return self.headers, self.extended_headers, self.data
 
    def get_extended_headers(self):
       return self.extended_headers
