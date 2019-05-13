@@ -169,7 +169,7 @@ class FileUtils:
 
 def add_next_class_to_excel(input_excel, output_excel):
     f = FileUtils()
-    excel_headers, excel_rows = f.read_excel_to_memory(os.path.join("C:\\", "Users", "naira11", "Desktop", "SnehMail", "Clean_sheet.xlsx"))
+    excel_headers, excel_rows = f.read_excel_to_memory(input_excel)
     for i in range(0, len(excel_rows)):
         if 'Nur' in excel_rows[i][2] or 'nur' in excel_rows[i][2]:
             excel_rows[i].append('Jr.Kg.')
@@ -181,8 +181,8 @@ def add_next_class_to_excel(input_excel, output_excel):
 
 if __name__ == "__main__":
     f = FileUtils()
-    print(f.find_n_files_by_fuzzymatch(os.path.join("C:\\", "Users", "naira11", "Documents", "wittymail_data", 'allpdf'), 'aarahya jadav,ayush kurund,aarohiBhagat,aahil sayyed', ignore_phrases = ['Nursery', 'Kothrud']))
+    #print(f.find_n_files_by_fuzzymatch(os.path.join("C:\\", "Users", "naira11", "Documents", "wittymail_data", 'allpdf'), 'aarahya jadav,ayush kurund,aarohiBhagat,aahil sayyed', ignore_phrases = ['Nursery', 'Kothrud']))
     #f.pdf_rotate(os.path.join("C:\\", "Users","naira11", 'Test.pdf'), Direction.CLOCKWISE)
     #f.pdf_rotate(Direction.ANTICLOCKWISE)
-    #print(add_next_class_to_excel(os.path.join("C:\\", "Users", "naira11", "Desktop", "SnehMail", "Clean_sheet.xlsx"), 'test1.xlsx'))
+    print(add_next_class_to_excel(os.path.join("C:\\", "Users", "naira11", "Desktop", "SnehMail", "MissingReportCards.xlsx"), 'test1.xlsx'))
     next

@@ -103,5 +103,5 @@ class SMTPEmailProvider(EmailProvider):
             return [0, 'Email sent successfully']
         except:
             self.login()
-            log.exception("Failed to send test email")
+            log.exception("Failed to send email")
             return [-1, 'Error']

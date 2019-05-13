@@ -345,12 +345,7 @@ class EmailView(FlaskView):
 
             Email.common_attachment_dir = flask_app.config['COMMON_ATTACHMENTS_DIR']
             e = Email(tos, ccs, attachments, data['subject'], data['body'])
-            for i in range(0,3):
-                try:
-                    err = self.email_provider_type.send_email(e)
-                except:
-                    continue
-                break
+            err = self.email_provider_type.send_email(e)
 
             if err[0] != 0:
                 return (jsonify({"err_msg": err[1]}),
