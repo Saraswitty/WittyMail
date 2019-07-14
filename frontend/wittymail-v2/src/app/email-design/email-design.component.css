@@ -1,0 +1,21 @@
+.full-width {
+    width: 80%;
+}
+
+.table-container {
+    overflow: auto;
+}
+
+.email-body-preview {
+    border-width: 1px;
+    border-color:  grey;
+    border-style: solid;
+    padding: 0.5rem;
+    height: 100%;
+    overflow: auto;
+
+}
+
+.email-settings-input-field {
+    width: 50vw;
+}

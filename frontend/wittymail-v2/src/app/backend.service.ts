@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LoggerService } from './util/logger.service';
 import { HttpErrorResponse, HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Observable } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -12,6 +11,7 @@ export interface VersionInfo {
 
 export interface ColumnHeadersWithRowContent {
   headers: string[];
+  extended_headers: string[];
   contents: any[];
 }
 
@@ -22,14 +22,17 @@ export interface ColumnMappings {
 }
 
 export interface EmailMetadata {
-  to_column: string;
-  cc_column: string;
   subject_template: string;
   body_template: string;
 }
 
 export interface AttachmentMetadata {
   attachment_column: string;
+}
+
+export interface AttachmentRotation {
+  filename: string;
+  direction: string;
 }
 
 export interface EmailServerDetails {
@@ -59,10 +62,24 @@ export interface TemplateOutput {
   reality: string;
 }
 
+export interface CandidateAttachmentsInput {
+  selected_row: any;
+}
+
+export interface CandidateAttachments {
+  subject: string;
+  pdfNames: string[];
+}
+
+export interface CandidateAttachmentSelection {
+  selected_row: any;
+  pdfName: string;  
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class WittymailService {
+export class BackendService {
 
   emailMetadataInstance: EmailMetadata;
   attachmentMetadataInstance: AttachmentMetadata;
@@ -77,7 +94,11 @@ export class WittymailService {
       set_mapping: 'api/sheet/mapping' // POST
     },
     attachment: {
-      upload: 'api/attachment/upload' // POST
+      upload: 'api/attachment/upload', // POST
+      rotate: 'api/attachment/rotate', // POST
+      get_file: 'api/attachment/file/', // GET with filename appended to URL
+      candidate: 'api/attachment/candidate', // GET with selected_row
+      candidate_select: 'api/attachment/candidate/select', // POST with selected_row and attachment name
     },
     email: {
       set_server: 'api/email/server', // POST
@@ -118,7 +139,7 @@ export class WittymailService {
       console.log("REST API failed, response: " + error);
     }
 
-    return new ErrorObservable();
+    return throwError(error);
   }
 
   private handleError(operation = 'operation') {
@@ -149,7 +170,7 @@ export class WittymailService {
     return this.urls.sheet.upload;
   }
 
-  getFodderDownloadUrl(): string {
+  getSheetDownloadUrl(): string {
     return this.urls.sheet.get_file;
   }
 
@@ -164,68 +185,18 @@ export class WittymailService {
       );
   }
 
-  getVomit(): Observable<ColumnHeadersWithRowContent> {
+  getSheetContents(): Observable<ColumnHeadersWithRowContent> {
     return this.http.get<ColumnHeadersWithRowContent>(this.urls.sheet.get_contents)
       .pipe(
-        catchError(this.handleError('getVomit'))
+        catchError(this.handleError('getSheetContents'))
       );
-
-    // let res: ColumnHeadersWithRowContent = {
-    //   headers: [
-    //     'Name of Child', 'Class', 'Sponsor', 'Mail ID', 'Reference', 'Reference mail ID'
-    //   ],
-    //   contents: [
-    //     {
-    //       'Name of Child': 'Aradhya Karche',
-    //       'Class': 'Nursery- kalewadi',
-    //       'Sponsor': 'Kalubai pratishthan',
-    //       'Mail ID': 'Sanjaysandhu8090@gmail.com',
-    //       'Reference': 'Ravi',
-    //       'Reference mail ID': 'amboreravi@gmail.com',
-    //       'status': 'Pending',
-    //       'email': {
-    //         'from': 'wittymail@acme.com',
-    //         'to': 'Sanjaysandhu8090@gmail.com',
-    //         'cc': 'amboreravi@gmail.com',
-    //         'attachment': {
-    //           'name': 'Aradhya Karche.pdf',
-    //           'url': 'api/attachment/Aradhya%20Karche.pdf'
-    //         },
-    //         'subject': 'First term progress report for Aradhya Karche',
-    //         'body': 'Dear Kalubai pratishthan,'
-    //       }
-    //     },
-    //     {
-    //       'Name of Child': 'Vedika Shirgire',
-    //       'Class': 'Nursery- kalewadi',
-    //       'Sponsor': 'Apurva kumar',
-    //       'Mail ID': 'apurv07vit@gmail.com',
-    //       'Reference': 'Anish',
-    //       'Reference mail ID': 'anishgarg07@gmail.com',
-    //       'status': 'Pending',
-    //       'email': {
-    //         'from': 'wittymail@acme.com',
-    //         'to': 'apurv07vit@gmail.com',
-    //         'cc': 'anishgarg07@gmail.com',
-    //         'attachment': {
-    //           'name': 'Vedika Shirgire.pdf',
-    //           'url': 'api/attachment/Vedika%20Shirgire.pdf'
-    //         },
-    //         'subject': 'First term progress report for Vedika Shirgire',
-    //         'body': 'Dear Apurva kumar,'
-    //       }
-    //     }
-    //   ]
-    // };
-
-    // return res;
   }
 
-  saveEmailToCCColumns(to_column: string, cc_column: string) {
-    this.emailMetadataInstance.to_column = to_column;
-    this.emailMetadataInstance.cc_column = cc_column;
-
-    this.log.info("emailMetadataInstance: ", this.emailMetadataInstance);
+  postColumnMapping(mapping: ColumnMappings) {
+    return this.http.post<TemplateOutput>(this.urls.sheet.set_mapping, mapping)
+      .pipe(
+        catchError(this.handleError('postColumnMapping'))
+      );
   }
 
   saveEmailSubjectBodyTemplate(subject_template: string, body_template: string) {
@@ -241,6 +212,28 @@ export class WittymailService {
     this.log.info("attachmentMetadataInstance: ", this.attachmentMetadataInstance);
   }
 
+  rotateAttachment(rotation: AttachmentRotation) {
+    return this.http.post<TemplateOutput>(this.urls.attachment.rotate, rotation)
+      .pipe(
+        catchError(this.handleError('rotateAttachment'))
+      );
+  }
+
+  getCandidateAttachments(selected_row: CandidateAttachmentsInput): Observable<CandidateAttachments> {
+    return this.http.get<CandidateAttachments>(this.urls.attachment.candidate, 
+      {params: {'selected_row': selected_row.selected_row}})
+      .pipe(
+        catchError(this.handleError('getCandidateAttachments'))
+      );
+  }
+
+  selectAttachmentCandidate(selected: CandidateAttachmentSelection) {
+    return this.http.post<CandidateAttachmentSelection>(this.urls.attachment.candidate_select, selected)
+      .pipe(
+        catchError(this.handleError('selectAttachmentCandidate'))
+      );
+  }
+
   resolveTemplate(input: TemplateInput): Observable<TemplateOutput> {
     this.log.info("POSTing template: ", input);
     return this.http.post<TemplateOutput>(this.urls.email.convert_template_to_string, input)
@@ -249,9 +242,8 @@ export class WittymailService {
       );
   }
 
-  postEmailMetadata(): Observable<string> {
-    this.log.info("POSTing email metadata: ", this.emailMetadataInstance);
-    return this.http.post<string>(this.urls.email.set_metadata_and_contents, this.emailMetadataInstance)
+  postEmailMetadata(templates: EmailMetadata): Observable<string> {
+    return this.http.post<string>(this.urls.email.set_metadata_and_contents, templates)
       .pipe(
         catchError(this.handleError('postEmailMetadata'))
       );

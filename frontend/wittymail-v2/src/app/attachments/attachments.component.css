@@ -1,0 +1,57 @@
+table {
+    width: 100%;
+}
+
+.highlight-table-row {
+    background: #42A948; /* green */
+}
+
+.attachment-candidate-list {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.attachment-cadidates-list-container {
+    height: 30%;
+    overflow: auto;
+    margin-bottom: 0.3rem;
+}
+
+.attachment-candidate-list-item {
+    margin: 5px;
+}
+
+.embedded-pdf-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+.step-container {
+    height: 100%;
+}
+
+.attachment-selector-container {
+    height: 100vh;
+}
+
+button {
+    margin: 5px;
+}
+
+.btn-icon {
+    margin-right: 5px;
+}
+
+.pdf-btn-group {
+    text-align: center;
+}
+
+.summary-table-container {
+    height: 100vh;
+    overflow: auto;
+}
+
+.next-button {
+    text-align: right;
+}

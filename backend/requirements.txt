@@ -4,3 +4,6 @@ openpyxl
 requests
 PyPDF2
 pyinstaller
+flask-classy
+fuzzywuzzy
+python-Levenshtein

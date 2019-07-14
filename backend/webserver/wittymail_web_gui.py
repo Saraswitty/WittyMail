@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import os, sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # This should be the first import to bootstrap the runtime env
 import util.bootstrap
